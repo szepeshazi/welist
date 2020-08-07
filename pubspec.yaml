@@ -9,16 +9,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cloud_firestore: ^0.13.0+1
-  mobx: ^0.3.10
-  flutter_mobx: ^0.3.4+1
-  provider: ^3.2.0
+  cloud_firestore: ^0.13.7
+  mobx: ^1.2.1+1
+  flutter_mobx: ^1.1.0+1
+  provider: ^4.3.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^1.7.2
-  mobx_codegen: ^0.3.10+1
+  build_runner: ^1.10.1
+  mobx_codegen: ^1.1.0+1
 
 # The following section is specific to Flutter.
 flutter:
