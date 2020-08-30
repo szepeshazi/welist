@@ -12,14 +12,14 @@ abstract class _WeList with Store {
 
   @action
   Future<void> load() async {
-    Firestore.instance.collection('listItems').snapshots().listen((event) {
-      items = ObservableList.of(event.documents.map((e) => WeListItem.fromSnapshot(e)));
+    FirebaseFirestore.instance.collection('listItems').snapshots().listen((event) {
+      items = ObservableList.of(event.docs.map((e) => WeListItem.fromSnapshot(e)));
     });
   }
 
   @action
   void add(WeListItem item) {
-    Firestore.instance
+    FirebaseFirestore.instance
         .collection('listItems')
         .add({"name": item.name, "createdAt": item.createdAt, "completedAt": null});
   }
@@ -27,6 +27,6 @@ abstract class _WeList with Store {
   @action
   void remove(WeListItem item) {
     print("deleting document ${item.id}");
-    Firestore.instance.collection('listItems').document(item.id).delete();
+    FirebaseFirestore.instance.collection('listItems').doc(item.id).delete();
   }
 }

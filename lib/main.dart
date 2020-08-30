@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
@@ -5,23 +6,37 @@ import 'package:welist/observable_input_value/observable_input.dart';
 import 'package:welist/we_list/we_list.dart';
 import 'package:welist/we_list_item/we_list_item.dart';
 
+import 'login_ui/login_screen.dart';
+import 'login_ui/transition_route_observer.dart';
+
 void main() => runApp(WeListApp());
 
 class WeListApp extends StatelessWidget {
-  // This widget is the root of your application.
+  final Future<FirebaseApp> _initialize = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'WeList',
       theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-      ),
-      home: WeListHome(),
+          // Define the default brightness and colors.
+          brightness: Brightness.light,
+          primaryColor: Colors.lime[500],
+          accentColor: Colors.deepOrange[300]),
+      home: FutureBuilder(
+          future: _initialize,
+          builder: (context, snapshot) {
+            return LoginScreen();
+          }),
+      navigatorObservers: [TransitionRouteObserver()],
+      routes: routes,
     );
   }
 }
 
 class WeListHome extends StatelessWidget {
+  static const String routeName = "/WeList";
+
   @override
   Widget build(BuildContext context) => Provider<WeList>(
       create: (_) => WeList()..load(),
@@ -91,3 +106,8 @@ class WeListView extends StatelessWidget {
             ));
   }
 }
+
+Map<String, WidgetBuilder> routes = {
+  LoginScreen.routeName: (BuildContext context) => LoginScreen(),
+  WeListHome.routeName: (BuildContext context) => WeListHome(),
+};

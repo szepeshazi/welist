@@ -33,7 +33,7 @@ abstract class _WeListItem with Store {
   }
 
   _WeListItem.fromSnapshot(DocumentSnapshot snapshot)
-      : this.fromMap(snapshot.documentID, data: snapshot.data, reference: snapshot.reference);
+      : this.fromMap(snapshot.id, data: snapshot.data(), reference: snapshot.reference);
 
   @computed
   bool get completed => completedAt != null;
@@ -45,7 +45,7 @@ abstract class _WeListItem with Store {
   @action
   void setState(bool state) {
     int _completedAt = state ? DateTime.now().millisecondsSinceEpoch : null;
-    reference.updateData({"completedAt": _completedAt});
+    reference.update({"completedAt": _completedAt});
   }
 
   @override
