@@ -9,5 +9,5 @@ abstract class _ObservableInput with Store {
   String input;
 
   @action
-  set value(String newValue) => input = newValue;
+  void setValue(String newValue) => input = newValue;
 }

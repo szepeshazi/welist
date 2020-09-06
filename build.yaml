@@ -1,0 +1,6 @@
+targets:
+  welist:
+    builders:
+      juicer:juicer:
+        generate_for:
+          - lib/juiced/juiced.dart
