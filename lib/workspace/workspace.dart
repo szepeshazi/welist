@@ -41,7 +41,7 @@ abstract class _Workspace with Store {
     return fs
         .collection("relations")
         .where('userId', isEqualTo: auth.userReference)
-        .where('relation', whereIn: ['owner', 'accessor'])
+        .where('relation', whereIn: ['owner', 'editor', 'viewer'])
         .snapshots()
         .listen((update) => _updateWorkspace(update));
   }
@@ -87,5 +87,9 @@ abstract class _Workspace with Store {
     await Future.wait(deleteOperations);
     //TODO: delete items collection
     await container.reference.delete();
+  }
+
+  void cleanUp() {
+    relationChangeListener?.cancel();
   }
 }

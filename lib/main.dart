@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:welist/view_list/view_list_widget.dart';
 import 'package:welist/workspace/workspace.dart';
 import 'package:welist/workspace/workspace_widget.dart';
 
@@ -63,64 +64,6 @@ class WeListHome extends StatelessWidget {
       ;
 }
 
-// class WeListNewItem extends StatelessWidget {
-//   final ObservableInput oInput = ObservableInput();
-//   final TextEditingController controller = TextEditingController(text: "");
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final WeList weList = Provider.of(context);
-//     return Observer(
-//         builder: (context) => Container(
-//             padding: EdgeInsets.only(top: 6.0, bottom: 6.0),
-//             margin: EdgeInsets.only(left: 20.0, right: 20.0),
-//             child: TextField(
-//                 autofocus: true,
-//                 onChanged: (String value) {
-//                   oInput.value = value;
-//                 },
-//                 onSubmitted: (_) {
-//                   weList.add(WeListItem(oInput.input));
-//                   oInput.value = "";
-//                   controller.value = TextEditingValue(text: "empty");
-//                 })));
-//   }
-// }
-//
-// class WeListView extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     final WeList weList = Provider.of(context);
-//     return Observer(
-//         builder: (_) => Flexible(
-//               child: ListView.builder(
-//                   itemCount: weList.items.length,
-//                   itemBuilder: (_, index) {
-//                     WeListItem item = weList.items[index];
-//                     return Observer(
-//                         builder: (_) => Column(children: [
-//                               CheckboxListTile(
-//                                 controlAffinity: ListTileControlAffinity.leading,
-//                                 value: item.completed,
-//                                 onChanged: (bool newValue) => item.setState(newValue),
-//                                 title: Row(
-//                                   children: <Widget>[
-//                                     Expanded(
-//                                         child: Text(
-//                                       item.name,
-//                                       overflow: TextOverflow.ellipsis,
-//                                     )),
-//                                     IconButton(icon: const Icon(Icons.delete), onPressed: () => weList.remove(item))
-//                                   ],
-//                                 ),
-//                               ),
-//                               Text(item.stateName, textAlign: TextAlign.start, overflow: TextOverflow.ellipsis)
-//                             ]));
-//                   }),
-//             ));
-//   }
-// }
-
 class Routes {
   // Route name constants
   static const String splash = "/spash";
@@ -128,6 +71,7 @@ class Routes {
   static const String home = '/home';
   static const String createList = '/createList';
   static const String viewList = '/viewList';
+  static const String createItem = "/createItem";
 
   /// The map used to define our routes, needs to be supplied to [MaterialApp]
   static Map<String, WidgetBuilder> getRoutes() {
@@ -136,7 +80,8 @@ class Routes {
       Routes.login: (context) => LoginScreen(),
       Routes.home: (context) => WeListHome(),
       Routes.createList: (context) => CreateListContainerWidget(),
-      Routes.viewList: (context) => null
+      Routes.viewList: (context) => ViewListWidget(),
+      Routes.createItem: (context) => CreateListContainerWidget()
     };
   }
 }

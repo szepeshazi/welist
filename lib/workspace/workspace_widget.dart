@@ -53,7 +53,7 @@ class ListContainerRowWidget extends StatelessWidget {
           workspace.delete(container);
         }),
         onTap: () {
-          Navigator.pushNamed(context, Routes.home);
+          Navigator.pushNamed(context, Routes.viewList,  arguments: container);
         });
   }
 }

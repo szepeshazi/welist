@@ -7,12 +7,14 @@
 import "package:welist/juiced/auth/user.dart" as jcr_i1;
 import "package:welist/juiced/workspace/relation.dart" as jcr_i2;
 import "package:welist/juiced/workspace/list_container.dart" as jcr_i3;
+import "package:welist/juiced/list_item/list_item.dart" as jcr_i4;
 import 'package:juicer/juicer.dart';
 export "package:welist/juiced/juiced.dart";
 
 // package:welist/juiced/auth/user.dart User
 // package:welist/juiced/workspace/relation.dart Relation
 // package:welist/juiced/workspace/list_container.dart ListContainer
+// package:welist/juiced/list_item/list_item.dart ListItem
 class _$UserJuicer extends ClassMapper<jcr_i1.User> {
   const _$UserJuicer();
   @override
@@ -92,8 +94,38 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i3.ListContainer> {
   }
 }
 
+class _$ListItemJuicer extends ClassMapper<jcr_i4.ListItem> {
+  const _$ListItemJuicer();
+  @override
+  jcr_i4.ListItem newInstance() => jcr_i4.ListItem();
+  @override
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i4.ListItem val) =>
+      juicer.removeNullValues({
+        "reference": juicer.encode(val.reference),
+        "name": val.name,
+        "timeCreated": val.timeCreated,
+        "timeCompleted": val.timeCompleted,
+// completed is ignored
+// stateName is ignored
+      });
+  @override
+  jcr_i4.ListItem fromMap(Juicer juicer, Map map, jcr_i4.ListItem empty) {
+    if (map.containsKey("reference"))
+      empty.reference = juicer.decode(map["reference"], null);
+    if (map.containsKey("name")) empty.name = map["name"];
+    if (map.containsKey("timeCreated"))
+      empty.timeCreated = map["timeCreated"]?.toInt();
+    if (map.containsKey("timeCompleted"))
+      empty.timeCompleted = map["timeCompleted"]?.toInt();
+// completed is ignored
+// stateName is ignored
+    return empty;
+  }
+}
+
 const Juicer juicer = const Juicer(const {
   jcr_i1.User: const _$UserJuicer(),
   jcr_i2.Relation: const _$RelationJuicer(),
   jcr_i3.ListContainer: const _$ListContainerJuicer(),
+  jcr_i4.ListItem: const _$ListItemJuicer(),
 });
