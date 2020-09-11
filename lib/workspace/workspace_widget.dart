@@ -26,12 +26,13 @@ class ListContainersWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final Workspace workspace = Provider.of(context);
     return Observer(
-        builder: (context) => ListView.builder(
-            padding: const EdgeInsets.all(8),
-            shrinkWrap: true,
-            itemCount: workspace.containers?.length ?? 0,
-            itemBuilder: (BuildContext context, index) =>
-                ListContainerRowWidget(container: workspace.containers[index])));
+        builder: (context) =>
+            ListView.builder(
+                padding: const EdgeInsets.all(8),
+                shrinkWrap: true,
+                itemCount: workspace.containers?.length ?? 0,
+                itemBuilder: (BuildContext context, index) =>
+                    ListContainerRowWidget(container: workspace.containers[index])));
   }
 }
 
@@ -42,13 +43,17 @@ class ListContainerRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(title: Text(container.name), trailing: icons[container.type] ?? defaultIcon);
+    final Workspace workspace = Provider.of(context);
+    return ListTile(
+        title: Row(
+          children: [Text(container.name), container.icon],
+        ),
+        trailing:
+        IconButton(icon: Icon(Icons.delete), onPressed: () {
+          workspace.delete(container);
+        }),
+        onTap: () {
+          Navigator.pushNamed(context, Routes.home);
+        });
   }
-
-  static const Map<ContainerType, Icon> icons = {
-    ContainerType.shopping: Icon(Icons.shopping_cart),
-    ContainerType.todo: Icon(Icons.check_box)
-  };
-
-  static const Icon defaultIcon = Icon(Icons.not_interested);
 }

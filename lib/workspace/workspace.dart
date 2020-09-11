@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 import 'package:welist/juiced/juiced.dart';
@@ -20,51 +22,70 @@ abstract class _Workspace with Store {
 
   final Auth auth;
 
+  StreamSubscription<QuerySnapshot> relationChangeListener;
+
   _Workspace(this.auth) : fs = FirebaseFirestore.instance;
 
   void initialize() {
-    autorun((_) => load(auth.uiUser));
+    // Listen to authentication changes
+    autorun((_) => _reset(auth.uiUser));
   }
 
-  @action
-  Future<void> load(dynamic _) async {
-    print("************** Workspace.load() called via reaction on auth.user: ${auth.user}");
-    if (auth.uiUser == null) {
-      containers = null;
-      relations = null;
-      return;
-    }
+  void _reset(dynamic _) {
+    relationChangeListener?.cancel();
+    relationChangeListener = subscribeToChanges(null);
+  }
 
-    QuerySnapshot snapshot = await fs
-        .collection('relations')
+  StreamSubscription<QuerySnapshot> subscribeToChanges(dynamic _) {
+    // Listen to relation record changes that affects current user
+    return fs
+        .collection("relations")
         .where('userId', isEqualTo: auth.userReference)
-        .where('relation', whereIn: ['owner', 'accessor']).get();
+        .where('relation', whereIn: ['owner', 'accessor'])
+        .snapshots()
+        .listen((update) => _updateWorkspace(update));
+  }
+
+  Future<void> _updateWorkspace(QuerySnapshot update) async {
     List<Relation> _relations = [];
     List<ListContainer> _containers = [];
-    if (snapshot.docs.isNotEmpty) {
-      for (var doc in snapshot.docs) {
+    if (update.docs.isNotEmpty) {
+      for (var doc in update.docs) {
         Relation rel = j.juicer.decode(doc.data(), (_) => Relation());
         _relations.add(rel);
         print("Relation: $rel, doc.reference.path: ${doc.reference.path}");
-        DocumentSnapshot containerSnapshot =
-            await fs.collection('containers').doc(rel.containerId.id).get();
+        DocumentSnapshot containerSnapshot = await fs.collection('containers').doc(rel.containerId.id).get();
         if (containerSnapshot != null) {
-          _containers.add(j.juicer.decode(containerSnapshot.data(), (_) => ListContainer()));
+          _containers.add(j.juicer
+              .decode(containerSnapshot.data(), (_) => ListContainer()..reference = containerSnapshot.reference));
         }
       }
     }
     relations = _relations;
     containers = _containers;
-    print(containers);
   }
 
   @action
-  Future<void> add(String userId, ListContainer container) async {
-    // TODO: add container and relations
+  Future<void> add(DocumentReference userReference, ListContainer container) async {
+    container.timeCreated = DateTime.now().millisecondsSinceEpoch;
+    DocumentReference containerRef = await fs.collection("containers").add(j.juicer.encode(container));
+    Relation relation = Relation()
+      ..containerId = containerRef
+      ..relation = "owner"
+      ..userId = userReference;
+    await fs.collection("relations").add(j.juicer.encode(relation));
   }
 
   @action
   Future<void> delete(ListContainer container) async {
-    //TODO: remove container, items collection and relations as well
+    List<Future> deleteOperations = [];
+    QuerySnapshot relations =
+        await fs.collection("relations").where('containerId', isEqualTo: container.reference).get();
+    for (var d in relations.docs) {
+      deleteOperations.add(d.reference.delete());
+    }
+    await Future.wait(deleteOperations);
+    //TODO: delete items collection
+    await container.reference.delete();
   }
 }

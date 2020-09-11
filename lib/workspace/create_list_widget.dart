@@ -5,7 +5,6 @@ import 'package:welist/juiced/juiced.dart';
 
 import '../auth/auth.dart';
 import '../workspace/workspace.dart';
-import '../list_container/list_container.dart';
 
 class CreateListContainerWidget extends StatelessWidget {
   @override
@@ -56,7 +55,7 @@ class AddListContainerFormState extends State<AddListContainerForm> {
             Column(
               children: <Widget>[
                 ListTile(
-                  title: Text(containerTypeLabels[ContainerType.shopping]),
+                  title: Text(ListContainer.containerTypeLabels[ContainerType.shopping]),
                   leading: Radio(
                     value: ContainerType.shopping,
                     groupValue: newListContainer.type,
@@ -68,7 +67,7 @@ class AddListContainerFormState extends State<AddListContainerForm> {
                   ),
                 ),
                 ListTile(
-                  title: Text(containerTypeLabels[ContainerType.todo]),
+                  title: Text(ListContainer.containerTypeLabels[ContainerType.todo]),
                   leading: Radio(
                     value: ContainerType.todo,
                     groupValue: newListContainer.type,
@@ -84,13 +83,14 @@ class AddListContainerFormState extends State<AddListContainerForm> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: RaisedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Validate returns true if the form is valid, or false
                   // otherwise.
                   if (_formKey.currentState.validate()) {
                     // If the form is valid, display a Snackbar.
                     Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
-                    workspace.add(auth.userReference.id, newListContainer);
+                    await workspace.add(auth.userReference, newListContainer);
+                    Navigator.pop(context);
                   }
                 },
                 child: Text('Submit'),

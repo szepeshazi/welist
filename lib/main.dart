@@ -124,17 +124,19 @@ class WeListHome extends StatelessWidget {
 class Routes {
   // Route name constants
   static const String splash = "/spash";
-  static const String login = '/list';
-  static const String list = '/detail';
+  static const String login = '/login';
+  static const String home = '/home';
   static const String createList = '/createList';
+  static const String viewList = '/viewList';
 
   /// The map used to define our routes, needs to be supplied to [MaterialApp]
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       Routes.splash: (context) => Splash(),
       Routes.login: (context) => LoginScreen(),
-      Routes.list: (context) => WeListHome(),
-      Routes.createList: (context) => CreateListContainerWidget()
+      Routes.home: (context) => WeListHome(),
+      Routes.createList: (context) => CreateListContainerWidget(),
+      Routes.viewList: (context) => null
     };
   }
 }

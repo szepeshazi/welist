@@ -62,19 +62,32 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i3.ListContainer> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i3.ListContainer val) =>
       juicer.removeNullValues({
+        "reference": juicer.encode(val.reference),
         "name": val.name,
         "timeCreated": val.timeCreated,
         "typeName": val.typeName,
+// containerTypeLabels is ignored
+// _icons is ignored
+// _defaultIcon is ignored
 // type is ignored
+// label is ignored
+// icon is ignored
       });
   @override
   jcr_i3.ListContainer fromMap(
       Juicer juicer, Map map, jcr_i3.ListContainer empty) {
+    if (map.containsKey("reference"))
+      empty.reference = juicer.decode(map["reference"], null);
     if (map.containsKey("name")) empty.name = map["name"];
     if (map.containsKey("timeCreated"))
       empty.timeCreated = map["timeCreated"]?.toInt();
     if (map.containsKey("typeName")) empty.typeName = map["typeName"];
+// containerTypeLabels is ignored
+// _icons is ignored
+// _defaultIcon is ignored
 // type is ignored
+// label is ignored
+// icon is ignored
     return empty;
   }
 }
