@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/juiced/juiced.dart';
+import 'package:welist/profile/user_info_widget.dart';
 
 import '../main.dart';
 import 'create_multi_item_widget.dart';
@@ -23,7 +24,10 @@ class ViewListWidgetInner extends StatelessWidget {
   Widget build(BuildContext context) {
     final ViewList viewList = Provider.of(context);
     return Scaffold(
-        appBar: AppBar(title: Text(viewList.container.name)),
+        appBar: AppBar(
+          title: Text(viewList.container.name),
+          actions: [UserInfoWidget()]
+        ),
         body: ViewListWrapperWidget(),
         floatingActionButton: Observer(
             builder: (context) => InkWell(

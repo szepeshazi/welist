@@ -2,13 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/juiced/juiced.dart';
+import 'package:welist/profile/user_info_widget.dart';
 
 import '../workspace/workspace.dart';
 
 class CreateListContainerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: AppBar(title: Text("Add a list")), body: AddListContainerForm());
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Add a list"),
+          actions: [UserInfoWidget()]
+        ),
+        body: AddListContainerForm());
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/juiced/juiced.dart';
+import 'package:welist/profile/user_info_widget.dart';
 
 import '../main.dart';
 import '../workspace/workspace.dart';
@@ -12,7 +13,10 @@ class WorkspaceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("My lists")),
+        appBar: AppBar(
+          title: Text("My lists"),
+          actions: [UserInfoWidget()]
+        ),
         body: ListContainersWidget(),
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add),
@@ -29,7 +33,6 @@ class ListContainersWidget extends StatelessWidget {
     return Observer(
         builder: (context) => ListView.builder(
             padding: const EdgeInsets.only(left: 8),
-
             shrinkWrap: true,
             itemCount: workspace.containers?.length ?? 0,
             itemBuilder: (BuildContext context, index) =>
