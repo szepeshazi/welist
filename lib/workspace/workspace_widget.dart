@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -26,13 +27,13 @@ class ListContainersWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final Workspace workspace = Provider.of(context);
     return Observer(
-        builder: (context) =>
-            ListView.builder(
-                padding: const EdgeInsets.all(8),
-                shrinkWrap: true,
-                itemCount: workspace.containers?.length ?? 0,
-                itemBuilder: (BuildContext context, index) =>
-                    ListContainerRowWidget(container: workspace.containers[index])));
+        builder: (context) => ListView.builder(
+            padding: const EdgeInsets.only(left: 8),
+
+            shrinkWrap: true,
+            itemCount: workspace.containers?.length ?? 0,
+            itemBuilder: (BuildContext context, index) =>
+                ListContainerRowWidget(container: workspace.containers[index])));
   }
 }
 
@@ -46,14 +47,23 @@ class ListContainerRowWidget extends StatelessWidget {
     final Workspace workspace = Provider.of(context);
     return ListTile(
         title: Row(
-          children: [Text(container.name), container.icon],
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Expanded(
+                child: Row(children: [
+              Text(container.name),
+              if ((container.itemCount ?? 0) > 0) Text(" (${container.itemCount})")
+            ])),
+            Container(margin: EdgeInsets.only(left: 100.0), child: container.icon)
+          ],
         ),
-        trailing:
-        IconButton(icon: Icon(Icons.delete), onPressed: () {
-          workspace.delete(container);
-        }),
+        trailing: IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () {
+              workspace.delete(container);
+            }),
         onTap: () {
-          Navigator.pushNamed(context, Routes.viewList,  arguments: container);
+          Navigator.pushNamed(context, Routes.viewList, arguments: container);
         });
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/juiced/juiced.dart';
 
-import '../auth/auth.dart';
 import '../workspace/workspace.dart';
 
 class CreateListContainerWidget extends StatelessWidget {
@@ -30,12 +29,11 @@ class AddListContainerFormState extends State<AddListContainerForm> {
   // not a GlobalKey<MyCustomFormState>.
   final _formKey = GlobalKey<FormState>();
 
-  ListContainer newListContainer = ListContainer()..type = ContainerType.todo;
+  ListContainer newListContainer = ListContainer()..type = ContainerType.shopping;
 
   @override
   Widget build(BuildContext context) {
     final Workspace workspace = Provider.of(context);
-    final Auth auth = Provider.of(context);
     // Build a Form widget using the _formKey created above.
     return Form(
         key: _formKey,
@@ -89,7 +87,7 @@ class AddListContainerFormState extends State<AddListContainerForm> {
                   if (_formKey.currentState.validate()) {
                     // If the form is valid, display a Snackbar.
                     Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
-                    await workspace.add(auth.userReference, newListContainer);
+                    await workspace.add(newListContainer);
                     Navigator.pop(context);
                   }
                 },

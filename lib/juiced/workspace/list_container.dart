@@ -12,7 +12,11 @@ class ListContainer {
 
   int timeCreated;
 
+  int itemCount;
+
   String typeName;
+
+  List<String> accessors;
 
   @Property(ignore: true)
   set type(ContainerType newValue) => typeName = containerName(newValue);

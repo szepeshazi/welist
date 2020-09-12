@@ -67,7 +67,9 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i3.ListContainer> {
         "reference": juicer.encode(val.reference),
         "name": val.name,
         "timeCreated": val.timeCreated,
+        "itemCount": val.itemCount,
         "typeName": val.typeName,
+        "accessors": val.accessors?.map(juicer.encode)?.toList(),
 // containerTypeLabels is ignored
 // _icons is ignored
 // _defaultIcon is ignored
@@ -83,7 +85,13 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i3.ListContainer> {
     if (map.containsKey("name")) empty.name = map["name"];
     if (map.containsKey("timeCreated"))
       empty.timeCreated = map["timeCreated"]?.toInt();
+    if (map.containsKey("itemCount"))
+      empty.itemCount = map["itemCount"]?.toInt();
     if (map.containsKey("typeName")) empty.typeName = map["typeName"];
+    if (map.containsKey("accessors"))
+      empty.accessors = juicer.decodeIterable(
+              map["accessors"], (dynamic val) => val as String, <String>[])
+          as List<String>;
 // containerTypeLabels is ignored
 // _icons is ignored
 // _defaultIcon is ignored

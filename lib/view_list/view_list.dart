@@ -56,15 +56,19 @@ abstract class _ViewList with Store {
 
   @action
   Future<void> add(ListItem item) async {
+    // TODO: input sanity check, transaction
     item
       ..timeCreated = DateTime.now().millisecondsSinceEpoch
       ..timeCompleted = null;
     await fs.doc(container.reference.path).collection("items").add(j.juicer.encode(item));
+    await fs.doc(container.reference.path).update({"itemCount": FieldValue.increment(1)});
   }
 
   @action
   Future<void> delete(ListItem item) async {
+    // TODO: input sanity check, transaction
     await item.reference.delete();
+    await fs.doc(container.reference.path).update({"itemCount": FieldValue.increment(-1)});
   }
 
   @action
