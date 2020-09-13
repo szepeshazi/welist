@@ -5,6 +5,7 @@ import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/auth/auth.dart';
 
+import '../main.dart';
 import 'constants.dart';
 import 'users.dart';
 
@@ -138,8 +139,7 @@ class LoginScreen extends StatelessWidget {
         auth.startAnimation();
       },
       onSubmitAnimationCompleted: () {
-        print("FlutterLogin, animation completed, notifying auth");
-        auth.completeAnimation();
+        Navigator.pushNamed(context, Routes.home);
       },
       onRecoverPassword: (name) {
         print('Recover password info');

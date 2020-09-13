@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juicer/metadata.dart';
 
+import '../juiced.dart';
+
 @juiced
 class ListContainer {
 
@@ -16,7 +18,7 @@ class ListContainer {
 
   String typeName;
 
-  List<String> accessors;
+  List<String> rawAccessors;
 
   @Property(ignore: true)
   set type(ContainerType newValue) => typeName = containerName(newValue);
@@ -29,6 +31,9 @@ class ListContainer {
 
   @Property(ignore: true)
   Icon get icon => _icons[type] ?? _defaultIcon;
+
+  @Property(ignore: true)
+  List<UserRole> accessors;
 
   @Property(ignore: true)
   static const Map<ContainerType, String> containerTypeLabels = {
@@ -46,6 +51,13 @@ class ListContainer {
 
   @override
   String toString() => "ListContainer(name: $name, timeCreated: $timeCreated, type: $type)";
+}
+
+class UserRole {
+  final User user;
+  final String role;
+
+  UserRole(this.user, this.role);
 }
 
 enum ContainerType { shopping, todo }

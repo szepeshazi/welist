@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/view_list/view_list_widget.dart';
+import 'package:welist/workspace/list_container_shares.dart';
 import 'package:welist/workspace/workspace.dart';
 import 'package:welist/workspace/workspace_widget.dart';
 
@@ -42,7 +43,7 @@ class MainContainer extends StatelessWidget {
             if (!auth.initialized) {
               print("#### ${DateTime.now().millisecondsSinceEpoch} Creating widget Splash");
               widget = Splash();
-            } else if (auth.uiUser != null) {
+            } else if (auth.user != null) {
               print("#### ${DateTime.now().millisecondsSinceEpoch} Creating widget WeListHome");
               widget = WeListHome();
             } else {
@@ -72,6 +73,7 @@ class Routes {
   static const String createList = '/createList';
   static const String viewList = '/viewList';
   static const String createItem = "/createItem";
+  static const String listContainerShares = "/listContainerShares";
 
   /// The map used to define our routes, needs to be supplied to [MaterialApp]
   static Map<String, WidgetBuilder> getRoutes() {
@@ -81,7 +83,8 @@ class Routes {
       Routes.home: (context) => WeListHome(),
       Routes.createList: (context) => CreateListContainerWidget(),
       Routes.viewList: (context) => ViewListWidget(),
-      Routes.createItem: (context) => CreateListContainerWidget()
+      Routes.createItem: (context) => CreateListContainerWidget(),
+      Routes.listContainerShares: (context) => ListContainerSharesWidget()
     };
   }
 }

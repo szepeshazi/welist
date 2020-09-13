@@ -13,10 +13,7 @@ class WorkspaceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("My lists"),
-          actions: [UserInfoWidget()]
-        ),
+        appBar: AppBar(title: Text("My lists"), actions: [UserInfoWidget()]),
         body: ListContainersWidget(),
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add),
@@ -54,19 +51,39 @@ class ListContainerRowWidget extends StatelessWidget {
           children: [
             Expanded(
                 child: Row(children: [
+              Container(padding: EdgeInsets.only(right: 5.0), child: container.icon),
               Text(container.name),
               if ((container.itemCount ?? 0) > 0) Text(" (${container.itemCount})")
             ])),
-            Container(margin: EdgeInsets.only(left: 100.0), child: container.icon)
+            Container(
+                margin: EdgeInsets.only(left: 5.0),
+                child: InkWell(
+                  onTap: () => Navigator.pushNamed(context, Routes.listContainerShares, arguments: container),
+                  child: Row(children: [Icon(Icons.people), Text("(1)")]),
+                )),
           ],
         ),
-        trailing: IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () {
-              workspace.delete(container);
+        trailing: PopupMenuButton<ListContainerMenuItem>(
+            itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: ListContainerMenuItem.delete,
+                    child: Row(children: [
+                      Container(padding: EdgeInsets.only(left: 10, right: 10), child: Text("Delete ${container.name}")),
+                      Icon(Icons.delete)
+                    ]),
+                  )
+                ],
+            onSelected: (ListContainerMenuItem selected) {
+              switch (selected) {
+                case ListContainerMenuItem.delete:
+                  workspace.delete(container);
+                  break;
+              }
             }),
         onTap: () {
           Navigator.pushNamed(context, Routes.viewList, arguments: container);
         });
   }
 }
+
+enum ListContainerMenuItem { delete }
