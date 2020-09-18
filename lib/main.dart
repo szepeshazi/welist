@@ -9,7 +9,7 @@ import 'package:welist/workspace/workspace_widget.dart';
 import 'auth/auth.dart';
 import 'login_ui/login_screen.dart';
 import 'login_ui/transition_route_observer.dart';
-import 'splash/splash.dart';
+import 'splash/splash_widget.dart';
 import 'workspace/create_list_widget.dart';
 
 void main() => runApp(WeListApp());
@@ -42,7 +42,7 @@ class MainContainer extends StatelessWidget {
             Widget widget;
             if (!auth.initialized) {
               print("#### ${DateTime.now().millisecondsSinceEpoch} Creating widget Splash");
-              widget = Splash();
+              widget = SplashWidget();
             } else if (auth.user != null) {
               print("#### ${DateTime.now().millisecondsSinceEpoch} Creating widget WeListHome");
               widget = WeListHome();
@@ -78,7 +78,7 @@ class Routes {
   /// The map used to define our routes, needs to be supplied to [MaterialApp]
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      Routes.splash: (context) => Splash(),
+      Routes.splash: (context) => SplashWidget(),
       Routes.login: (context) => LoginScreen(),
       Routes.home: (context) => WeListHome(),
       Routes.createList: (context) => CreateListContainerWidget(),

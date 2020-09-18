@@ -38,7 +38,7 @@ abstract class _Auth with Store {
 
   Future<void> initialize() async {
     await Firebase.initializeApp();
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(Duration(seconds: 5));
     _fbAuth = FirebaseAuth.instance;
     _fs = FirebaseFirestore.instance;
     _fbAuth.authStateChanges().listen(_userUpdate);

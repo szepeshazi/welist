@@ -1,23 +1,24 @@
-import 'package:animate_do/animate_do.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
-class Splash extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-        color: Colors.white,
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          ElasticInRight(
-              delay: Duration(milliseconds: 600),
-              child: Text("We List", textAlign: TextAlign.center, style: Theme.of(context).textTheme.headline4)),
-          ZoomIn(child: Image(image: AssetImage('assets/images/checklist.jpg'))),
-          JelloIn(
-              delay: Duration(milliseconds: 1200),
-              child: Container(
-                  margin: EdgeInsets.only(top: 20),
-                  child: Text("Universal, shared lists for everyonce",
-                      textAlign: TextAlign.center, style: Theme.of(context).textTheme.subtitle2)))
-        ]));
+import 'package:flutter/animation.dart';
+import 'package:mobx/mobx.dart';
+
+part 'splash.g.dart';
+
+class Splash = _Splash with _$Splash;
+
+abstract class _Splash with Store {
+
+  Map<AnimationPart, AnimationController> controllers = {};
+
+  @observable
+  bool something = false;
+
+  @action
+  setController(AnimationPart part, AnimationController controller) {
+    controllers[part] = controller;
   }
+}
+
+enum AnimationPart {
+  zoomImage, mainTextIn, subTextIn
 }
