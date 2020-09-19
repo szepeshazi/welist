@@ -29,16 +29,12 @@ abstract class _Auth with Store {
   @observable
   bool animationInProgress = false;
 
-  @computed
-  we.User get uiUser => animationInProgress ? null : user;
-
   _Auth() {
     print("Auth: $hashCode");
   }
 
   Future<void> initialize() async {
     await Firebase.initializeApp();
-    await Future.delayed(Duration(seconds: 5));
     _fbAuth = FirebaseAuth.instance;
     _fs = FirebaseFirestore.instance;
     _fbAuth.authStateChanges().listen(_userUpdate);

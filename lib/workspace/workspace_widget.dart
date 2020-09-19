@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:welist/auth/auth.dart';
 import 'package:welist/juiced/juiced.dart';
 import 'package:welist/profile/user_info_widget.dart';
 
@@ -12,14 +14,24 @@ import '../workspace/workspace.dart';
 class WorkspaceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text("My lists"), actions: [UserInfoWidget()]),
-        body: ListContainersWidget(),
-        floatingActionButton: FloatingActionButton(
-            child: Icon(Icons.add),
-            onPressed: () {
-              Navigator.pushNamed(context, Routes.createList);
-            }));
+    final Auth auth = Provider.of(context);
+    reaction((_) => auth.user, (user) {
+      if (user == null) {
+        Navigator.pushNamedAndRemoveUntil(context, Routes.login, (_) => true);
+      }
+    });
+    return MultiProvider(
+        providers: [
+          Provider<Workspace>(create: (context) => Workspace(Provider.of<Auth>(context, listen: false))..initialize())
+        ],
+        child: Scaffold(
+            appBar: AppBar(title: Text("My lists"), actions: [UserInfoWidget()]),
+            body: ListContainersWidget(),
+            floatingActionButton: FloatingActionButton(
+                child: Icon(Icons.add),
+                onPressed: () {
+                  Navigator.pushNamed(context, Routes.createList);
+                })));
   }
 }
 

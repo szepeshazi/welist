@@ -139,7 +139,7 @@ class LoginScreen extends StatelessWidget {
         auth.startAnimation();
       },
       onSubmitAnimationCompleted: () {
-        Navigator.pushNamed(context, Routes.home);
+        Navigator.pushReplacementNamed(context, Routes.home);
       },
       onRecoverPassword: (name) {
         print('Recover password info');

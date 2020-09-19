@@ -22,8 +22,6 @@ abstract class _Workspace with Store {
 
   StreamSubscription<QuerySnapshot> containerChangeListener;
 
-//   List<StreamSubscription<DocumentSnapshot>> containerChangeListeners;
-
   _Workspace(this.auth) : fs = FirebaseFirestore.instance;
 
   void initialize() {
@@ -32,6 +30,7 @@ abstract class _Workspace with Store {
 
   StreamSubscription<QuerySnapshot> subscribeToContainerChanges() {
     // Listen to containers the current user has access to
+    print("query condition: ${Role.attachRoles(auth.userReference.path)}");
     return fs
         .collection(collectionListContainers)
         .where('rawAccessors', arrayContainsAny: Role.attachRoles(auth.userReference.path))
@@ -53,8 +52,8 @@ abstract class _Workspace with Store {
         User user = j.juicer.decode(userSnapshot.data(), (_) => User());
         UserRole userRole = UserRole(user, role);
         container.accessors.add(userRole);
-        _containers.add(container);
       }
+      _containers.add(container);
     }
     containers = _containers;
   }

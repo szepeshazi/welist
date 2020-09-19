@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/view_list/view_list_widget.dart';
 import 'package:welist/workspace/list_container_shares.dart';
@@ -19,7 +19,6 @@ class WeListApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       Provider<Auth>(create: (_) => Auth()..initialize()),
-      Provider<Workspace>(create: (context) => Workspace(Provider.of<Auth>(context, listen: false))..initialize())
     ], child: MainContainer());
   }
 }
@@ -28,41 +27,24 @@ class WeListApp extends StatelessWidget {
 class MainContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Auth auth = Provider.of(context);
-    return MaterialApp(
+    Widget app = MaterialApp(
       title: 'WeList',
       theme: ThemeData(
           // Define the default brightness and colors.
           brightness: Brightness.light,
           primaryColor: Colors.lightBlue[500],
           accentColor: Colors.deepOrange[300]),
-      home: Observer(
-          name: "MainContainerObserver",
-          builder: (BuildContext context) {
-            Widget widget;
-            if (!auth.initialized) {
-              print("#### ${DateTime.now().millisecondsSinceEpoch} Creating widget Splash");
-              widget = SplashWidget();
-            } else if (auth.user != null) {
-              print("#### ${DateTime.now().millisecondsSinceEpoch} Creating widget WeListHome");
-              widget = WeListHome();
-            } else {
-              print("#### ${DateTime.now().millisecondsSinceEpoch} Creating widget LoginScreen");
-              widget = LoginScreen();
-            }
-            return widget;
-          }),
+      home: SplashWidget(),
       navigatorObservers: [TransitionRouteObserver()],
       routes: Routes.getRoutes(),
     );
+    return app;
   }
 }
 
 class WeListHome extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => WorkspaceWidget()
-//            children: <Widget>[WeListNewItem(), WeListView()],
-      ;
+  Widget build(BuildContext context) => WorkspaceWidget();
 }
 
 class Routes {

@@ -1,21 +1,22 @@
+import 'dart:async';
 
 import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 
 class AnimationDirector {
+
+  final completeController = StreamController<bool>.broadcast();
+
+  Stream<bool> get completed => completeController.stream;
+
   Map<AnimationPart, AnimationController> _parts = {};
 
   ControllerCallback register(AnimationPart part, {bool setupComplete = false}) => (controller) {
         _parts[part] = controller;
-        print("Got $part, $controller");
         if (setupComplete) {
           for (AnimationPart part in _parts.keys) {
-            print(part);
             _parts[part].addStatusListener((status) {
-              print("animation: ${part.id} is $status");
               for (AnimationPart dependent in _parts.keys) {
-                print("Checking potential dependent: ${dependent.id}, dependsOn: ${dependent.dependsOn}, trigger: "
-                    "${dependent.trigger}");
                 if (dependent.dependsOn == part.id && dependent.trigger == status) {
                   if (dependent.delay != null) {
                     Future.delayed(dependent.delay).then((_) => _parts[dependent].forward());
@@ -23,7 +24,12 @@ class AnimationDirector {
                     _parts[dependent].forward();
                   }
                 }
-            }});
+                if (status == AnimationStatus.completed) {
+                  bool completed = _parts.values.where((ctrl) => ctrl.status != AnimationStatus.completed).length == 0;
+                  completeController.add(completed);
+                }
+              }
+            });
             if (part.dependsOn == null) {
               if (part.delay != null) {
                 Future.delayed(part.delay).then((_) => _parts[part].forward());
@@ -34,6 +40,10 @@ class AnimationDirector {
           }
         }
       };
+
+  void cleanUp() {
+    completeController.close();
+  }
 }
 
 class AnimationPart {
