@@ -61,7 +61,7 @@ abstract class _Workspace with Store {
   @action
   Future<void> add(ListContainer container) async {
     container
-      ..timeCreated = DateTime.now().millisecondsSinceEpoch
+//      ..timeCreated = DateTime.now().millisecondsSinceEpoch
       ..itemCount = 0;
     DocumentReference containerRef = await fs.collection(collectionListContainers).add(j.juicer.encode(container));
     await containerRef.update({

@@ -2,17 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juicer/metadata.dart';
+import 'package:welist/juiced/common/access_log.dart';
 
+import '../../shared/enum_codec.dart';
 import '../juiced.dart';
 
+enum ContainerType { shopping, todo }
+
 @juiced
-class ListContainer {
+class ListContainer with AccessLogUtils implements HasAccessLog {
 
   DocumentReference reference;
 
   String name;
-
-  int timeCreated;
 
   int itemCount;
 
@@ -20,11 +22,16 @@ class ListContainer {
 
   List<String> rawAccessors;
 
-  @Property(ignore: true)
-  set type(ContainerType newValue) => typeName = containerName(newValue);
+  AccessLog accessLog;
 
   @Property(ignore: true)
-  ContainerType get type => containerTypeByName(typeName);
+  final EnumCodec<ContainerType> _containerTypeCodec = EnumCodec(ContainerType.values);
+
+  @Property(ignore: true)
+  set type(ContainerType newValue) => typeName = _containerTypeCodec.asString(newValue);
+
+  @Property(ignore: true)
+  ContainerType get type => _containerTypeCodec.asEnum(typeName);
 
   @Property(ignore: true)
   String get label => containerTypeLabels[type];
@@ -50,7 +57,7 @@ class ListContainer {
   static const Icon _defaultIcon = Icon(Icons.not_interested);
 
   @override
-  String toString() => "ListContainer(name: $name, timeCreated: $timeCreated, type: $type)";
+  String toString() => "ListContainer(name: $name, type: $type)";
 }
 
 class UserRole {
@@ -59,10 +66,3 @@ class UserRole {
 
   UserRole(this.user, this.role);
 }
-
-enum ContainerType { shopping, todo }
-
-String containerName(ContainerType type) => type.toString().split('.').last;
-
-ContainerType containerTypeByName(String name) =>
-    const <String, ContainerType>{"shopping": ContainerType.shopping, "todo": ContainerType.todo}[name];
