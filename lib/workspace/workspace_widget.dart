@@ -2,36 +2,72 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/auth/auth.dart';
-import 'package:welist/juiced/juiced.dart';
-import 'package:welist/profile/user_info_widget.dart';
+import 'package:welist/login_ui/login_screen.dart';
+import 'package:welist/splash/splash_widget.dart';
+import 'package:welist/view_list/view_list_widget.dart';
 
+import '../auth/auth.dart';
+import '../juiced/juiced.dart';
 import '../main.dart';
+import '../navigation/main_page.dart';
+import '../profile/user_info_widget.dart';
 import '../workspace/workspace.dart';
+import 'create_list_widget.dart';
 
 class WorkspaceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Auth auth = Provider.of(context);
-    reaction((_) => auth.user, (user) {
-      if (user == null) {
-        Navigator.pushNamedAndRemoveUntil(context, Routes.login, (_) => true);
-      }
-    });
+    final MainPage mainPage = Provider.of(context);
     return MultiProvider(
         providers: [
           Provider<Workspace>(create: (context) => Workspace(Provider.of<Auth>(context, listen: false))..initialize())
         ],
-        child: Scaffold(
-            appBar: AppBar(title: Text("My lists"), actions: [UserInfoWidget()]),
-            body: ListContainersWidget(),
-            floatingActionButton: FloatingActionButton(
-                child: Icon(Icons.add),
-                onPressed: () {
-                  Navigator.pushNamed(context, Routes.createList);
-                })));
+        child: Observer(
+            builder: (context) => Navigator(
+                    pages: [
+                      if (mainPage.currentState == MainPageState.splashAnimation)
+                        MaterialPage(key: ValueKey("splash"), name: "splash", child: SplashWidget()),
+                      if (mainPage.currentState == MainPageState.loggedIn)
+                        MaterialPage(key: ValueKey("workspace"), name: "workspace", child: MainScaffoldWidget()),
+                      if (mainPage.currentState == MainPageState.loggedOut)
+                        MaterialPage(key: ValueKey("login"), name: "login", child: LoginScreen()),
+                      if (mainPage.newList)
+                        MaterialPage(
+                            key: ValueKey("createList"), name: "createList", child: CreateListContainerWidget()),
+                      if (mainPage.selectedContainer != null)
+                        MaterialPage(
+                            key: ValueKey("viewList"),
+                            name: "viewList",
+                            child: ViewListWidget(container: mainPage.selectedContainer))
+                    ],
+                    onPopPage: (route, result) {
+                      if (!route.didPop(result)) {
+                        return false;
+                      }
+                      print("route popped: ${route.settings.name}");
+                      if (route.settings.name == "createList") {
+                        mainPage.setNewList(false);
+                      } else if (route.settings.name == "viewList") {
+                        mainPage.selectContainer(null);
+                      }
+                      return true;
+                    })));
+  }
+}
+
+class MainScaffoldWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final MainPage mainPage = Provider.of(context);
+    return Scaffold(
+        appBar: AppBar(title: Text("My lists"), actions: [UserInfoWidget()]),
+        body: ListContainersWidget(),
+        floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () {
+              mainPage.setNewList(true);
+            }));
   }
 }
 
@@ -57,6 +93,7 @@ class ListContainerRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Workspace workspace = Provider.of(context);
+    final MainPage mainPage = Provider.of(context);
     return ListTile(
         title: Row(
           mainAxisSize: MainAxisSize.max,
@@ -93,7 +130,7 @@ class ListContainerRowWidget extends StatelessWidget {
               }
             }),
         onTap: () {
-          Navigator.pushNamed(context, Routes.viewList, arguments: container);
+          mainPage.selectContainer(container);
         });
   }
 }

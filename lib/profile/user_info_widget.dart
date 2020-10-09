@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/auth/auth.dart';
+import 'package:welist/navigation/main_page.dart';
 
 import '../main.dart';
 
@@ -11,6 +12,7 @@ class UserInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Auth auth = Provider.of(context);
+    final MainPage mainPage = Provider.of(context);
     return Row(children: [
       Text(auth.user.displayName ?? auth.user.email.split("@").first),
       Container(padding: EdgeInsets.only(left: 10), child: Icon(Icons.account_circle)),
@@ -36,6 +38,7 @@ class UserInfoWidget extends StatelessWidget {
                Navigator.pushNamed(context, Routes.home);
                 break;
               case ProfileMenuItem.logout:
+                mainPage.pushState(MainPageState.loggedOut);
                 FirebaseAuth.instance.signOut();
                 break;
             }

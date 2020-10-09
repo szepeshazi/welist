@@ -26,8 +26,6 @@ abstract class _Auth with Store {
   @observable
   bool initialized = false;
 
-  @observable
-  bool animationInProgress = false;
 
   _Auth() {
     print("Auth: $hashCode");
@@ -69,17 +67,6 @@ abstract class _Auth with Store {
     print("User object after getUserDocument(): $user");
   }
 
-  @action
-  void startAnimation() {
-    print("Auth: animation started");
-    animationInProgress = true;
-  }
-
-  @action
-  void completeAnimation() {
-    print("Auth: animation stopped");
-    animationInProgress = false;
-  }
 
   void clear() {
     userReference = null;

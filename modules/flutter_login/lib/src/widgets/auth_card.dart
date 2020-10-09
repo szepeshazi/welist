@@ -451,8 +451,6 @@ class _LoginCardState extends State<_LoginCard> with TickerProviderStateMixin {
     final auth = Provider.of<Auth>(context, listen: false);
     String error;
 
-    widget?.onSubmitAnimationStarted();
-
     if (auth.isLogin) {
       error = await auth.onLogin(LoginData(
         name: auth.email,

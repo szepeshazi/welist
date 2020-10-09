@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mobx/mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:welist/navigation/main_page.dart';
 import 'package:welist/view_list/view_list_widget.dart';
 import 'package:welist/workspace/list_container_shares.dart';
-import 'package:welist/workspace/workspace.dart';
 import 'package:welist/workspace/workspace_widget.dart';
 
 import 'auth/auth.dart';
@@ -17,9 +16,9 @@ void main() => runApp(WeListApp());
 class WeListApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(providers: [
-      Provider<Auth>(create: (_) => Auth()..initialize()),
-    ], child: MainContainer());
+    return MultiProvider(
+        providers: [Provider<Auth>(create: (_) => Auth()..initialize()), Provider<MainPage>(create: (_) => MainPage())],
+        child: MainContainer());
   }
 }
 
@@ -34,9 +33,7 @@ class MainContainer extends StatelessWidget {
           brightness: Brightness.light,
           primaryColor: Colors.lightBlue[500],
           accentColor: Colors.deepOrange[300]),
-      home: SplashWidget(),
-      navigatorObservers: [TransitionRouteObserver()],
-      routes: Routes.getRoutes(),
+      home: WorkspaceWidget()
     );
     return app;
   }
@@ -60,7 +57,7 @@ class Routes {
   /// The map used to define our routes, needs to be supplied to [MaterialApp]
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      Routes.splash: (context) => SplashWidget(),
+      Routes.splash: (context) => WorkspaceWidget(),
       Routes.login: (context) => LoginScreen(),
       Routes.home: (context) => WeListHome(),
       Routes.createList: (context) => CreateListContainerWidget(),

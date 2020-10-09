@@ -4,6 +4,7 @@ import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/auth/auth.dart';
+import 'package:welist/navigation/main_page.dart';
 
 import '../main.dart';
 import 'constants.dart';
@@ -23,7 +24,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Auth auth = Provider.of(context);
+    final MainPage mainPage = Provider.of(context);
 
     return FlutterLogin(
       title: Constants.appName,
@@ -134,12 +135,8 @@ class LoginScreen extends StatelessWidget {
       },
       onLogin: _login,
       onSignup: _register,
-      onSubmitAnimationStarted: () {
-        print("FlutterLogin, animation started, notifying auth");
-        auth.startAnimation();
-      },
       onSubmitAnimationCompleted: () {
-        Navigator.pushReplacementNamed(context, Routes.home);
+        mainPage.pushState(MainPageState.loggedIn);
       },
       onRecoverPassword: (name) {
         print('Recover password info');

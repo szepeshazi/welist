@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:welist/animation_director/animation_director.dart';
 import 'package:welist/auth/auth.dart';
+import 'package:welist/navigation/main_page.dart';
 
 import '../main.dart';
 
@@ -11,13 +12,14 @@ class SplashWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Auth auth = Provider.of(context);
+    final MainPage mainPage  = Provider.of(context);
     final AnimationDirector director = AnimationDirector();
     director.completed.listen((event) {
       if (event) {
         if (auth.user != null) {
-          Navigator.pushReplacementNamed(context, Routes.home);
+          mainPage.pushState(MainPageState.loggedIn);
         } else {
-          Navigator.pushReplacementNamed(context, Routes.login);
+          mainPage.pushState(MainPageState.loggedOut);
         }
       }
     });

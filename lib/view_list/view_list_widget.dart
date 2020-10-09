@@ -10,9 +10,13 @@ import 'create_multi_item_widget.dart';
 import 'view_list.dart';
 
 class ViewListWidget extends StatelessWidget {
+
+  final ListContainer container;
+
+  const ViewListWidget({Key key, this.container}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final ListContainer container = ModalRoute.of(context).settings.arguments;
     return MultiProvider(
         providers: [Provider<ViewList>(create: (_) => ViewList(container)..initialize())],
         child: ViewListWidgetInner());
