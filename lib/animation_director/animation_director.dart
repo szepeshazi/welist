@@ -25,7 +25,7 @@ class AnimationDirector {
                   }
                 }
                 if (status == AnimationStatus.completed) {
-                  bool completed = _parts.values.where((ctrl) => ctrl.status != AnimationStatus.completed).length == 0;
+                  bool completed = _parts.values.where((ctrl) => ctrl.status != AnimationStatus.completed).isEmpty;
                   completeController.add(completed);
                 }
               }
