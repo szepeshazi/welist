@@ -2,11 +2,9 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/animation_director/animation_director.dart';
-import 'package:welist/auth/auth.dart';
-import 'package:welist/navigation/main_page.dart';
-
-import '../main.dart';
+import '../auth/auth.dart';
+import '../navigation/main_page.dart';
+import '../shared/animation_director/animation_director.dart';
 
 class SplashWidget extends StatelessWidget {
   @override

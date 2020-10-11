@@ -4,6 +4,7 @@ import 'package:matcher/matcher.dart';
 import 'package:welist/juiced/juiced.dart';
 
 class AccessLogTest with AccessLogUtils implements HasAccessLog {
+  @override
   AccessLog accessLog;
 }
 

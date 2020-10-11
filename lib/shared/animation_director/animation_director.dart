@@ -9,7 +9,7 @@ class AnimationDirector {
 
   Stream<bool> get completed => completeController.stream;
 
-  Map<AnimationPart, AnimationController> _parts = {};
+  final Map<AnimationPart, AnimationController> _parts = {};
 
   ControllerCallback register(AnimationPart part, {bool setupComplete = false}) => (controller) {
         _parts[part] = controller;

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
-import 'package:welist/juiced/juiced.dart';
+import '../juiced/juiced.dart';
 
 import '../juiced/juiced.juicer.dart' as j;
 

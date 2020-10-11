@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/juiced/juiced.dart';
-import 'package:welist/profile/user_info_widget.dart';
+import '../juiced/juiced.dart';
+import '../profile/user_info_widget.dart';
 
-import '../main.dart';
 import 'create_multi_item_widget.dart';
 import 'view_list.dart';
 
@@ -42,7 +41,7 @@ class ViewListWidgetInner extends StatelessWidget {
                 child: FloatingActionButton(
                     child: Icon(viewList.multiEditMode ? Icons.remove : Icons.add),
                     onPressed: () {
-                      Navigator.pushNamed(context, Routes.createList);
+                      // TODO: add a single item to list
                     }))));
   }
 }

@@ -3,23 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/auth/auth.dart';
-import 'package:welist/navigation/main_page.dart';
+import '../navigation/main_page.dart';
 
-import '../main.dart';
 import 'constants.dart';
-import 'users.dart';
 
 class LoginScreen extends StatelessWidget {
   Duration get loginTime => Duration(milliseconds: timeDilation.ceil() * 2250);
 
-  Future<String> _recoverPassword(String name) {
-    return Future.delayed(loginTime).then((_) {
-      if (!mockUsers.containsKey(name)) {
-        return 'Username not exists';
-      }
-      return null;
-    });
+  Future<String> _recoverPassword(String name) async {
+    return "Not Implemented";
   }
 
   @override

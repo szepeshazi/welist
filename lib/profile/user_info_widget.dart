@@ -3,10 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/auth/auth.dart';
-import 'package:welist/navigation/main_page.dart';
-
-import '../main.dart';
+import '../auth/auth.dart';
+import '../navigation/main_page.dart';
 
 class UserInfoWidget extends StatelessWidget {
   @override
@@ -35,7 +33,7 @@ class UserInfoWidget extends StatelessWidget {
       onSelected: (ProfileMenuItem selected) {
             switch(selected) {
               case ProfileMenuItem.settings:
-               Navigator.pushNamed(context, Routes.home);
+               // TODO: profile menu
                 break;
               case ProfileMenuItem.logout:
                 mainPage.pushState(MainPageState.loggedOut);

@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
-import 'package:welist/juiced/auth/roles.dart';
-import 'package:welist/juiced/juiced.dart';
 
 import '../auth/auth.dart';
+import '../juiced/auth/roles.dart';
+import '../juiced/juiced.dart';
 import '../juiced/juiced.juicer.dart' as j;
 
 part 'workspace.g.dart';

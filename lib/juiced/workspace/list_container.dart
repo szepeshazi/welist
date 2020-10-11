@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juicer/metadata.dart';
-import 'package:welist/juiced/common/access_log.dart';
+import '../common/access_log.dart';
 
 import '../../shared/enum_codec.dart';
 import '../juiced.dart';
@@ -22,6 +22,7 @@ class ListContainer with AccessLogUtils implements HasAccessLog {
 
   List<String> rawAccessors;
 
+  @override
   AccessLog accessLog;
 
   @Property(ignore: true)

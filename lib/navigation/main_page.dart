@@ -1,5 +1,5 @@
 import 'package:mobx/mobx.dart';
-import 'package:welist/juiced/juiced.dart';
+import '../juiced/juiced.dart';
 
 part 'main_page.g.dart';
 
@@ -10,25 +10,25 @@ abstract class _MainPage with Store {
   MainPageState currentState = MainPageState.splashAnimation;
 
   @observable
-  bool newList = false;
+  bool showCreateListWidget = false;
 
   @observable
   ListContainer selectedContainer;
 
-  @action
-  void pushState(MainPageState newState) {
-    currentState = newState;
-    print("MainPage currentState: $currentState");
-  }
+  @observable
+  ListContainer showSharesForContainer;
 
   @action
-  void setNewList(bool newValue) {
-    newList = newValue;
-  }
+  void pushState(MainPageState newState) => currentState = newState;
 
+  @action
+  void toggleCreateListWidget(bool newValue) => showCreateListWidget = newValue;
+
+  @action
+  void toggleSharesForContainer(ListContainer newValue) => showSharesForContainer = newValue;
+
+  @action
   void selectContainer(ListContainer container) => selectedContainer = container;
 }
 
-enum MainPageState {
-  splashAnimation, loggedIn, loggedOut
-}
+enum MainPageState { splashAnimation, loggedIn, loggedOut }

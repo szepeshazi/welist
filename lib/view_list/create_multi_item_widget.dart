@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/juiced/juiced.dart';
-import 'package:welist/observable_input_value/observable_input.dart';
+import '../juiced/juiced.dart';
+import '../observable_input_value/observable_input.dart';
 
 import 'view_list.dart';
 

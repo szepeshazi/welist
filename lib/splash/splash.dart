@@ -14,7 +14,7 @@ abstract class _Splash with Store {
   bool something = false;
 
   @action
-  setController(AnimationPart part, AnimationController controller) {
+  void setController(AnimationPart part, AnimationController controller) {
     controllers[part] = controller;
   }
 }

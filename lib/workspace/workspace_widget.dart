@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/login_ui/login_screen.dart';
-import 'package:welist/splash/splash_widget.dart';
-import 'package:welist/view_list/view_list_widget.dart';
 
 import '../auth/auth.dart';
 import '../juiced/juiced.dart';
-import '../main.dart';
+import '../login_ui/login_screen.dart';
 import '../navigation/main_page.dart';
 import '../profile/user_info_widget.dart';
+import '../splash/splash_widget.dart';
+import '../view_list/view_list_widget.dart';
 import '../workspace/workspace.dart';
 import 'create_list_widget.dart';
+import 'list_container_shares.dart';
 
 class WorkspaceWidget extends StatelessWidget {
   @override
@@ -32,24 +32,30 @@ class WorkspaceWidget extends StatelessWidget {
                         MaterialPage(key: ValueKey("workspace"), name: "workspace", child: MainScaffoldWidget()),
                       if (mainPage.currentState == MainPageState.loggedOut)
                         MaterialPage(key: ValueKey("login"), name: "login", child: LoginScreen()),
-                      if (mainPage.newList)
+                      if (mainPage.showCreateListWidget)
                         MaterialPage(
                             key: ValueKey("createList"), name: "createList", child: CreateListContainerWidget()),
                       if (mainPage.selectedContainer != null)
                         MaterialPage(
                             key: ValueKey("viewList"),
                             name: "viewList",
-                            child: ViewListWidget(container: mainPage.selectedContainer))
+                            child: ViewListWidget(container: mainPage.selectedContainer)),
+                      if (mainPage.showSharesForContainer != null)
+                        MaterialPage(
+                            key: ValueKey("shares"),
+                            name: "shares",
+                            child: ListContainerSharesWidget(container: mainPage.showSharesForContainer)),
                     ],
                     onPopPage: (route, result) {
                       if (!route.didPop(result)) {
                         return false;
                       }
-                      print("route popped: ${route.settings.name}");
                       if (route.settings.name == "createList") {
-                        mainPage.setNewList(false);
+                        mainPage.toggleCreateListWidget(false);
                       } else if (route.settings.name == "viewList") {
                         mainPage.selectContainer(null);
+                      } else if (route.settings.name == "shares") {
+                        mainPage.toggleSharesForContainer(null);
                       }
                       return true;
                     })));
@@ -66,7 +72,7 @@ class MainScaffoldWidget extends StatelessWidget {
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add),
             onPressed: () {
-              mainPage.setNewList(true);
+              mainPage.toggleCreateListWidget(true);
             }));
   }
 }
@@ -107,7 +113,7 @@ class ListContainerRowWidget extends StatelessWidget {
             Container(
                 margin: EdgeInsets.only(left: 5.0),
                 child: InkWell(
-                  onTap: () => Navigator.pushNamed(context, Routes.listContainerShares, arguments: container),
+                  onTap: () => mainPage.toggleSharesForContainer(container),
                   child: Row(children: [Icon(Icons.people), Text("(1)")]),
                 )),
           ],

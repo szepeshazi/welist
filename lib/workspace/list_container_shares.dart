@@ -1,13 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:welist/juiced/juiced.dart';
-import 'package:welist/profile/user_info_widget.dart';
+
+import '../juiced/juiced.dart';
+import '../profile/user_info_widget.dart';
 
 class ListContainerSharesWidget extends StatelessWidget {
+  final ListContainer container;
+
+  const ListContainerSharesWidget({Key key, this.container}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final ListContainer container = ModalRoute.of(context).settings.arguments;
-
     return Scaffold(
         appBar: AppBar(title: Text("${container.name} accessors"), actions: [UserInfoWidget()]),
         body: ListContainerShareListWidget(container: container));
