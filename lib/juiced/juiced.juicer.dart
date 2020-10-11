@@ -17,6 +17,7 @@ export "package:welist/juiced/juiced.dart";
 // package:welist/juiced/workspace/list_container.dart ListContainer
 // package:welist/juiced/list_item/list_item.dart ListItem
 // package:welist/juiced/common/access_log.dart AccessEntry
+// package:welist/juiced/common/access_log.dart ChangeSet
 // package:welist/juiced/common/access_log.dart AccessLog
 class _$UserJuicer extends ClassMapper<jcr_i1.User> {
   const _$UserJuicer();
@@ -149,6 +150,11 @@ class _$AccessEntryJuicer extends ClassMapper<jcr_i5.AccessEntry> {
         "userId": val.userId,
         "timestamp": val.timestamp,
         "actionName": val.actionName,
+        "changeSet": juicer.encode(val.changeSet),
+        "lastFlattenedProperties": val.lastFlattenedProperties == null
+            ? null
+            : Map.fromIterable(val.lastFlattenedProperties.keys,
+                value: (k) => juicer.encode(val.lastFlattenedProperties[k])),
 // _accessActionCodec is ignored
 // action is ignored
       });
@@ -158,8 +164,50 @@ class _$AccessEntryJuicer extends ClassMapper<jcr_i5.AccessEntry> {
     if (map.containsKey("timestamp"))
       empty.timestamp = map["timestamp"]?.toInt();
     if (map.containsKey("actionName")) empty.actionName = map["actionName"];
+    if (map.containsKey("changeSet"))
+      empty.changeSet =
+          juicer.decode(map["changeSet"], (_) => jcr_i5.ChangeSet());
+    if (map.containsKey("lastFlattenedProperties"))
+      empty.lastFlattenedProperties = juicer.decodeMap(
+              map["lastFlattenedProperties"], null, <String, dynamic>{})
+          as Map<String, dynamic>;
 // _accessActionCodec is ignored
 // action is ignored
+    return empty;
+  }
+}
+
+class _$ChangeSetJuicer extends ClassMapper<jcr_i5.ChangeSet> {
+  const _$ChangeSetJuicer();
+  @override
+  jcr_i5.ChangeSet newInstance() => jcr_i5.ChangeSet();
+  @override
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i5.ChangeSet val) =>
+      juicer.removeNullValues({
+        "deletedProperties":
+            val.deletedProperties?.map(juicer.encode)?.toList(),
+        "addedProperties": val.addedProperties == null
+            ? null
+            : Map.fromIterable(val.addedProperties.keys,
+                value: (k) => juicer.encode(val.addedProperties[k])),
+        "updatedProperties": val.updatedProperties == null
+            ? null
+            : Map.fromIterable(val.updatedProperties.keys,
+                value: (k) => juicer.encode(val.updatedProperties[k])),
+      });
+  @override
+  jcr_i5.ChangeSet fromMap(Juicer juicer, Map map, jcr_i5.ChangeSet empty) {
+    if (map.containsKey("deletedProperties"))
+      empty.deletedProperties = juicer.decodeIterable(map["deletedProperties"],
+          (dynamic val) => val as String, <String>[]) as List<String>;
+    if (map.containsKey("addedProperties"))
+      empty.addedProperties =
+          juicer.decodeMap(map["addedProperties"], null, <String, dynamic>{})
+              as Map<String, dynamic>;
+    if (map.containsKey("updatedProperties"))
+      empty.updatedProperties =
+          juicer.decodeMap(map["updatedProperties"], null, <String, dynamic>{})
+              as Map<String, dynamic>;
     return empty;
   }
 }
@@ -173,7 +221,6 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
       juicer.removeNullValues({
         "entries": val.entries?.map(juicer.encode)?.toList(),
         "create": juicer.encode(val.create),
-        "lastUpdate": juicer.encode(val.lastUpdate),
 // maxLogSize is ignored
       });
   @override
@@ -185,9 +232,6 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
           <jcr_i5.AccessEntry>[]) as List<jcr_i5.AccessEntry>;
     if (map.containsKey("create"))
       empty.create = juicer.decode(map["create"], (_) => jcr_i5.AccessEntry());
-    if (map.containsKey("lastUpdate"))
-      empty.lastUpdate =
-          juicer.decode(map["lastUpdate"], (_) => jcr_i5.AccessEntry());
 // maxLogSize is ignored
     return empty;
   }
@@ -199,5 +243,6 @@ const Juicer juicer = const Juicer(const {
   jcr_i3.ListContainer: const _$ListContainerJuicer(),
   jcr_i4.ListItem: const _$ListItemJuicer(),
   jcr_i5.AccessEntry: const _$AccessEntryJuicer(),
+  jcr_i5.ChangeSet: const _$ChangeSetJuicer(),
   jcr_i5.AccessLog: const _$AccessLogJuicer(),
 });

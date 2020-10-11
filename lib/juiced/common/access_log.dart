@@ -14,13 +14,19 @@ class AccessEntry {
 
   String actionName;
 
+  ChangeSet changeSet;
+
+  Map<String, dynamic> lastFlattenedProperties;
+
   AccessEntry();
 
-  factory AccessEntry.now(String uid, AccessAction act, {int ts}) {
+  factory AccessEntry.now(String uid, AccessAction act, dynamic flattenedProperties, ChangeSet changes) {
     return AccessEntry()
       ..userId = uid
-      ..timestamp = ts ?? DateTime.now().millisecondsSinceEpoch
-      ..action = act;
+      ..timestamp = DateTime.now().millisecondsSinceEpoch
+      ..action = act
+      ..lastFlattenedProperties = flattenedProperties
+      ..changeSet = changes;
   }
 
   @Property(ignore: true)
@@ -34,12 +40,22 @@ class AccessEntry {
 }
 
 @juiced
+class ChangeSet {
+  List<String> deletedProperties;
+
+  Map<String, dynamic> addedProperties;
+
+  Map<String, dynamic> updatedProperties;
+
+  @override
+  String toString() => "deleted: $deletedProperties, added: $addedProperties, updated: $updatedProperties";
+}
+
+@juiced
 class AccessLog {
   List<AccessEntry> entries = [];
 
   AccessEntry create;
-
-  AccessEntry lastUpdate;
 
   static const int maxLogSize = 10;
 }
@@ -49,23 +65,41 @@ abstract class HasAccessLog {
 }
 
 mixin AccessLogUtils implements HasAccessLog {
-  void log(AccessEntry entry) {
+  List<AccessEntry> get logEntries => accessLog.entries;
+
+  void log(String userId, Map<String, dynamic> flattenedProperties, {bool deleteEntity = false}) {
+    AccessAction action;
+    if (deleteEntity) {
+      action = AccessAction.delete;
+    } else if (accessLog.entries.isEmpty) {
+      action = AccessAction.create;
+    } else {
+      action = AccessAction.update;
+    }
+
+    ChangeSet changeSet;
+    if (accessLog.entries.isEmpty) {
+      changeSet = ChangeSet()..addedProperties = flattenedProperties;
+    } else {
+      changeSet = _trackChanges(logEntries.last.lastFlattenedProperties, flattenedProperties);
+    }
+
+    final entry = AccessEntry.now(userId, action, flattenedProperties, changeSet);
+
     int truncateAt = min(accessLog.entries.length, AccessLog.maxLogSize - 1);
     if (accessLog.entries.isEmpty) {
-      if (entry.action != AccessAction.create) {
-        throw StateError("First action on any object should be create, got ${entry.action}");
-      } else {
-        accessLog.create = entry;
-      }
-    } else {
-      if (entry.action == AccessAction.create) {
-        throw StateError("Only the first action should be create on any object, got ${entry.action}");
-      } else {
-        accessLog.lastUpdate = entry;
-      }
+      accessLog.create = entry;
     }
     accessLog.entries = accessLog.entries.sublist(0, truncateAt)..insert(0, entry);
   }
 
-  List<AccessEntry> get logEntries => accessLog.entries;
+  ChangeSet _trackChanges(Map<String, dynamic> prev, Map<String, dynamic> current) {
+    ChangeSet result = ChangeSet();
+    result.deletedProperties = prev.keys.where((key) => !current.containsKey(key)).toList();
+    List<String> updatedKeys = prev.keys.where((key) => current.containsKey(key) && prev[key] != current[key]).toList();
+    result.updatedProperties = Map.fromIterable(updatedKeys, value: (key) => current[key]);
+    result.addedProperties =
+        Map.fromIterable(current.keys.where((key) => !prev.containsKey(key)), value: (key) => current[key]);
+    return result;
+  }
 }

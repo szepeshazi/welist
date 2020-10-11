@@ -1,5 +1,6 @@
 @TestOn('vm')
 import 'package:flutter_test/flutter_test.dart';
+import 'package:welist/juiced/common/utils.dart';
 import 'package:welist/juiced/juiced.dart';
 import 'package:welist/juiced/juiced.juicer.dart' as j;
 
@@ -17,12 +18,13 @@ void main() {
                 ..email = "john@doe.com",
               "owner")
         ]
-        ..accessLog = AccessLog()
-        ..log(AccessEntry.now("userId", AccessAction.create));
+        ..accessLog = AccessLog();
+
+
 
       Map<String, dynamic> result = j.juicer.encode(container);
-      print(result);
-
+      dynamic flattened = flatten(result);
+      container.log("user_1", flattened);
       expect(result['accessLog'], isNotNull);
     });
   });
