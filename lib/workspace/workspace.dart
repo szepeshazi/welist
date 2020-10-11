@@ -61,9 +61,12 @@ abstract class _Workspace with Store {
   @action
   Future<void> add(ListContainer container) async {
     container
-//      ..timeCreated = DateTime.now().millisecondsSinceEpoch
-      ..itemCount = 0;
-    DocumentReference containerRef = await fs.collection(collectionListContainers).add(j.juicer.encode(container));
+      ..itemCount = 0
+      ..accessLog = AccessLog();
+    var encoded = j.juicer.encode(container);
+    container.log(auth.userReference.path, encoded);
+    encoded = j.juicer.encode(container);
+    DocumentReference containerRef = await fs.collection(collectionListContainers).add(encoded);
     await containerRef.update({
       "rawAccessors": FieldValue.arrayUnion(["${auth.userReference.path}::owner"])
     });

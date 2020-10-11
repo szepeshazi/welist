@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+
+import '../auth/auth.dart';
 import '../juiced/juiced.dart';
 import '../observable_input_value/observable_input.dart';
-
 import 'view_list.dart';
 
 class CreateMultiItemWidget extends StatelessWidget {
@@ -14,6 +15,7 @@ class CreateMultiItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ViewList viewList = Provider.of(context);
+    final Auth auth = Provider.of(context);
     return Observer(
         builder: (context) => Container(
             padding: EdgeInsets.only(top: 6.0, bottom: 6.0),
@@ -26,9 +28,8 @@ class CreateMultiItemWidget extends StatelessWidget {
                 onSubmitted: (_) {
                   ListItem item = ListItem()
                     ..name = oInput.input
-                    ..timeCreated = DateTime.now().millisecondsSinceEpoch
                     ..timeCompleted = null;
-                  viewList.add(item);
+                  viewList.add(auth.userReference.path, item);
                   oInput.setValue("");
                   controller.value = TextEditingValue(text: "empty");
                 })));

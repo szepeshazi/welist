@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:juicer/metadata.dart';
 
 import '../../shared/enum_codec.dart';
+import 'utils.dart';
 
 enum AccessAction { create, update, delete }
 
@@ -58,6 +59,10 @@ class AccessLog {
   AccessEntry create;
 
   static const int maxLogSize = 10;
+
+  int get timeCreated => create?.timestamp;
+
+  int get timeUpdated => entries.isNotEmpty ? entries.first.timestamp : null;
 }
 
 abstract class HasAccessLog {
@@ -67,7 +72,7 @@ abstract class HasAccessLog {
 mixin AccessLogUtils implements HasAccessLog {
   List<AccessEntry> get logEntries => accessLog.entries;
 
-  void log(String userId, Map<String, dynamic> flattenedProperties, {bool deleteEntity = false}) {
+  void log(String userId, dynamic encoded, {bool deleteEntity = false}) {
     AccessAction action;
     if (deleteEntity) {
       action = AccessAction.delete;
@@ -78,6 +83,7 @@ mixin AccessLogUtils implements HasAccessLog {
     }
 
     ChangeSet changeSet;
+    Map<String, dynamic> flattenedProperties = flatten(encoded..remove("accessLog"));
     if (accessLog.entries.isEmpty) {
       changeSet = ChangeSet()..addedProperties = flattenedProperties;
     } else {

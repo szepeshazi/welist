@@ -118,22 +118,22 @@ class _$ListItemJuicer extends ClassMapper<jcr_i4.ListItem> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i4.ListItem val) =>
       juicer.removeNullValues({
-        "reference": juicer.encode(val.reference),
+// reference is ignored
         "name": val.name,
-        "timeCreated": val.timeCreated,
         "timeCompleted": val.timeCompleted,
+        "accessLog": juicer.encode(val.accessLog),
 // completed is ignored
 // stateName is ignored
       });
   @override
   jcr_i4.ListItem fromMap(Juicer juicer, Map map, jcr_i4.ListItem empty) {
-    if (map.containsKey("reference"))
-      empty.reference = juicer.decode(map["reference"], null);
+// reference is ignored
     if (map.containsKey("name")) empty.name = map["name"];
-    if (map.containsKey("timeCreated"))
-      empty.timeCreated = map["timeCreated"]?.toInt();
     if (map.containsKey("timeCompleted"))
       empty.timeCompleted = map["timeCompleted"]?.toInt();
+    if (map.containsKey("accessLog"))
+      empty.accessLog =
+          juicer.decode(map["accessLog"], (_) => jcr_i5.AccessLog());
 // completed is ignored
 // stateName is ignored
     return empty;
@@ -222,6 +222,8 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
         "entries": val.entries?.map(juicer.encode)?.toList(),
         "create": juicer.encode(val.create),
 // maxLogSize is ignored
+        "timeCreated": val.timeCreated,
+        "timeUpdated": val.timeUpdated,
       });
   @override
   jcr_i5.AccessLog fromMap(Juicer juicer, Map map, jcr_i5.AccessLog empty) {
@@ -233,6 +235,8 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
     if (map.containsKey("create"))
       empty.create = juicer.decode(map["create"], (_) => jcr_i5.AccessEntry());
 // maxLogSize is ignored
+// timeCreated is ignored
+// timeUpdated is ignored
     return empty;
   }
 }

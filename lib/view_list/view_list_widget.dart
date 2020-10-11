@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+
+import '../auth/auth.dart';
 import '../juiced/juiced.dart';
 import '../profile/user_info_widget.dart';
-
 import 'create_multi_item_widget.dart';
 import 'view_list.dart';
 
 class ViewListWidget extends StatelessWidget {
-
   final ListContainer container;
 
   const ViewListWidget({Key key, this.container}) : super(key: key);
@@ -27,10 +27,7 @@ class ViewListWidgetInner extends StatelessWidget {
   Widget build(BuildContext context) {
     final ViewList viewList = Provider.of(context);
     return Scaffold(
-        appBar: AppBar(
-          title: Text(viewList.container.name),
-          actions: [UserInfoWidget()]
-        ),
+        appBar: AppBar(title: Text(viewList.container.name), actions: [UserInfoWidget()]),
         body: ViewListWrapperWidget(),
         floatingActionButton: Observer(
             builder: (context) => InkWell(
@@ -70,10 +67,14 @@ class ListItemRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ViewList viewList = Provider.of(context);
+    final Auth auth = Provider.of(context);
     return CheckboxListTile(
         controlAffinity: ListTileControlAffinity.leading,
         value: item.completed,
-        onChanged: (bool newValue) => item.setState(newValue),
+        onChanged: (bool newValue) {
+          item.setState(newValue);
+          viewList.update(auth.userReference.path, item);
+        },
         title: Row(
           children: <Widget>[
             Expanded(

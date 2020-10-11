@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
 
+import '../common/access_log.dart';
+
 @juiced
-class ListItem {
+class ListItem with AccessLogUtils implements HasAccessLog {
+  @Property(ignore: true)
   DocumentReference reference;
 
   String name;
 
-  int timeCreated;
-
   int timeCompleted;
+
+  @override
+  AccessLog accessLog;
 
   @Property(ignore: true)
   bool get completed => timeCompleted != null;
@@ -19,10 +23,7 @@ class ListItem {
       completed ? "Completed at ${DateTime.fromMillisecondsSinceEpoch(timeCompleted).toIso8601String()}" : "Open";
 
   @Property(ignore: true)
-  Future<void> setState(bool state) async {
-    int _timeCompleted = state ? DateTime.now().millisecondsSinceEpoch : null;
-    await reference.update({"timeCompleted": _timeCompleted});
-  }
+  void setState(bool state) => timeCompleted = state ? DateTime.now().millisecondsSinceEpoch : null;
 
   @override
   String toString() => "$name ($stateName)";

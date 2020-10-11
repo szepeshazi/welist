@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
-import '../juiced/juiced.dart';
 
+import '../juiced/juiced.dart';
 import '../juiced/juiced.juicer.dart' as j;
 
 part 'view_list.g.dart';
@@ -55,12 +55,25 @@ abstract class _ViewList with Store {
   }
 
   @action
-  Future<void> add(ListItem item) async {
+  Future<void> add(String userId, ListItem item) async {
     // TODO: input sanity check, transaction
     item
-      ..timeCreated = DateTime.now().millisecondsSinceEpoch
-      ..timeCompleted = null;
+      ..timeCompleted = null
+      ..accessLog = AccessLog();
+    dynamic encoded = j.juicer.encode(item);
+    item.log(userId, encoded);
+    encoded = j.juicer.encode(item);
     await fs.doc(container.reference.path).collection("items").add(j.juicer.encode(item));
+    await fs.doc(container.reference.path).update({"itemCount": FieldValue.increment(1)});
+  }
+
+  @action
+  Future<void> update(String userId, ListItem item) async {
+    // TODO: input sanity check, transaction
+    dynamic encoded = j.juicer.encode(item);
+    item.log(userId, encoded);
+    encoded = j.juicer.encode(item);
+    await item.reference.set(encoded);
     await fs.doc(container.reference.path).update({"itemCount": FieldValue.increment(1)});
   }
 
