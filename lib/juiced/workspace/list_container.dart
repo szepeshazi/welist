@@ -12,6 +12,7 @@ enum ContainerType { shopping, todo }
 @juiced
 class ListContainer with AccessLogUtils implements HasAccessLog {
 
+  @Property(ignore: true)
   DocumentReference reference;
 
   String name;

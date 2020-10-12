@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 
+import '../auth/auth.dart';
 import '../juiced/juiced.dart';
 import '../juiced/juiced.juicer.dart' as j;
 
@@ -22,9 +23,11 @@ abstract class _ViewList with Store {
 
   final FirebaseFirestore fs;
 
+  final Auth auth;
+
   StreamSubscription<QuerySnapshot> listChangeListener;
 
-  _ViewList(this.container) : fs = FirebaseFirestore.instance;
+  _ViewList(this.container, this.auth) : fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to authentication changes
@@ -60,21 +63,32 @@ abstract class _ViewList with Store {
     item
       ..timeCompleted = null
       ..accessLog = AccessLog();
-    dynamic encoded = j.juicer.encode(item);
-    item.log(userId, encoded);
-    encoded = j.juicer.encode(item);
-    await fs.doc(container.reference.path).collection("items").add(j.juicer.encode(item));
-    await fs.doc(container.reference.path).update({"itemCount": FieldValue.increment(1)});
+    dynamic encodedItem = j.juicer.encode(item);
+    item.log(userId, encodedItem);
+    encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
+    await container.reference.collection("items").add(j.juicer.encode(item));
+
+    // pseudo increment to be included in access log
+    // real increment operation will happen on FB, and changes will be pushed to the obj
+    container.itemCount++;
+    dynamic encodedContainer = j.juicer.encode(container);
+    dynamic cAccessBefore = encodedContainer["accessLog"];
+    container.log(userId, encodedContainer);
+    dynamic containerAccess = j.juicer.encode(container.accessLog);
+    await container.reference.update({"itemCount": FieldValue.increment(1), "accessLog": containerAccess});
   }
 
   @action
   Future<void> update(String userId, ListItem item) async {
     // TODO: input sanity check, transaction
-    dynamic encoded = j.juicer.encode(item);
-    item.log(userId, encoded);
-    encoded = j.juicer.encode(item);
-    await item.reference.set(encoded);
-    await fs.doc(container.reference.path).update({"itemCount": FieldValue.increment(1)});
+    dynamic encodedItem = j.juicer.encode(item);
+    item.log(auth.userReference.path, encodedItem);
+    encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
+    await item.reference.set(encodedItem);
+    dynamic encodedContainer = j.juicer.encode(container);
+    container.log(auth.userReference.path, encodedContainer);
+    encodedContainer["accessLog"] = j.juicer.encode(container.accessLog);
+    await container.reference.update({"itemCount": FieldValue.increment(1)});
   }
 
   @action

@@ -20,9 +20,7 @@ class WorkspaceWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final MainPage mainPage = Provider.of(context);
     return MultiProvider(
-        providers: [
-          Provider<Workspace>(create: (context) => Workspace(Provider.of<Auth>(context, listen: false))..initialize())
-        ],
+        providers: [Provider<Workspace>(create: (context) => Workspace(context.read<Auth>())..initialize())],
         child: Observer(
             builder: (context) => Navigator(
                     pages: [

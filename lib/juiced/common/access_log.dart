@@ -17,8 +17,6 @@ class AccessEntry {
 
   ChangeSet changeSet;
 
-  Map<String, dynamic> lastFlattenedProperties;
-
   AccessEntry();
 
   factory AccessEntry.now(String uid, AccessAction act, dynamic flattenedProperties, ChangeSet changes) {
@@ -26,7 +24,6 @@ class AccessEntry {
       ..userId = uid
       ..timestamp = DateTime.now().millisecondsSinceEpoch
       ..action = act
-      ..lastFlattenedProperties = flattenedProperties
       ..changeSet = changes;
   }
 
@@ -58,6 +55,8 @@ class AccessLog {
 
   AccessEntry create;
 
+  Map<String, dynamic> lastFlattenedProperties;
+
   static const int maxLogSize = 10;
 
   int get timeCreated => create?.timestamp;
@@ -87,7 +86,7 @@ mixin AccessLogUtils implements HasAccessLog {
     if (accessLog.entries.isEmpty) {
       changeSet = ChangeSet()..addedProperties = flattenedProperties;
     } else {
-      changeSet = _trackChanges(logEntries.last.lastFlattenedProperties, flattenedProperties);
+      changeSet = _trackChanges(accessLog.lastFlattenedProperties, flattenedProperties);
     }
 
     final entry = AccessEntry.now(userId, action, flattenedProperties, changeSet);
@@ -97,6 +96,7 @@ mixin AccessLogUtils implements HasAccessLog {
       accessLog.create = entry;
     }
     accessLog.entries = accessLog.entries.sublist(0, truncateAt)..insert(0, entry);
+    accessLog.lastFlattenedProperties = flattenedProperties;
   }
 
   ChangeSet _trackChanges(Map<String, dynamic> prev, Map<String, dynamic> current) {

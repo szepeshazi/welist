@@ -14,8 +14,8 @@ class CreateMultiItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ViewList viewList = Provider.of(context);
     final Auth auth = Provider.of(context);
+    final ViewList viewList = Provider.of(context);
     return Observer(
         builder: (context) => Container(
             padding: EdgeInsets.only(top: 6.0, bottom: 6.0),

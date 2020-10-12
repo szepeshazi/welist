@@ -68,7 +68,7 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i3.ListContainer> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i3.ListContainer val) =>
       juicer.removeNullValues({
-        "reference": juicer.encode(val.reference),
+// reference is ignored
         "name": val.name,
         "itemCount": val.itemCount,
         "typeName": val.typeName,
@@ -86,8 +86,7 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i3.ListContainer> {
   @override
   jcr_i3.ListContainer fromMap(
       Juicer juicer, Map map, jcr_i3.ListContainer empty) {
-    if (map.containsKey("reference"))
-      empty.reference = juicer.decode(map["reference"], null);
+// reference is ignored
     if (map.containsKey("name")) empty.name = map["name"];
     if (map.containsKey("itemCount"))
       empty.itemCount = map["itemCount"]?.toInt();
@@ -151,10 +150,6 @@ class _$AccessEntryJuicer extends ClassMapper<jcr_i5.AccessEntry> {
         "timestamp": val.timestamp,
         "actionName": val.actionName,
         "changeSet": juicer.encode(val.changeSet),
-        "lastFlattenedProperties": val.lastFlattenedProperties == null
-            ? null
-            : Map.fromIterable(val.lastFlattenedProperties.keys,
-                value: (k) => juicer.encode(val.lastFlattenedProperties[k])),
 // _accessActionCodec is ignored
 // action is ignored
       });
@@ -167,10 +162,6 @@ class _$AccessEntryJuicer extends ClassMapper<jcr_i5.AccessEntry> {
     if (map.containsKey("changeSet"))
       empty.changeSet =
           juicer.decode(map["changeSet"], (_) => jcr_i5.ChangeSet());
-    if (map.containsKey("lastFlattenedProperties"))
-      empty.lastFlattenedProperties = juicer.decodeMap(
-              map["lastFlattenedProperties"], null, <String, dynamic>{})
-          as Map<String, dynamic>;
 // _accessActionCodec is ignored
 // action is ignored
     return empty;
@@ -221,6 +212,10 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
       juicer.removeNullValues({
         "entries": val.entries?.map(juicer.encode)?.toList(),
         "create": juicer.encode(val.create),
+        "lastFlattenedProperties": val.lastFlattenedProperties == null
+            ? null
+            : Map.fromIterable(val.lastFlattenedProperties.keys,
+                value: (k) => juicer.encode(val.lastFlattenedProperties[k])),
 // maxLogSize is ignored
         "timeCreated": val.timeCreated,
         "timeUpdated": val.timeUpdated,
@@ -234,6 +229,10 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
           <jcr_i5.AccessEntry>[]) as List<jcr_i5.AccessEntry>;
     if (map.containsKey("create"))
       empty.create = juicer.decode(map["create"], (_) => jcr_i5.AccessEntry());
+    if (map.containsKey("lastFlattenedProperties"))
+      empty.lastFlattenedProperties = juicer.decodeMap(
+              map["lastFlattenedProperties"], null, <String, dynamic>{})
+          as Map<String, dynamic>;
 // maxLogSize is ignored
 // timeCreated is ignored
 // timeUpdated is ignored

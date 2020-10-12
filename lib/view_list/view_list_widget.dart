@@ -17,7 +17,7 @@ class ViewListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [Provider<ViewList>(create: (_) => ViewList(container)..initialize())],
+        providers: [Provider<ViewList>(create: (_) => ViewList(container, context.read<Auth>())..initialize())],
         child: ViewListWidgetInner());
   }
 }
