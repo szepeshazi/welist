@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth.dart';
 import '../juiced/juiced.dart';
 import '../observable_input_value/observable_input.dart';
 import 'view_list.dart';
@@ -14,7 +13,6 @@ class CreateMultiItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Auth auth = Provider.of(context);
     final ViewList viewList = Provider.of(context);
     final controller = TextEditingController(text: "");
 
@@ -34,7 +32,7 @@ class CreateMultiItemWidget extends StatelessWidget {
                     ListItem item = ListItem()
                       ..name = oInput.input
                       ..timeCompleted = null;
-                    viewList.add(auth.userReference.path, item);
+                    viewList.add(item);
                     oInput.setValue("");
                     controller.text = oInput.input;
                     inputFocusNode.requestFocus();

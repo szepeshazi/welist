@@ -32,7 +32,7 @@ abstract class _ViewList with Store {
   void initialize() {
     // Listen to authentication changes
     listChangeListener =
-        fs.doc(container.reference.path).collection("items").snapshots().listen((updates) => _updateViewList(updates));
+        container.reference.collection("items").snapshots().listen((updates) => _updateViewList(updates));
   }
 
   Future<void> _updateViewList(QuerySnapshot updates) async {
@@ -58,13 +58,13 @@ abstract class _ViewList with Store {
   }
 
   @action
-  Future<void> add(String userId, ListItem item) async {
+  Future<void> add(ListItem item) async {
     // TODO: input sanity check, transaction
     item
       ..timeCompleted = null
       ..accessLog = AccessLog();
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(userId, encodedItem);
+    item.log(auth.userReference.id, encodedItem);
     encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
     await container.reference.collection("items").add(j.juicer.encode(item));
 
@@ -72,30 +72,27 @@ abstract class _ViewList with Store {
     // real increment operation will happen on FB, and changes will be pushed to the obj
     container.itemCount++;
     dynamic encodedContainer = j.juicer.encode(container);
-    dynamic cAccessBefore = encodedContainer["accessLog"];
-    container.log(userId, encodedContainer);
+    container.log(auth.userReference.id, encodedContainer);
     dynamic containerAccess = j.juicer.encode(container.accessLog);
     await container.reference.update({"itemCount": FieldValue.increment(1), "accessLog": containerAccess});
   }
 
   @action
-  Future<void> update(String userId, ListItem item) async {
+  Future<void> update(ListItem item) async {
     // TODO: input sanity check, transaction
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.userReference.path, encodedItem);
+    item.log(auth.userReference.id, encodedItem);
     encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
     await item.reference.set(encodedItem);
-    dynamic encodedContainer = j.juicer.encode(container);
-    container.log(auth.userReference.path, encodedContainer);
-    encodedContainer["accessLog"] = j.juicer.encode(container.accessLog);
-    await container.reference.update({"itemCount": FieldValue.increment(1)});
   }
 
   @action
   Future<void> delete(ListItem item) async {
     // TODO: input sanity check, transaction
-    await item.reference.delete();
-    await fs.doc(container.reference.path).update({"itemCount": FieldValue.increment(-1)});
+    dynamic encodedItem = j.juicer.encode(item);
+    item.log(auth.userReference.id, encodedItem);
+    encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
+    await container.reference.update({"itemCount": FieldValue.increment(-1)});
   }
 
   @action

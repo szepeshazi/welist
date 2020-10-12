@@ -30,10 +30,10 @@ abstract class _Workspace with Store {
 
   StreamSubscription<QuerySnapshot> subscribeToContainerChanges() {
     // Listen to containers the current user has access to
-    print("query condition: ${Role.attachRoles(auth.userReference.path)}");
+    print("query condition: ${Role.attachRoles(auth.userReference.id)}");
     return _fs
         .collection(collectionListContainers)
-        .where('rawAccessors', arrayContainsAny: Role.attachRoles(auth.userReference.path))
+        .where('rawAccessors', arrayContainsAny: Role.attachRoles(auth.userReference.id))
         .snapshots()
         .listen((update) => _updateContainers(update));
   }
@@ -49,12 +49,12 @@ abstract class _Workspace with Store {
         List<String> rawAccessorParts = rawAccessor.split("::");
         UserRole userRole = _userRoles[rawAccessor];
         if (userRole == null) {
-          String userPath = rawAccessorParts[0];
+          String userId = rawAccessorParts[0];
           String role = rawAccessorParts[1];
-          DocumentSnapshot userSnapshot = await _fs.doc(userPath).get();
+          DocumentSnapshot userSnapshot = await _fs.collection("users").doc(userId).get();
           User user = j.juicer.decode(userSnapshot.data(), (_) => User());
           userRole = UserRole(user, role);
-          _userRoles[userPath] = userRole;
+          _userRoles[userId] = userRole;
         }
         container.accessors.add(userRole);
       }
@@ -68,9 +68,9 @@ abstract class _Workspace with Store {
     container
       ..itemCount = 0
       ..accessLog = AccessLog()
-      ..rawAccessors = ["${auth.userReference.path}::owner"];
+      ..rawAccessors = ["${auth.userReference.id}::owner"];
     var encoded = j.juicer.encode(container);
-    container.log(auth.userReference.path, encoded);
+    container.log(auth.userReference.id, encoded);
     encoded["accessLog"] = j.juicer.encode(container.accessLog);
     await _fs.collection(collectionListContainers).add(encoded);
   }

@@ -67,13 +67,12 @@ class ListItemRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ViewList viewList = Provider.of(context);
-    final Auth auth = Provider.of(context);
     return CheckboxListTile(
         controlAffinity: ListTileControlAffinity.leading,
         value: item.completed,
         onChanged: (bool newValue) {
           item.setState(newValue);
-          viewList.update(auth.userReference.path, item);
+          viewList.update(item);
         },
         title: Row(
           children: <Widget>[

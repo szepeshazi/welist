@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:mobx/mobx.dart';
 
 part 'observable_input.g.dart';
