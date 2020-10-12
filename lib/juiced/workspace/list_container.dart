@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:juicer/juicer.dart';
 import 'package:juicer/metadata.dart';
-import '../common/access_log.dart';
 
 import '../../shared/enum_codec.dart';
+import '../common/access_log.dart';
 import '../juiced.dart';
 
 enum ContainerType { shopping, todo }
 
 @juiced
-class ListContainer with AccessLogUtils implements HasAccessLog {
-
+class ListContainer with AccessLogUtils {
   @Property(ignore: true)
   DocumentReference reference;
 
@@ -56,6 +56,28 @@ class ListContainer with AccessLogUtils implements HasAccessLog {
     ContainerType.todo: Icon(Icons.check_box)
   };
 
+  static Future<ListContainer> fromSnapshot(
+      DocumentSnapshot snapshot, Juicer juicer, FetchUserCallback fetchUserCallback) async {
+    Map<String, UserRole> _userRoles = {};
+    ListContainer container = juicer.decode(snapshot.data(), (_) => ListContainer()..reference = snapshot.reference);
+    // TODO: accessor details should only be fetched when going to list sharing page
+    container.accessors = [];
+    for (String rawAccessor in container.rawAccessors) {
+      List<String> rawAccessorParts = rawAccessor.split("::");
+      UserRole userRole = _userRoles[rawAccessor];
+      if (userRole == null) {
+        String userId = rawAccessorParts[0];
+        String role = rawAccessorParts[1];
+        DocumentSnapshot userSnapshot = await fetchUserCallback(userId);
+        User user = juicer.decode(userSnapshot.data(), (_) => User());
+        userRole = UserRole(user, role);
+        _userRoles[userId] = userRole;
+      }
+      container.accessors.add(userRole);
+    }
+    return container;
+  }
+
   static const Icon _defaultIcon = Icon(Icons.not_interested);
 
   @override
@@ -68,3 +90,5 @@ class UserRole {
 
   UserRole(this.user, this.role);
 }
+
+typedef FetchUserCallback = Future<DocumentSnapshot> Function(String userId);

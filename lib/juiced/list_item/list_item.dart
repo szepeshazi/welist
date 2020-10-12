@@ -4,7 +4,7 @@ import 'package:juicer/metadata.dart';
 import '../common/access_log.dart';
 
 @juiced
-class ListItem with AccessLogUtils implements HasAccessLog {
+class ListItem with AccessLogUtils {
   @Property(ignore: true)
   DocumentReference reference;
 

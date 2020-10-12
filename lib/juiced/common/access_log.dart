@@ -5,7 +5,7 @@ import 'package:juicer/metadata.dart';
 import '../../shared/enum_codec.dart';
 import 'utils.dart';
 
-enum AccessAction { create, update, delete }
+enum AccessAction { create, update, delete, restore }
 
 @juiced
 class AccessEntry {
@@ -57,11 +57,15 @@ class AccessLog {
 
   Map<String, dynamic> lastFlattenedProperties;
 
-  static const int maxLogSize = 10;
-
+  @Property(ignore: true)
   int get timeCreated => create?.timestamp;
 
+  @Property(ignore: true)
   int get timeUpdated => entries.isNotEmpty ? entries.first.timestamp : null;
+
+  bool get deleted => entries.isNotEmpty ? entries.first.action == AccessAction.delete : false;
+
+  static const int maxLogSize = 10;
 }
 
 abstract class HasAccessLog {
@@ -69,12 +73,12 @@ abstract class HasAccessLog {
 }
 
 mixin AccessLogUtils implements HasAccessLog {
-  List<AccessEntry> get logEntries => accessLog.entries;
-
-  void log(String userId, dynamic encoded, {bool deleteEntity = false}) {
+  void log(String userId, dynamic encoded, {bool deleteEntity = false, bool restoreEntity = false}) {
     AccessAction action;
     if (deleteEntity) {
       action = AccessAction.delete;
+    } else if (restoreEntity) {
+      action = AccessAction.restore;
     } else if (accessLog.entries.isEmpty) {
       action = AccessAction.create;
     } else {

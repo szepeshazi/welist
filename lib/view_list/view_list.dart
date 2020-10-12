@@ -31,8 +31,11 @@ abstract class _ViewList with Store {
 
   void initialize() {
     // Listen to authentication changes
-    listChangeListener =
-        container.reference.collection("items").snapshots().listen((updates) => _updateViewList(updates));
+    listChangeListener = container.reference
+        .collection("items")
+        .where('accessLog.deleted', isEqualTo: false)
+        .snapshots()
+        .listen((updates) => _updateViewList(updates));
   }
 
   Future<void> _updateViewList(QuerySnapshot updates) async {
@@ -66,7 +69,6 @@ abstract class _ViewList with Store {
     dynamic encodedItem = j.juicer.encode(item);
     item.log(auth.userReference.id, encodedItem);
     encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
-    await container.reference.collection("items").add(j.juicer.encode(item));
 
     // pseudo increment to be included in access log
     // real increment operation will happen on FB, and changes will be pushed to the obj
@@ -74,7 +76,11 @@ abstract class _ViewList with Store {
     dynamic encodedContainer = j.juicer.encode(container);
     container.log(auth.userReference.id, encodedContainer);
     dynamic containerAccess = j.juicer.encode(container.accessLog);
-    await container.reference.update({"itemCount": FieldValue.increment(1), "accessLog": containerAccess});
+
+    await fs.runTransaction((transaction) async {
+      await container.reference.collection("items").add(j.juicer.encode(item));
+      await container.reference.update({"itemCount": FieldValue.increment(1), "accessLog": containerAccess});
+    });
   }
 
   @action
@@ -90,9 +96,12 @@ abstract class _ViewList with Store {
   Future<void> delete(ListItem item) async {
     // TODO: input sanity check, transaction
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.userReference.id, encodedItem);
-    encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
-    await container.reference.update({"itemCount": FieldValue.increment(-1)});
+    item.log(auth.userReference.id, encodedItem, deleteEntity: true);
+    dynamic encodedAccess = j.juicer.encode(item.accessLog);
+    await fs.runTransaction((transaction) async {
+      await item.reference.update({"accessLog": encodedAccess});
+      await container.reference.update({"itemCount": FieldValue.increment(-1)});
+    });
   }
 
   @action

@@ -217,8 +217,9 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
             : Map.fromIterable(val.lastFlattenedProperties.keys,
                 value: (k) => juicer.encode(val.lastFlattenedProperties[k])),
 // maxLogSize is ignored
-        "timeCreated": val.timeCreated,
-        "timeUpdated": val.timeUpdated,
+// timeCreated is ignored
+// timeUpdated is ignored
+        "deleted": val.deleted,
       });
   @override
   jcr_i5.AccessLog fromMap(Juicer juicer, Map map, jcr_i5.AccessLog empty) {
@@ -236,6 +237,7 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
 // maxLogSize is ignored
 // timeCreated is ignored
 // timeUpdated is ignored
+// deleted is ignored
     return empty;
   }
 }
