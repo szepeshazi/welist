@@ -10,28 +10,36 @@ import 'view_list.dart';
 
 class CreateMultiItemWidget extends StatelessWidget {
   final ObservableInput oInput = ObservableInput();
-  final TextEditingController controller = TextEditingController(text: "");
+  final inputFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
     final Auth auth = Provider.of(context);
     final ViewList viewList = Provider.of(context);
+    final controller = TextEditingController(text: "");
+
     return Observer(
         builder: (context) => Container(
             padding: EdgeInsets.only(top: 6.0, bottom: 6.0),
             margin: EdgeInsets.only(left: 20.0, right: 20.0),
-            child: TextField(
-                autofocus: true,
-                onChanged: (String value) {
-                  oInput.setValue(value);
-                },
-                onSubmitted: (_) {
-                  ListItem item = ListItem()
-                    ..name = oInput.input
-                    ..timeCompleted = null;
-                  viewList.add(auth.userReference.path, item);
-                  oInput.setValue("");
-                  controller.value = TextEditingValue(text: "empty");
-                })));
+            child: Column(children: [
+              TextField(
+                  autofocus: true,
+                  controller: controller,
+                  onChanged: (String value) {
+                    oInput.setValue(value);
+                  },
+                  focusNode: inputFocusNode,
+                  onSubmitted: (_) {
+                    ListItem item = ListItem()
+                      ..name = oInput.input
+                      ..timeCompleted = null;
+                    viewList.add(auth.userReference.path, item);
+                    oInput.setValue("");
+                    controller.text = oInput.input;
+                    inputFocusNode.requestFocus();
+                  }),
+              Text("current Input: ${oInput.input}")
+            ])));
   }
 }

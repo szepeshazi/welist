@@ -47,7 +47,7 @@ class ViewListWrapperWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ViewList viewList = Provider.of(context);
-    return Observer(
+    return Provider(create: (_) => null, child: Observer(
         builder: (context) => Column(children: [
               if (viewList.multiEditMode) CreateMultiItemWidget(),
               ListView.builder(
@@ -55,7 +55,7 @@ class ViewListWrapperWidget extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: viewList.items?.length ?? 0,
                   itemBuilder: (BuildContext context, index) => ListItemRowWidget(item: viewList.items[index]))
-            ]));
+            ])));
   }
 }
 
