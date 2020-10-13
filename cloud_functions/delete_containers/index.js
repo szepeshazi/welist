@@ -1,24 +1,16 @@
+/**
+ * Remove containers marked for deletion
+ */
 const {Firestore} = require('@google-cloud/firestore');
-
-// Create a new client
 const fs = new Firestore();
 
-
 /**
- * Triggered from a message on a Cloud Pub/Sub topic.
- *
- * @param {!Object} event Event payload.
- * @param {!Object} context Metadata for the event.
+ * Triggered by Cloud Pub/Sub 'deleteContainer' topic.
  */
-exports.executeDelete = async (event, context) => {
-    const message = event.data
-        ? Buffer.from(event.data, 'base64').toString()
-        : 'No message';
-    console.log(message);
-
+exports.executeDelete = async (_, __) => {
     const containerLimit = 10;
-    const itemLimit = 100;
-    const maxDeleteOperations = 1000;
+    const itemLimit = 2;
+    const maxDeleteOperations = 5;
     let deleteCount = 0;
     let docsToDelete = [];
 
@@ -32,11 +24,21 @@ exports.executeDelete = async (event, context) => {
     for (const container of containersSnapshot.docs) {
         docsToDelete.push(`container: ${container.id} (${container.data()['name']})`);
         deleteCount++;
-        const itemsSnapshot = await container.ref.collection('items').limit(itemLimit).get();
-        for (const item of itemsSnapshot.docs) {
-            docsToDelete.push(`item: ${item.id} (${item.data()['name']})`);
-            deleteCount++;
-            if (deleteCount > maxDeleteOperations) break;
+
+        let hasMoreItems = true;
+        let lastItemRef = null;
+        while (hasMoreItems) {
+            let itemsQuery = container.ref.collection('items').limit(itemLimit);
+            if (lastItemRef != null) {
+                itemsQuery = itemsQuery.startAfter(lastItemRef);
+            }
+            const itemsSnapshot = await itemsQuery.get();
+            hasMoreItems = !itemsSnapshot.empty;
+            lastItemRef = itemsSnapshot.docs[itemsSnapshot.docs.length -1];
+            for (const item of itemsSnapshot.docs) {
+                docsToDelete.push(`item: ${item.id} (${item.data()['name']})`);
+                deleteCount++;
+            }
         }
         if (deleteCount > maxDeleteOperations) break;
     }
