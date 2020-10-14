@@ -21,6 +21,7 @@ dependencies:
   intl:
   juicer:
   animate_do:
+  pedantic:
 
 dev_dependencies:
   flutter_test:

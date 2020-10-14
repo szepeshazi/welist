@@ -31,11 +31,11 @@ abstract class _Workspace with Store {
 
   StreamSubscription<QuerySnapshot> subscribeToContainerChanges() {
     // Listen to containers the current user has access to
-    print("query condition: ${Role.attachRoles(auth.userReference.id)}");
+    print("query condition: ${Role.attachRoles(auth.user.reference.id)}");
     return _fs
         .collection(collectionListContainers)
         .notDeleted
-        .where('rawAccessors', arrayContainsAny: Role.attachRoles(auth.userReference.id))
+        .where('rawAccessors', arrayContainsAny: Role.attachRoles(auth.user.reference.id))
         .snapshots()
         .listen((update) => _updateContainers(update));
   }
@@ -54,9 +54,9 @@ abstract class _Workspace with Store {
     container
       ..itemCount = 0
       ..accessLog = AccessLog()
-      ..rawAccessors = ["${auth.userReference.id}::owner"];
+      ..rawAccessors = ["${auth.user.reference.id}::owner"];
     var encoded = j.juicer.encode(container);
-    container.log(auth.userReference.id, encoded);
+    container.log(auth.user.reference.id, encoded);
     encoded["accessLog"] = j.juicer.encode(container.accessLog);
     await _fs.collection(collectionListContainers).add(encoded);
   }
@@ -64,7 +64,7 @@ abstract class _Workspace with Store {
   @action
   Future<void> delete(ListContainer container) async {
     var encoded = j.juicer.encode(container);
-    container.log(auth.userReference.id, encoded, deleteEntity: true);
+    container.log(auth.user.reference.id, encoded, deleteEntity: true);
     dynamic encodedAccess = j.juicer.encode(container.accessLog);
     await container.reference.update({"accessLog": encodedAccess});
   }

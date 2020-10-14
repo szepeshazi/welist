@@ -2,24 +2,17 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
-import '../auth/auth.dart';
-import '../navigation/main_page.dart';
+
+import '../main_page/main_page_navigator.dart';
 import '../shared/animation_director/animation_director.dart';
 
 class SplashWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Auth auth = Provider.of(context);
-    final MainPage mainPage  = Provider.of(context);
+    final MainPageNavigator _mainPageNavigator = Provider.of(context);
     final AnimationDirector director = AnimationDirector();
-    director.completed.listen((event) {
-      if (event) {
-        if (auth.user != null) {
-          mainPage.pushState(MainPageState.loggedIn);
-        } else {
-          mainPage.pushState(MainPageState.loggedOut);
-        }
-      }
+    director.completed.listen((_) {
+      _mainPageNavigator.updateSplashScreenStatus(false);
     });
     return Container(
         color: Colors.white,

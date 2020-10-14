@@ -26,12 +26,14 @@ class _$UserJuicer extends ClassMapper<jcr_i1.User> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i1.User val) =>
       juicer.removeNullValues({
+// reference is ignored
         "authId": val.authId,
         "displayName": val.displayName,
         "email": val.email,
       });
   @override
   jcr_i1.User fromMap(Juicer juicer, Map map, jcr_i1.User empty) {
+// reference is ignored
     if (map.containsKey("authId")) empty.authId = map["authId"];
     if (map.containsKey("displayName")) empty.displayName = map["displayName"];
     if (map.containsKey("email")) empty.email = map["email"];

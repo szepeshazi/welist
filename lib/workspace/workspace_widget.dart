@@ -6,71 +6,65 @@ import 'package:provider/provider.dart';
 
 import '../auth/auth.dart';
 import '../juiced/juiced.dart';
-import '../login_ui/login_screen.dart';
-import '../navigation/main_page.dart';
 import '../profile/user_info_widget.dart';
-import '../splash/splash_widget.dart';
 import '../view_list/view_list_widget.dart';
 import '../workspace/workspace.dart';
 import 'create_list_widget.dart';
-import 'list_container_shares.dart';
+import 'workspace_navigator.dart';
 
 class WorkspaceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final MainPage mainPage = Provider.of(context);
-    return MultiProvider(
-        providers: [Provider<Workspace>(create: (context) => Workspace(context.read<Auth>())..initialize())],
-        child: Observer(
-            builder: (context) => Navigator(
-                    pages: [
-                      if (mainPage.currentState == MainPageState.splashAnimation)
-                        MaterialPage(key: ValueKey("splash"), name: "splash", child: SplashWidget()),
-                      if (mainPage.currentState == MainPageState.loggedIn)
-                        MaterialPage(key: ValueKey("workspace"), name: "workspace", child: MainScaffoldWidget()),
-                      if (mainPage.currentState == MainPageState.loggedOut)
-                        MaterialPage(key: ValueKey("login"), name: "login", child: LoginScreen()),
-                      if (mainPage.showCreateListWidget)
-                        MaterialPage(
-                            key: ValueKey("createList"), name: "createList", child: CreateListContainerWidget()),
-                      if (mainPage.selectedContainer != null)
-                        MaterialPage(
-                            key: ValueKey("viewList"),
-                            name: "viewList",
-                            child: ViewListWidget(container: mainPage.selectedContainer)),
-                      if (mainPage.showSharesForContainer != null)
-                        MaterialPage(
-                            key: ValueKey("shares"),
-                            name: "shares",
-                            child: ListContainerSharesWidget(container: mainPage.showSharesForContainer)),
-                    ],
-                    onPopPage: (route, result) {
-                      if (!route.didPop(result)) {
-                        return false;
-                      }
-                      if (route.settings.name == "createList") {
-                        mainPage.toggleCreateListWidget(false);
-                      } else if (route.settings.name == "viewList") {
-                        mainPage.selectContainer(null);
-                      } else if (route.settings.name == "shares") {
-                        mainPage.toggleSharesForContainer(null);
-                      }
-                      return true;
-                    })));
+    return MultiProvider(providers: [
+      Provider<Workspace>(create: (_) => Workspace(context.read<Auth>())..initialize()),
+      Provider<WorkspaceNavigator>(create: (_) => WorkspaceNavigator())
+    ], child: WorkspaceNavigatorWidget());
   }
 }
 
-class MainScaffoldWidget extends StatelessWidget {
+class WorkspaceNavigatorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final MainPage mainPage = Provider.of(context);
+    final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
+    return Observer(
+        builder: (context) => Navigator(
+                pages: [
+                  MaterialPage(key: ValueKey("containerList"), name: "containerList", child: WorkspaceScaffoldWidget()),
+                  if (_workspaceNavigator.showAddContainerWidget)
+                    MaterialPage(
+                        key: ValueKey("addContainer"), name: "addContainer", child: CreateListContainerWidget()),
+                  if (_workspaceNavigator.selectedContainer != null)
+                    MaterialPage(
+                        key: ValueKey("containerDetails"),
+                        name: "containerDetails",
+                        child: ViewListWidget(container: _workspaceNavigator.selectedContainer))
+                ],
+                onPopPage: (route, result) {
+                  if (!route.didPop(result)) {
+                    return false;
+                  }
+                  if (route.settings.name == "addContainer") {
+                    _workspaceNavigator.toggleAddContainerWidget(false);
+                  }
+                  if (route.settings.name == "containerDetails") {
+                    _workspaceNavigator.toggleSelectedContainer(null);
+                  }
+                  return true;
+                }));
+  }
+}
+
+class WorkspaceScaffoldWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
     return Scaffold(
         appBar: AppBar(title: Text("My lists"), actions: [UserInfoWidget()]),
         body: ListContainersWidget(),
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add),
             onPressed: () {
-              mainPage.toggleCreateListWidget(true);
+              _workspaceNavigator.toggleAddContainerWidget(true);
             }));
   }
 }
@@ -97,7 +91,7 @@ class ListContainerRowWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Workspace workspace = Provider.of(context);
-    final MainPage mainPage = Provider.of(context);
+    final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
     return ListTile(
         title: Row(
           mainAxisSize: MainAxisSize.max,
@@ -111,7 +105,7 @@ class ListContainerRowWidget extends StatelessWidget {
             Container(
                 margin: EdgeInsets.only(left: 5.0),
                 child: InkWell(
-                  onTap: () => mainPage.toggleSharesForContainer(container),
+                  onTap: () {}, // TODO: show shares for container
                   child: Row(children: [Icon(Icons.people), Text("(1)")]),
                 )),
           ],
@@ -134,7 +128,7 @@ class ListContainerRowWidget extends StatelessWidget {
               }
             }),
         onTap: () {
-          mainPage.selectContainer(container);
+          _workspaceNavigator.toggleSelectedContainer(container);
         });
   }
 }

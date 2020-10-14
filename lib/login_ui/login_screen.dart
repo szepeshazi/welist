@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
-import '../navigation/main_page.dart';
+import '../main_page/main_page_navigator.dart';
 
 import 'constants.dart';
 
@@ -16,7 +16,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MainPage mainPage = Provider.of(context);
+    final MainPageNavigator _mainPageNavigator = Provider.of(context);
 
     return FlutterLogin(
       title: Constants.appName,
@@ -128,7 +128,8 @@ class LoginScreen extends StatelessWidget {
       onLogin: _login,
       onSignup: _register,
       onSubmitAnimationCompleted: () {
-        mainPage.pushState(MainPageState.loggedIn);
+        // TODO login or register successful
+        _mainPageNavigator.updateLoginScreenStatus(false);
       },
       onRecoverPassword: (name) {
         print('Recover password info');
@@ -146,7 +147,7 @@ class LoginScreen extends StatelessWidget {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(email: loginData.name, password: loginData.password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        result = 'The password provided is too weak.';
+        result = 'Password is weak (should be at least 6 chars)';
       } else if (e.code == 'email-already-in-use') {
         result = 'The account already exists for that email.';
       }

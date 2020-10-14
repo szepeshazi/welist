@@ -3,14 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
+
 import '../auth/auth.dart';
-import '../navigation/main_page.dart';
 
 class UserInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Auth auth = Provider.of(context);
-    final MainPage mainPage = Provider.of(context);
     return Row(children: [
       Text(auth.user.displayName ?? auth.user.email.split("@").first),
       Container(padding: EdgeInsets.only(left: 10), child: Icon(Icons.account_circle)),
@@ -30,21 +29,19 @@ class UserInfoWidget extends StatelessWidget {
                       Icon(Icons.exit_to_app)
                     ]))
               ],
-      onSelected: (ProfileMenuItem selected) {
-            switch(selected) {
+          onSelected: (ProfileMenuItem selected) {
+            switch (selected) {
               case ProfileMenuItem.settings:
-               // TODO: profile menu
+                // TODO: profile menu
                 break;
               case ProfileMenuItem.logout:
-                mainPage.pushState(MainPageState.loggedOut);
-                FirebaseAuth.instance.signOut();
+                // TODO: fixed delay
+                Future.delayed(Duration(milliseconds: 250)).then((_) => FirebaseAuth.instance.signOut());
                 break;
             }
-      })
+          })
     ]);
   }
 }
 
-enum ProfileMenuItem {
-  settings, logout
-}
+enum ProfileMenuItem { settings, logout }

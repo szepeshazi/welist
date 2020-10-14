@@ -67,14 +67,14 @@ abstract class _ViewList with Store {
       ..timeCompleted = null
       ..accessLog = AccessLog();
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.userReference.id, encodedItem);
+    item.log(auth.user.reference.id, encodedItem);
     encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
 
     // pseudo increment to be included in access log
     // real increment operation will happen on FB, and changes will be pushed to the obj
     container.itemCount++;
     dynamic encodedContainer = j.juicer.encode(container);
-    container.log(auth.userReference.id, encodedContainer);
+    container.log(auth.user.reference.id, encodedContainer);
     dynamic containerAccess = j.juicer.encode(container.accessLog);
 
     await fs.runTransaction((transaction) async {
@@ -87,7 +87,7 @@ abstract class _ViewList with Store {
   Future<void> update(ListItem item) async {
     // TODO: input sanity check, transaction
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.userReference.id, encodedItem);
+    item.log(auth.user.reference.id, encodedItem);
     encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
     await item.reference.set(encodedItem);
   }
@@ -96,7 +96,7 @@ abstract class _ViewList with Store {
   Future<void> delete(ListItem item) async {
     // TODO: input sanity check, transaction
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.userReference.id, encodedItem, deleteEntity: true);
+    item.log(auth.user.reference.id, encodedItem, deleteEntity: true);
     dynamic encodedAccess = j.juicer.encode(item.accessLog);
     await fs.runTransaction((transaction) async {
       await item.reference.update({"accessLog": encodedAccess});
