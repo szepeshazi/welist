@@ -6,19 +6,8 @@ import '../profile/user_info_widget.dart';
 
 import '../workspace/workspace.dart';
 
-class CreateListContainerWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Add a list"),
-          actions: [UserInfoWidget()]
-        ),
-        body: AddListContainerForm());
-  }
-}
 
-class AddListContainerForm extends StatefulWidget {
+class CreateListContainerWidget extends StatefulWidget {
   @override
   AddListContainerFormState createState() {
     return AddListContainerFormState();
@@ -27,7 +16,7 @@ class AddListContainerForm extends StatefulWidget {
 
 // Define a corresponding State class.
 // This class holds data related to the form.
-class AddListContainerFormState extends State<AddListContainerForm> {
+class AddListContainerFormState extends State<CreateListContainerWidget> {
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
   //

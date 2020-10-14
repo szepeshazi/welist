@@ -13,9 +13,16 @@ abstract class _WorkspaceNavigator with Store {
   @observable
   ListContainer selectedContainer;
 
+  @observable
+  ListContainer showSharesForContainer;
+
   @action
   void toggleAddContainerWidget(bool show) => showAddContainerWidget = show;
 
   @action
   void toggleSelectedContainer(ListContainer selected) => selectedContainer = selected;
+
+  @action
+  void toggleSharesForContainer(ListContainer selected) => showSharesForContainer = selected;
+
 }

@@ -10,6 +10,7 @@ import '../profile/user_info_widget.dart';
 import '../view_list/view_list_widget.dart';
 import '../workspace/workspace.dart';
 import 'create_list_widget.dart';
+import 'list_container_shares.dart';
 import 'workspace_navigator.dart';
 
 class WorkspaceWidget extends StatelessWidget {
@@ -29,25 +30,42 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
     return Observer(
         builder: (context) => Navigator(
                 pages: [
-                  MaterialPage(key: ValueKey("containerList"), name: "containerList", child: WorkspaceScaffoldWidget()),
+                  MaterialPage(
+                      key: ValueKey("containerList"),
+                      name: "containerList",
+                      child: WorkspaceScaffoldWidget(
+                        body: ListContainersWidget(),
+                      )),
                   if (_workspaceNavigator.showAddContainerWidget)
                     MaterialPage(
-                        key: ValueKey("addContainer"), name: "addContainer", child: CreateListContainerWidget()),
+                        key: ValueKey("addContainer"),
+                        name: "addContainer",
+                        child: WorkspaceScaffoldWidget(body: CreateListContainerWidget())),
                   if (_workspaceNavigator.selectedContainer != null)
                     MaterialPage(
                         key: ValueKey("containerDetails"),
                         name: "containerDetails",
-                        child: ViewListWidget(container: _workspaceNavigator.selectedContainer))
+                        child: ViewListWidget(container: _workspaceNavigator.selectedContainer)),
+                  if (_workspaceNavigator.showSharesForContainer != null)
+                    MaterialPage(
+                        key: ValueKey("containerShares"),
+                        name: "containerShares",
+                        child: ListContainerSharesWidget(container: _workspaceNavigator.showSharesForContainer))
                 ],
                 onPopPage: (route, result) {
                   if (!route.didPop(result)) {
                     return false;
                   }
-                  if (route.settings.name == "addContainer") {
-                    _workspaceNavigator.toggleAddContainerWidget(false);
-                  }
-                  if (route.settings.name == "containerDetails") {
-                    _workspaceNavigator.toggleSelectedContainer(null);
+                  switch (route.settings.name) {
+                    case "addContainer":
+                      _workspaceNavigator.toggleAddContainerWidget(false);
+                      break;
+                    case "containerDetails":
+                      _workspaceNavigator.toggleSelectedContainer(null);
+                      break;
+                    case "containerShares":
+                      _workspaceNavigator.toggleSharesForContainer(null);
+                      break;
                   }
                   return true;
                 }));
@@ -55,12 +73,16 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
 }
 
 class WorkspaceScaffoldWidget extends StatelessWidget {
+  final Widget body;
+
+  const WorkspaceScaffoldWidget({Key key, this.body}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
     return Scaffold(
         appBar: AppBar(title: Text("My lists"), actions: [UserInfoWidget()]),
-        body: ListContainersWidget(),
+        body: body,
         floatingActionButton: FloatingActionButton(
             child: Icon(Icons.add),
             onPressed: () {
@@ -90,7 +112,7 @@ class ListContainerRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Workspace workspace = Provider.of(context);
+    final Workspace _workspace = Provider.of(context);
     final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
     return ListTile(
         title: Row(
@@ -105,7 +127,9 @@ class ListContainerRowWidget extends StatelessWidget {
             Container(
                 margin: EdgeInsets.only(left: 5.0),
                 child: InkWell(
-                  onTap: () {}, // TODO: show shares for container
+                  onTap: () {
+                    _workspaceNavigator.toggleSharesForContainer(container);
+                  }, // TODO: show shares for container
                   child: Row(children: [Icon(Icons.people), Text("(1)")]),
                 )),
           ],
@@ -123,7 +147,7 @@ class ListContainerRowWidget extends StatelessWidget {
             onSelected: (ListContainerMenuItem selected) {
               switch (selected) {
                 case ListContainerMenuItem.delete:
-                  workspace.delete(container);
+                  _workspace.delete(container);
                   break;
               }
             }),
