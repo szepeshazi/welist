@@ -1,15 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart' show timeDilation;
 import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
-import '../main_page/main_page_navigator.dart';
 
+import '../main_page/main_page_navigator.dart';
 import 'constants.dart';
 
 class LoginScreen extends StatelessWidget {
-  Duration get loginTime => Duration(milliseconds: timeDilation.ceil() * 2250);
-
   Future<String> _recoverPassword(String name) async {
     return "Not Implemented";
   }
@@ -20,8 +17,8 @@ class LoginScreen extends StatelessWidget {
 
     return FlutterLogin(
       title: Constants.appName,
-      //logo: 'assets/images/ecorp.png',
-      logoTag: Constants.logoTag,
+      //logo: 'assets/images/checklist_logo.jpg',
+      //logoTag: Constants.logoTag,
       titleTag: Constants.titleTag,
       // messages: LoginMessages(
       //   usernameHint: 'Username',
@@ -37,19 +34,14 @@ class LoginScreen extends StatelessWidget {
       //   recoverPasswordDescription: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry',
       //   recoverPasswordSuccess: 'Password rescued successfully',
       // ),
-      // theme: LoginTheme(
-      //   primaryColor: Colors.teal,
-      //   accentColor: Colors.yellow,
-      //   errorColor: Colors.deepOrange,
-      //   pageColorLight: Colors.indigo.shade300,
-      //   pageColorDark: Colors.indigo.shade500,
-      //   titleStyle: TextStyle(
-      //     color: Colors.greenAccent,
-      //     fontFamily: 'Quicksand',
-      //     letterSpacing: 4,
-      //   ),
-      //   // beforeHeroFontSize: 50,
-      //   // afterHeroFontSize: 20,
+      theme: LoginTheme(
+        titleStyle: TextStyle(
+          color: Colors.white,
+          fontFamily: 'Quicksand',
+          letterSpacing: 4,
+        ),
+        beforeHeroFontSize: 50,
+        afterHeroFontSize: 20),
       //   bodyStyle: TextStyle(
       //     fontStyle: FontStyle.italic,
       //     decoration: TextDecoration.underline,

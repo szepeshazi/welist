@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../login_ui/login_screen.dart';
+import '../login_register/login_widget.dart';
 import '../splash/splash_widget.dart';
 import '../workspace/workspace_widget.dart';
 import 'main_page_navigator.dart';

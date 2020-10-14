@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../juiced/juiced.dart';
-import '../profile/user_info_widget.dart';
-
 import '../workspace/workspace.dart';
-
+import 'workspace_navigator.dart';
 
 class CreateListContainerWidget extends StatefulWidget {
   @override
@@ -28,7 +26,9 @@ class AddListContainerFormState extends State<CreateListContainerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final Workspace workspace = Provider.of(context);
+    final Workspace _workspace = Provider.of(context);
+    final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
+
     // Build a Form widget using the _formKey created above.
     return Form(
         key: _formKey,
@@ -82,8 +82,8 @@ class AddListContainerFormState extends State<CreateListContainerWidget> {
                   if (_formKey.currentState.validate()) {
                     // If the form is valid, display a Snackbar.
                     Scaffold.of(context).showSnackBar(SnackBar(content: Text('Processing Data')));
-                    await workspace.add(newListContainer);
-                    Navigator.pop(context);
+                    await _workspace.add(newListContainer);
+                    _workspaceNavigator.toggleAddContainerWidget(false);
                   }
                 },
                 child: Text('Submit'),

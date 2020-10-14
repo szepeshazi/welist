@@ -83,11 +83,9 @@ abstract class _Auth with Store {
       DocumentReference userRef = await _fs.collection("users").add(j.juicer.encode(newUser));
       newUser.reference = userRef;
       user = newUser;
-      print("fetchUserAccount: user created: $user");
     } else {
       QueryDocumentSnapshot currentUserSnapshot = userSnapshot.docs.first;
       user = j.juicer.decode(currentUserSnapshot.data(), (_) => we.User()..reference = currentUserSnapshot.reference);
-      print("fetchUserAccount: user fetched: $user");
     }
     status = UserStatus.loggedIn;
   }

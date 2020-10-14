@@ -28,8 +28,7 @@ class AuthCard extends StatefulWidget {
       this.emailValidator,
       this.passwordValidator,
       this.onSubmit,
-      this.onSubmitCompleted,
-      this.onSubmitAnimationStart})
+      this.onSubmitCompleted})
       : super(key: key);
 
   final EdgeInsets padding;
@@ -38,7 +37,6 @@ class AuthCard extends StatefulWidget {
   final FormFieldValidator<String> passwordValidator;
   final Function onSubmit;
   final Function onSubmitCompleted;
-  final Function onSubmitAnimationStart;
 
   @override
   AuthCardState createState() => AuthCardState();
@@ -278,8 +276,7 @@ class AuthCardState extends State<AuthCard> with TickerProviderStateMixin {
                       _forwardChangeRouteAnimation().then((_) {
                         widget?.onSubmitCompleted();
                       });
-                    },
-                    onSubmitAnimationStarted: widget.onSubmitAnimationStart,
+                    }
                   ),
                 )
               : _RecoverCard(
@@ -319,8 +316,7 @@ class _LoginCard extends StatefulWidget {
     @required this.passwordValidator,
     @required this.onSwitchRecoveryPassword,
     this.onSwitchAuth,
-    this.onSubmitCompleted,
-    this.onSubmitAnimationStarted,
+    this.onSubmitCompleted
   }) : super(key: key);
 
   final AnimationController loadingController;
@@ -329,7 +325,6 @@ class _LoginCard extends StatefulWidget {
   final Function onSwitchRecoveryPassword;
   final Function onSwitchAuth;
   final Function onSubmitCompleted;
-  final Function onSubmitAnimationStarted;
 
   @override
   _LoginCardState createState() => _LoginCardState();
