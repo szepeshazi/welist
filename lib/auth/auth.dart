@@ -89,6 +89,23 @@ abstract class _Auth with Store {
     }
     status = UserStatus.loggedIn;
   }
+
+  Future<void> login(String email, String password) async {
+    await _fbAuth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
+  Future<void> signOut() async {
+    await _fbAuth.signOut();
+  }
+
+  Future<void> register(String email, String password) async {
+    await _fbAuth.createUserWithEmailAndPassword(email: email, password: password);
+  }
+
+  Future<void> resetPassword(String email) async {
+    await _fbAuth.sendPasswordResetEmail(email: email);
+  }
+
 }
 
 enum UserStatus { loggedOut, verificationRequired, loggedIn }

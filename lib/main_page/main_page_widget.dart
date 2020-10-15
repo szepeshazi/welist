@@ -21,7 +21,7 @@ class MainPageWidget extends StatelessWidget {
                   if (_mainPageNavigator.mainWidget == MainWidget.workSpace)
                     MaterialPage(key: ValueKey("workspace"), name: "workspace", child: WorkspaceWidget()),
                   if (_mainPageNavigator.mainWidget == MainWidget.loginRegister)
-                    MaterialPage(key: ValueKey("login"), name: "login", child: LoginScreen()),
+                    MaterialPage(key: ValueKey("login"), name: "login", child: LoginWidget()),
                 ],
                 onPopPage: (route, result) {
                   if (!route.didPop(result)) {

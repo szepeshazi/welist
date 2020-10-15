@@ -127,7 +127,7 @@ class __HeroTextContentState extends State<_HeroTextContent>
       type: MaterialType.transparency,
       child: Text(
         widget.text,
-        style: widget.style.copyWith(fontSize: fontSize),
+        style: widget.style.copyWith(fontSize: fontSize, color: Colors.white),
         textAlign: widget.textAlign,
         textDirection: widget.textDirection,
         textScaleFactor: widget.textScaleFactor,

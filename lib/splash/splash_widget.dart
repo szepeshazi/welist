@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -11,8 +13,12 @@ class SplashWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final MainPageNavigator _mainPageNavigator = Provider.of(context);
     final AnimationDirector director = AnimationDirector();
-    director.completed.listen((_) {
-      _mainPageNavigator.updateSplashScreenStatus(false);
+    StreamSubscription directorListener;
+    directorListener= director.completed.listen((bool completed) {
+      if (completed) {
+        _mainPageNavigator.updateSplashScreenStatus(false);
+        directorListener.cancel();
+      }
     });
     return Container(
         color: Colors.white,
@@ -22,7 +28,8 @@ class SplashWidget extends StatelessWidget {
               animate: false,
               controller: director
                   .register(AnimationPart(id: titlePart, dependsOn: imagePart, trigger: AnimationStatus.completed)),
-              child: Text("We List", textAlign: TextAlign.center, style: Theme.of(context).textTheme.headline4)),
+              child: Text("We List", textAlign: TextAlign.center, style: Theme.of(context).textTheme.headline4
+                  .copyWith(color: Colors.black))),
           ZoomIn(
               manualTrigger: true,
               animate: true,

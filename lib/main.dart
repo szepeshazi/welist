@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'auth/auth.dart';
@@ -24,10 +25,11 @@ class MainContainer extends StatelessWidget {
         child: MaterialApp(
             title: 'WeList',
             theme: ThemeData(
-                brightness: Brightness.light,
-                primaryColor: Colors.lightBlue[500],
-                accentColor: Colors.deepOrange[300],
-                fontFamily: "Roboto"),
+              brightness: Brightness.light,
+              primaryColor: Colors.lightBlue[500],
+              accentColor: Colors.deepOrange[300],
+              textTheme: GoogleFonts.robotoTextTheme(Theme.of(context).textTheme),
+            ),
             home: MainPageWidget()));
   }
 }

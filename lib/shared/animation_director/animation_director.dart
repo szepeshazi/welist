@@ -4,7 +4,6 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 
 class AnimationDirector {
-
   final completeController = StreamController<bool>.broadcast();
 
   Stream<bool> get completed => completeController.stream;
@@ -26,7 +25,11 @@ class AnimationDirector {
                 }
                 if (status == AnimationStatus.completed) {
                   bool completed = _parts.values.where((ctrl) => ctrl.status != AnimationStatus.completed).isEmpty;
-                  completeController.add(completed);
+                  if (!completeController.isClosed) {
+                    completeController.add(completed);
+                  } if (completed) {
+                    completeController.close();
+                  }
                 }
               }
             });
