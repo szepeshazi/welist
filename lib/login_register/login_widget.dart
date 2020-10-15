@@ -38,10 +38,7 @@ class LoginWidget extends StatelessWidget {
       },
       onLogin: _loginFunction(_auth),
       onSignup: _registerFunction(_auth),
-      onSubmitAnimationCompleted: () {
-        // TODO login or register successful
-        _mainPageNavigator.updateLoginScreenStatus(false);
-      },
+      onSubmitAnimationCompleted: () => _mainPageNavigator.updateLoginScreenStatus(false),
       onRecoverPassword: _recoverPasswordFunction(_auth),
       showDebugButtons: false,
     );

@@ -12,6 +12,9 @@ abstract class _LoginRegisterNavigator with Store {
   @observable
   LoginState loginState;
 
+  @observable
+  bool showResendEmailButton = true;
+
   _LoginRegisterNavigator(this.auth) {
     autorun((_) {
       switch(auth.status) {
@@ -22,7 +25,7 @@ abstract class _LoginRegisterNavigator with Store {
           loginState = LoginState.confirm;
           break;
         case UserStatus.loggedIn:
-          // TODO: Handle this case.
+          print("login already concluded");
           break;
       }
     });
@@ -31,6 +34,9 @@ abstract class _LoginRegisterNavigator with Store {
 
   @action
   void setState(LoginState newState) => loginState = newState;
+
+  @action
+  void toggleResendEmailButton(bool newValue) => showResendEmailButton = newValue;
 }
 
 enum LoginState { login, confirm }

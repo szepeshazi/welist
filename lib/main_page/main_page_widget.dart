@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../login_register/login_widget.dart';
+import '../login_register/login_register_widget.dart';
 import '../splash/splash_widget.dart';
 import '../workspace/workspace_widget.dart';
 import 'main_page_navigator.dart';
@@ -21,7 +21,7 @@ class MainPageWidget extends StatelessWidget {
                   if (_mainPageNavigator.mainWidget == MainWidget.workSpace)
                     MaterialPage(key: ValueKey("workspace"), name: "workspace", child: WorkspaceWidget()),
                   if (_mainPageNavigator.mainWidget == MainWidget.loginRegister)
-                    MaterialPage(key: ValueKey("login"), name: "login", child: LoginWidget()),
+                    MaterialPage(key: ValueKey("login"), name: "login", child: LoginRegisterWidget()),
                 ],
                 onPopPage: (route, result) {
                   if (!route.didPop(result)) {

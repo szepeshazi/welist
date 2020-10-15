@@ -12,7 +12,7 @@ class LoginRegisterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [Provider<LoginRegisterNavigator>(create: (_) => LoginRegisterNavigator(context.read<Auth>()))],
-        child: null);
+        child: LoginRegisterWrapper());
   }
 }
 
@@ -23,10 +23,11 @@ class LoginRegisterWrapper extends StatelessWidget {
 
     return Navigator(
         pages: [
-          if (_loginRegisterNavigator.loginState == LoginState.login)
-            MaterialPage(key: ValueKey("login/login"), name: "login/login", child: LoginWidget()),
-          if (_loginRegisterNavigator.loginState == LoginState.confirm)
-            MaterialPage(key: ValueKey("login/confirm"), name: "login/confirm", child: ConfirmRegistrationWidget()),
+          // if (_loginRegisterNavigator.loginState == LoginState.login)
+          //   MaterialPage(key: ValueKey("login/login"), name: "login/login", child: LoginWidget()),
+          // if (_loginRegisterNavigator.loginState == LoginState.confirm)
+          //   MaterialPage(key: ValueKey("login/confirm"), name: "login/confirm", child: ConfirmRegistrationWidget()),
+          MaterialPage(key: ValueKey("login/confirm"), name: "login/confirm", child: ConfirmRegistrationWidget())
         ],
         onPopPage: (route, result) {
           if (!route.didPop(result)) {
