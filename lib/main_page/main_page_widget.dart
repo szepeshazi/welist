@@ -14,20 +14,19 @@ class MainPageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final MainPageNavigator _mainPageNavigator = Provider.of(context);
     return Observer(
-        builder: (context) => Navigator(
-                pages: [
-                  if (_mainPageNavigator.mainWidget == MainWidget.splashAnimation)
-                    MaterialPage(key: ValueKey("splash"), name: "splash", child: SplashWidget()),
-                  if (_mainPageNavigator.mainWidget == MainWidget.workSpace)
-                    MaterialPage(key: ValueKey("workspace"), name: "workspace", child: WorkspaceWidget()),
-                  if (_mainPageNavigator.mainWidget == MainWidget.loginRegister)
-                    MaterialPage(key: ValueKey("login"), name: "login", child: LoginRegisterWidget()),
-                ],
-                onPopPage: (route, result) {
-                  if (!route.didPop(result)) {
-                    return false;
-                  }
-                  return true;
-                }));
+        builder: (context) => Navigator(pages: [
+              if (_mainPageNavigator.mainWidget == MainWidget.splashAnimation)
+                MaterialPage(
+                    key: ValueKey("splash"),
+                    name: "splash",
+                    child: SplashWidget(([_]) => _mainPageNavigator.splashModuleDone())),
+              if (_mainPageNavigator.mainWidget == MainWidget.loginRegister)
+                MaterialPage(
+                    key: ValueKey("login"),
+                    name: "login",
+                    child: LoginRegisterWidget(([_]) => _mainPageNavigator.loginModuleDone())),
+              if (_mainPageNavigator.mainWidget == MainWidget.workSpace)
+                MaterialPage(key: ValueKey("workspace"), name: "workspace", child: WorkspaceWidget())
+            ], onPopPage: (route, result) => route.didPop(result)));
   }
 }

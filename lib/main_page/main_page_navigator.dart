@@ -7,7 +7,7 @@ part 'main_page_navigator.g.dart';
 class MainPageNavigator = _MainPageNavigator with _$MainPageNavigator;
 
 abstract class _MainPageNavigator with Store {
-  final Auth auth;
+  final Auth _auth;
 
   /// Main widget to display based on internal states
   @observable
@@ -16,42 +16,45 @@ abstract class _MainPageNavigator with Store {
   /// Internal state variables
   bool _authInitialized = false;
   UserStatus _userStatus;
-  bool _splashAnimationInProgress = true;
-  bool _loginAnimationInProgress = false;
 
-  _MainPageNavigator(this.auth) {
-    reaction((_) => auth.status, (authStatus) {
+  bool _splashModuleActive = true;
+  bool _loginModuleActive = false;
+
+  _MainPageNavigator(this._auth) {
+    reaction((_) => _auth.status, (authStatus) {
       _userStatus = authStatus;
-      _evaluateState();
+      _computeState();
     });
-    reaction((_) => auth.initialized, (authInitialized) {
+    reaction((_) => _auth.initialized, (authInitialized) {
       _authInitialized = authInitialized;
-      _evaluateState();
+      _computeState();
     });
   }
 
   @action
-  void updateSplashScreenStatus(bool active) {
-    _splashAnimationInProgress = active;
-    _evaluateState();
+  void loginModuleDone() {
+    _loginModuleActive = false;
+    _computeState();
   }
 
   @action
-  void updateLoginScreenStatus(bool active) {
-    _loginAnimationInProgress = active;
-    _evaluateState();
+  void splashModuleDone() {
+    _splashModuleActive = false;
+    _computeState();
   }
 
-  void _evaluateState() {
+  void _computeState() {
     MainWidget requiredWidget;
-    if (_splashAnimationInProgress || !_authInitialized) {
+    if (_splashModuleActive || !_authInitialized) {
       requiredWidget = MainWidget.splashAnimation;
-    } else if (_authInitialized && _userStatus == UserStatus.loggedIn && !_loginAnimationInProgress) {
+      _splashModuleActive = true;
+    } else if (_userStatus == UserStatus.loggedIn && !_loginModuleActive) {
       requiredWidget = MainWidget.workSpace;
     } else {
       requiredWidget = MainWidget.loginRegister;
-      _loginAnimationInProgress = true;
+      _loginModuleActive = true;
     }
+    print("MainPageNavigator computeState, previous: $mainWidget, current: $requiredWidget");
     if (requiredWidget != mainWidget) {
       mainWidget = requiredWidget;
     }

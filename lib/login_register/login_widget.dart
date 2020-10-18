@@ -4,13 +4,13 @@ import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
 
 import '../auth/auth.dart';
-import '../main_page/main_page_navigator.dart';
 import 'constants.dart';
+import 'login_register_navigator.dart';
 
 class LoginWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final MainPageNavigator _mainPageNavigator = Provider.of(context);
+    final LoginRegisterNavigator _loginRegisterNavigator = Provider.of(context);
     final Auth _auth = Provider.of(context);
 
     return FlutterLogin(
@@ -38,7 +38,7 @@ class LoginWidget extends StatelessWidget {
       },
       onLogin: _loginFunction(_auth),
       onSignup: _registerFunction(_auth),
-      onSubmitAnimationCompleted: () => _mainPageNavigator.updateLoginScreenStatus(false),
+      onSubmitAnimationCompleted: () => _loginRegisterNavigator.loginScreenDone(),
       onRecoverPassword: _recoverPasswordFunction(_auth),
       showDebugButtons: false,
     );

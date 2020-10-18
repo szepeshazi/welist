@@ -3,20 +3,22 @@ import 'dart:async';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:provider/provider.dart';
 
-import '../main_page/main_page_navigator.dart';
 import '../shared/animation_director/animation_director.dart';
+import '../shared/common.dart';
 
 class SplashWidget extends StatelessWidget {
+  final NotifyParent _notifyParent;
+
+  SplashWidget(this._notifyParent);
+
   @override
   Widget build(BuildContext context) {
-    final MainPageNavigator _mainPageNavigator = Provider.of(context);
     final AnimationDirector director = AnimationDirector();
     StreamSubscription directorListener;
-    directorListener= director.completed.listen((bool completed) {
+    directorListener = director.completed.listen((bool completed) {
       if (completed) {
-        _mainPageNavigator.updateSplashScreenStatus(false);
+        _notifyParent();
         directorListener.cancel();
       }
     });
@@ -28,8 +30,9 @@ class SplashWidget extends StatelessWidget {
               animate: false,
               controller: director
                   .register(AnimationPart(id: titlePart, dependsOn: imagePart, trigger: AnimationStatus.completed)),
-              child: Text("We List", textAlign: TextAlign.center, style: Theme.of(context).textTheme.headline4
-                  .copyWith(color: Colors.black))),
+              child: Text("We List",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline4.copyWith(color: Colors.black))),
           ZoomIn(
               manualTrigger: true,
               animate: true,
