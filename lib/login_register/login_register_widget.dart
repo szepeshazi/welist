@@ -19,7 +19,7 @@ class LoginRegisterWidget extends StatelessWidget {
     return MultiProvider(providers: [
       Provider<LoginRegisterNavigator>(
           create: (_) => LoginRegisterNavigator(auth: context.read<Auth>(), notifyParent: notifyParent))
-    ], child: LoginRegisterWrapper());
+    ], child: Scaffold(body: LoginRegisterWrapper()));
   }
 }
 

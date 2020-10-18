@@ -24,9 +24,14 @@ abstract class _Auth with Store {
   we.User user;
 
   @observable
+  bool resendVerificationEmailDisabled = false;
+
+  @observable
   UserStatus status;
 
   Timer verificationStatusTimer;
+
+  int lastVerificationEmailSent;
 
   Future<void> initialize() async {
     await Firebase.initializeApp();
@@ -56,8 +61,12 @@ abstract class _Auth with Store {
       // Unverified user, needs verification
       status = UserStatus.verificationRequired;
       if (verificationStatusTimer == null) {
-        unawaited(_fbAuth.currentUser.sendEmailVerification());
+        unawaited(sendVerificationEmailIfPermitted());
         verificationStatusTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+          int now = DateTime.now().millisecondsSinceEpoch;
+          if (now - (lastVerificationEmailSent ?? 0) > verificationEmailPeriod) {
+            resendVerificationEmailDisabled = false;
+          }
           _fbAuth.currentUser.reload();
           print("verificationStatusTimer: ${_fbAuth.currentUser.emailVerified}");
           if (_fbAuth.currentUser.emailVerified) {
@@ -73,7 +82,8 @@ abstract class _Auth with Store {
   }
 
   Future<void> fetchUserAccount() async {
-    QuerySnapshot userSnapshot = await _fs.collection("users").where("authId", isEqualTo: _fbAuth.currentUser.uid).get();
+    QuerySnapshot userSnapshot =
+        await _fs.collection("users").where("authId", isEqualTo: _fbAuth.currentUser.uid).get();
     if (userSnapshot.docs.isEmpty) {
       String displayName = _fbAuth.currentUser.displayName ?? _fbAuth.currentUser.email.split("@").first;
       final newUser = we.User()
@@ -95,6 +105,10 @@ abstract class _Auth with Store {
   }
 
   Future<void> signOut() async {
+    if (verificationStatusTimer != null) {
+      verificationStatusTimer.cancel();
+      verificationStatusTimer = null;
+    }
     await _fbAuth.signOut();
   }
 
@@ -106,6 +120,25 @@ abstract class _Auth with Store {
     await _fbAuth.sendPasswordResetEmail(email: email);
   }
 
+  Future<void> sendVerificationEmailIfPermitted() async {
+    int now = DateTime.now().millisecondsSinceEpoch;
+    if (now - (lastVerificationEmailSent ?? 0) > verificationEmailPeriod) {
+      try {
+        await _fbAuth.currentUser.sendEmailVerification();
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'too-many-requests') {
+          print("Too many attempts at sending verification email to ${_fbAuth.currentUser.email}");
+        } else {
+          rethrow;
+        }
+      } finally {
+        lastVerificationEmailSent = now;
+        resendVerificationEmailDisabled = true;
+      }
+    }
+  }
+
+  static final verificationEmailPeriod = Duration(seconds: 10).inMilliseconds;
 }
 
 enum UserStatus { loggedOut, verificationRequired, loggedIn }
