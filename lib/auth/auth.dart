@@ -82,20 +82,19 @@ abstract class _Auth with Store {
   }
 
   Future<void> fetchUserAccount() async {
-    QuerySnapshot userSnapshot =
-        await _fs.collection("users").where("authId", isEqualTo: _fbAuth.currentUser.uid).get();
-    if (userSnapshot.docs.isEmpty) {
+    DocumentSnapshot userSnapshot = await _fs.collection("users").doc(_fbAuth.currentUser.uid).get();
+    if (!userSnapshot.exists) {
+      DocumentReference userRef = _fs.collection("users").doc(_fbAuth.currentUser.uid);
       String displayName = _fbAuth.currentUser.displayName ?? _fbAuth.currentUser.email.split("@").first;
       final newUser = we.User()
-        ..authId = _fbAuth.currentUser.uid
         ..email = _fbAuth.currentUser.email
-        ..displayName = displayName;
-      DocumentReference userRef = await _fs.collection("users").add(j.juicer.encode(newUser));
-      newUser.reference = userRef;
+        ..displayName = displayName
+        ..reference = userRef;
+      final encodedUser = j.juicer.encode(newUser);
+      await userRef.set(encodedUser);
       user = newUser;
     } else {
-      QueryDocumentSnapshot currentUserSnapshot = userSnapshot.docs.first;
-      user = j.juicer.decode(currentUserSnapshot.data(), (_) => we.User()..reference = currentUserSnapshot.reference);
+      user = j.juicer.decode(userSnapshot.data(), (_) => we.User()..reference = userSnapshot.reference);
     }
     status = UserStatus.loggedIn;
   }

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 
 import '../auth/auth.dart';
-import '../juiced/auth/roles.dart';
 import '../juiced/juiced.dart';
 import '../juiced/juiced.juicer.dart' as j;
 import '../shared/service_base.dart';
@@ -31,11 +30,12 @@ abstract class _Workspace with Store {
 
   StreamSubscription<QuerySnapshot> subscribeToContainerChanges() {
     // Listen to containers the current user has access to
-    print("query condition: ${Role.attachRoles(auth.user.reference.id)}");
+    String accessField = "${ListContainer.accessorsField}.${ContainerAccess.anyLevelField}";
+    print("querying $accessField with value ${auth.user.reference.id}");
     return _fs
-        .collection(collectionListContainers)
+        .collection(ListContainer.collectionName)
         .notDeleted
-        .where('rawAccessors', arrayContainsAny: Role.attachRoles(auth.user.reference.id))
+        .where(accessField, arrayContains: auth.user.reference.id)
         .snapshots()
         .listen((update) => _updateContainers(update));
   }
@@ -43,7 +43,7 @@ abstract class _Workspace with Store {
   Future<void> _updateContainers(QuerySnapshot update) async {
     List<ListContainer> _containers = [];
     for (var doc in update.docs) {
-      ListContainer container = await ListContainer.fromSnapshot(doc, j.juicer, fetchUserCallback);
+      ListContainer container = await ListContainer.fromSnapshot(doc, j.juicer);
       _containers.add(container);
     }
     containers = _containers;
@@ -54,11 +54,13 @@ abstract class _Workspace with Store {
     container
       ..itemCount = 0
       ..accessLog = AccessLog()
-      ..rawAccessors = ["${auth.user.reference.id}::owner"];
+      ..accessors = (ContainerAccess()
+        ..anyLevel = [auth.user.reference.id]
+        ..owners = [auth.user.reference.id]);
     var encoded = j.juicer.encode(container);
     container.log(auth.user.reference.id, encoded);
     encoded["accessLog"] = j.juicer.encode(container.accessLog);
-    await _fs.collection(collectionListContainers).add(encoded);
+    await _fs.collection(ListContainer.collectionName).add(encoded);
   }
 
   @action
@@ -75,6 +77,4 @@ abstract class _Workspace with Store {
 
   static FetchUserCallback fetchUserCallback =
       (String userId) async => FirebaseFirestore.instance.collection("users").doc(userId).get();
-
-  static const String collectionListContainers = "containers";
 }

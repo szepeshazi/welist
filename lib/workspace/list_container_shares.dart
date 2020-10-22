@@ -27,15 +27,15 @@ class ListContainerShareListWidget extends StatelessWidget {
     return ListView.builder(
         padding: const EdgeInsets.only(left: 8),
         shrinkWrap: true,
-        itemCount: container.accessors.length ?? 0,
-        itemBuilder: (BuildContext context, index) => AccessorWidget(userRole: container.accessors[index]));
+        itemCount: container.accessors.anyLevel.length ?? 0,
+        itemBuilder: (BuildContext context, index) => AccessorWidget(userId: container.accessors.anyLevel[index]));
   }
 }
 
 class AccessorWidget extends StatelessWidget {
-  final UserRole userRole;
+  final String userId;
 
-  const AccessorWidget({Key key, this.userRole}) : super(key: key);
+  const AccessorWidget({Key key, this.userId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => ListTile(
@@ -45,8 +45,8 @@ class AccessorWidget extends StatelessWidget {
           Expanded(
               child: Row(children: [
             Container(padding: EdgeInsets.only(right: 5.0), child: Icon(Icons.account_circle)),
-            Text(userRole.user.email),
-            Container(padding: EdgeInsets.only(left: 5.0), child: Text("- ${userRole.role}"))
+            Text(userId),
+            Container(padding: EdgeInsets.only(left: 5.0), child: Text("- some role"))
           ]))
         ],
       ),

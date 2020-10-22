@@ -10,17 +10,7 @@ void main() {
       ListContainer container = ListContainer()
         ..type = ContainerType.todo
         ..name = "My todo list"
-        ..accessors = [
-          UserRole(
-              User()
-                ..authId = "authId"
-                ..displayName = "John"
-                ..email = "john@doe.com",
-              "owner")
-        ]
         ..accessLog = AccessLog();
-
-
 
       Map<String, dynamic> result = j.juicer.encode(container);
       dynamic flattened = flatten(result);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juicer/juicer.dart';
 import 'package:juicer/metadata.dart';
+import 'package:welist/juiced/workspace/container_access.dart';
 
 import '../../shared/enum_codec.dart';
 import '../common/access_log.dart';
@@ -21,10 +22,10 @@ class ListContainer with AccessLogUtils {
 
   String typeName;
 
-  List<String> rawAccessors;
-
   @override
   AccessLog accessLog;
+
+  ContainerAccess accessors;
 
   @Property(ignore: true)
   final EnumCodec<ContainerType> _containerTypeCodec = EnumCodec(ContainerType.values);
@@ -42,9 +43,6 @@ class ListContainer with AccessLogUtils {
   Icon get icon => _icons[type] ?? _defaultIcon;
 
   @Property(ignore: true)
-  List<UserRole> accessors;
-
-  @Property(ignore: true)
   static const Map<ContainerType, String> containerTypeLabels = {
     ContainerType.shopping: "Shopping list",
     ContainerType.todo: "Todo list"
@@ -57,38 +55,25 @@ class ListContainer with AccessLogUtils {
   };
 
   static Future<ListContainer> fromSnapshot(
-      DocumentSnapshot snapshot, Juicer juicer, FetchUserCallback fetchUserCallback) async {
-    Map<String, UserRole> _userRoles = {};
+      DocumentSnapshot snapshot, Juicer juicer) async {
     ListContainer container = juicer.decode(snapshot.data(), (_) => ListContainer()..reference = snapshot.reference);
     // TODO: accessor details should only be fetched when going to list sharing page
-    container.accessors = [];
-    for (String rawAccessor in container.rawAccessors) {
-      List<String> rawAccessorParts = rawAccessor.split("::");
-      UserRole userRole = _userRoles[rawAccessor];
-      if (userRole == null) {
-        String userId = rawAccessorParts[0];
-        String role = rawAccessorParts[1];
-        DocumentSnapshot userSnapshot = await fetchUserCallback(userId);
-        User user = juicer.decode(userSnapshot.data(), (_) => User());
-        userRole = UserRole(user, role);
-        _userRoles[userId] = userRole;
-      }
-      container.accessors.add(userRole);
-    }
     return container;
   }
 
   static const Icon _defaultIcon = Icon(Icons.not_interested);
 
+  // Collection name
+  static const collectionName = "listContainers";
+
+  // Property names
+  static const String nameField = "name";
+  static const String typeNameField = "typeName";
+  static const String itemCountField = "itemCount";
+  static const String accessorsField = "accessors";
+
   @override
   String toString() => "ListContainer(name: $name, type: $type)";
-}
-
-class UserRole {
-  final User user;
-  final String role;
-
-  UserRole(this.user, this.role);
 }
 
 typedef FetchUserCallback = Future<DocumentSnapshot> Function(String userId);

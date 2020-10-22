@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
 
 @juiced
-class User {
+class PublicProfile {
 
   @Property(ignore: true)
   DocumentReference reference;
@@ -14,5 +14,5 @@ class User {
   @override
   String toString() => "User(displayName: $displayName, email: $email)";
 
-  static const collectionName = "users";
+  static const collectionName = "publicProfiles";
 }
