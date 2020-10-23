@@ -31,12 +31,14 @@ class _$UserJuicer extends ClassMapper<jcr_i1.User> {
 // reference is ignored
         "displayName": val.displayName,
         "email": val.email,
+// collectionName is ignored
       });
   @override
   jcr_i1.User fromMap(Juicer juicer, Map map, jcr_i1.User empty) {
 // reference is ignored
     if (map.containsKey("displayName")) empty.displayName = map["displayName"];
     if (map.containsKey("email")) empty.email = map["email"];
+// collectionName is ignored
     return empty;
   }
 }
@@ -81,6 +83,7 @@ class _$ContainerAccessJuicer extends ClassMapper<jcr_i3.ContainerAccess> {
 // performersField is ignored
 // editorsField is ignored
 // ownersField is ignored
+// accessLevels is ignored
       });
   @override
   jcr_i3.ContainerAccess fromMap(
@@ -110,6 +113,7 @@ class _$ContainerAccessJuicer extends ClassMapper<jcr_i3.ContainerAccess> {
 // performersField is ignored
 // editorsField is ignored
 // ownersField is ignored
+// accessLevels is ignored
     return empty;
   }
 }

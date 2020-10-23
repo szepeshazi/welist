@@ -13,4 +13,6 @@ class ContainerAccess {
   static const String performersField = "performers";
   static const String editorsField = "editors";
   static const String ownersField = "owners";
+
+  static const List<String> accessLevels = [readersField, performersField, editorsField, ownersField];
 }

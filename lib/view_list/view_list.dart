@@ -31,6 +31,7 @@ abstract class _ViewList with Store {
 
   void initialize() {
     // Listen to authentication changes
+    print("Setup container items listener");
     listChangeListener = container.reference
         .collection("items")
         .where('accessLog.deleted', isEqualTo: false)
@@ -40,6 +41,7 @@ abstract class _ViewList with Store {
 
   Future<void> _updateViewList(QuerySnapshot updates) async {
     List<ListItem> _items = List.from(items);
+    print("_updateViewList received items ${updates.docChanges.length}");
     if (updates.docChanges.isNotEmpty) {
       for (var change in updates.docChanges) {
         switch (change.type) {

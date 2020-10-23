@@ -74,7 +74,4 @@ abstract class _Workspace with Store {
   void cleanUp() {
     containerChangeListener?.cancel();
   }
-
-  static FetchUserCallback fetchUserCallback =
-      (String userId) async => FirebaseFirestore.instance.collection("users").doc(userId).get();
 }

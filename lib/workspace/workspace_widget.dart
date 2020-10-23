@@ -10,7 +10,7 @@ import '../profile/user_info_widget.dart';
 import '../view_list/view_list_widget.dart';
 import '../workspace/workspace.dart';
 import 'create_list_widget.dart';
-import 'list_container_shares.dart';
+import 'shares/list_container_shares_widget.dart';
 import 'workspace_navigator.dart';
 
 class WorkspaceWidget extends StatelessWidget {
