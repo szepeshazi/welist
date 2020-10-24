@@ -1,8 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+import '../../profile/user_info_widget.dart';
 
 class InviteWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Container(child: Text("add accessor")));
+    return Scaffold(appBar: AppBar(title: Text("Add accessor"), actions: [UserInfoWidget()]), body: null);
   }
 }

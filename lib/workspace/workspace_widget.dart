@@ -29,6 +29,7 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
     final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
     return Observer(
         builder: (context) => Navigator(
+                key: GlobalKey(debugLabel: "first"),
                 pages: [
                   MaterialPage(
                       key: ValueKey("containerList"),
@@ -56,6 +57,7 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
                   if (!route.didPop(result)) {
                     return false;
                   }
+                  print("WorkspaceNavigator widget, popping: ${route.settings.name}");
                   switch (route.settings.name) {
                     case "addContainer":
                       _workspaceNavigator.toggleAddContainerWidget(false);
