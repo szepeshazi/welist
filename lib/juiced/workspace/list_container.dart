@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juicer/juicer.dart';
 import 'package:juicer/metadata.dart';
-import 'package:welist/juiced/workspace/container_access.dart';
+import '../common/accessors.dart';
 
 import '../../shared/enum_codec.dart';
 import '../common/access_log.dart';
@@ -12,7 +12,7 @@ import '../juiced.dart';
 enum ContainerType { shopping, todo }
 
 @juiced
-class ListContainer with AccessLogUtils {
+class ListContainer with AccessLogUtils, AccessorUtils {
   @Property(ignore: true)
   DocumentReference reference;
 
@@ -25,8 +25,9 @@ class ListContainer with AccessLogUtils {
   @override
   AccessLog accessLog;
 
-  ContainerAccess accessors;
-
+  @override
+  Map<String, List<dynamic>> accessors;
+  
   @Property(ignore: true)
   final EnumCodec<ContainerType> _containerTypeCodec = EnumCodec(ContainerType.values);
 
@@ -54,8 +55,7 @@ class ListContainer with AccessLogUtils {
     ContainerType.todo: Icon(Icons.check_box)
   };
 
-  static Future<ListContainer> fromSnapshot(
-      DocumentSnapshot snapshot, Juicer juicer) async {
+  static Future<ListContainer> fromSnapshot(DocumentSnapshot snapshot, Juicer juicer) async {
     ListContainer container = juicer.decode(snapshot.data(), (_) => ListContainer()..reference = snapshot.reference);
     // TODO: accessor details should only be fetched when going to list sharing page
     return container;

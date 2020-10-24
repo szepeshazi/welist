@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 
+import '../../juiced/common/accessors.dart';
 import '../../juiced/juiced.dart';
 import '../../juiced/juiced.juicer.dart' as j;
 
@@ -26,23 +27,18 @@ abstract class _ListContainerShares with Store {
     List<DisplayShare> containerShares = [];
     QuerySnapshot sharesSnapshot = await _fs
         .collection(User.collectionName)
-        .where(FieldPath.documentId, whereIn: container.accessors.anyLevel)
+        .where(FieldPath.documentId, whereIn: container.accessors[AccessorUtils.anyLevelKey])
         .get();
     for (var doc in sharesSnapshot.docs) {
       print("${doc.runtimeType}, ${doc.data()} ${doc.reference.id}");
     }
     Map<String, QueryDocumentSnapshot> userMap = Map.fromIterable(sharesSnapshot.docs, key: (doc) => doc.reference.id);
-    for (String uid in container.accessors.owners) {
-      User user = j.juicer.decode(userMap[uid].data(), (_) => User());
-      containerShares.add(DisplayShare(user.email, ContainerAccess.ownersField));
-    }
-    for (String uid in container.accessors.editors) {
-      User user = j.juicer.decode(userMap[uid].data(), (_) => User());
-      containerShares.add(DisplayShare(user.email, ContainerAccess.editorsField));
-    }
-    for (String uid in container.accessors.readers) {
-      User user = j.juicer.decode(userMap[uid].data(), (_) => User());
-      containerShares.add(DisplayShare(user.email, ContainerAccess.readersField));
+    for (String level in container.accessors.keys) {
+      if (level == AccessorUtils.anyLevelKey) continue;
+      for (String uid in container.accessors[level]) {
+        User user = j.juicer.decode(userMap[uid].data(), (_) => User());
+        containerShares.add(DisplayShare(user.email, ContainerAccess.labels[level]));
+      }
     }
     shares = containerShares;
   }

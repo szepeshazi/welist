@@ -10,4 +10,6 @@ class ServiceBase {
 
 extension QueryExtras on Query {
   Query get notDeleted => where("accessLog.deleted", isEqualTo: false);
+
+  Query hasAccess(String uid) => where("accessors.anyLevel", arrayContains: uid);
 }

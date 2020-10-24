@@ -30,12 +30,10 @@ abstract class _Workspace with Store {
 
   StreamSubscription<QuerySnapshot> subscribeToContainerChanges() {
     // Listen to containers the current user has access to
-    String accessField = "${ListContainer.accessorsField}.${ContainerAccess.anyLevelField}";
-    print("querying $accessField with value ${auth.user.reference.id}");
     return _fs
         .collection(ListContainer.collectionName)
         .notDeleted
-        .where(accessField, arrayContains: auth.user.reference.id)
+        .hasAccess(auth.user.reference.id)
         .snapshots()
         .listen((update) => _updateContainers(update));
   }
@@ -54,9 +52,7 @@ abstract class _Workspace with Store {
     container
       ..itemCount = 0
       ..accessLog = AccessLog()
-      ..accessors = (ContainerAccess()
-        ..anyLevel = [auth.user.reference.id]
-        ..owners = [auth.user.reference.id]);
+      ..addAccessor(auth.user.reference.id, ContainerAccess.owners);
     var encoded = j.juicer.encode(container);
     container.log(auth.user.reference.id, encoded);
     encoded["accessLog"] = j.juicer.encode(container.accessLog);
