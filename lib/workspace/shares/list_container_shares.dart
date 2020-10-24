@@ -17,6 +17,9 @@ abstract class _ListContainerShares with Store {
   @observable
   List<DisplayShare> shares;
 
+  @observable
+  bool showAddAccessorForm = false;
+
   _ListContainerShares(this.container) : _fs = FirebaseFirestore.instance;
 
   Future<void> load() async {
@@ -42,6 +45,9 @@ abstract class _ListContainerShares with Store {
     }
     shares = containerShares;
   }
+
+  @action
+  void toggleAddAccessorForm(bool newValue) => showAddAccessorForm = newValue;
 }
 
 class DisplayShare {

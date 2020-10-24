@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../juiced/juiced.dart';
 import '../../profile/user_info_widget.dart';
+import 'invite_widget.dart';
 import 'list_container_shares.dart';
 
 class ListContainerSharesWidget extends StatelessWidget {
@@ -16,9 +17,45 @@ class ListContainerSharesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
         providers: [Provider<ListContainerShares>(create: (_) => ListContainerShares(container)..load())],
-        child: Scaffold(
+        child: ListContainerSharesNavigatorWidget(container: container));
+  }
+}
+
+class ListContainerSharesNavigatorWidget extends StatelessWidget {
+  final ListContainer container;
+
+  const ListContainerSharesNavigatorWidget({Key key, this.container}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final ListContainerShares listContainerShares = Provider.of(context);
+    return Observer(
+        builder: (context) => Scaffold(
             appBar: AppBar(title: Text("${container.name} accessors"), actions: [UserInfoWidget()]),
-            body: ListContainerShareListWidget(container: container)));
+            body: Navigator(
+                pages: [
+                  MaterialPage(
+                      key: ValueKey("container/shares"),
+                      name: "container/shares",
+                      child: ListContainerShareListWidget(container: container)),
+                  if (listContainerShares.showAddAccessorForm)
+                    MaterialPage(
+                        key: ValueKey("container/shares/add"), name: "container/shares/add", child: InviteWidget())
+                ],
+                onPopPage: (route, result) {
+                  if (!route.didPop(result)) {
+                    return false;
+                  }
+                  if (route.settings.name == "container/shares/add") {
+                    listContainerShares.toggleAddAccessorForm(false);
+                  }
+                  return true;
+                }),
+            floatingActionButton: FloatingActionButton(
+                child: Icon(Icons.add),
+                onPressed: () {
+                  listContainerShares.toggleAddAccessorForm(true);
+                })));
   }
 }
 
