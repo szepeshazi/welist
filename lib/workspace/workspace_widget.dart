@@ -58,7 +58,8 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
                     name: "containerShares",
                     child: ListContainerSharesWidget(container: _workspaceNavigator.showSharesForContainer)),
               if (_sharesNavigator.showAddAccessorForm)
-                MaterialPage(key: ValueKey("containerShares/add"), name: "containerShares/add", child: InviteWidget())
+                MaterialPage(key: ValueKey("containerShares/add"), name: "containerShares/add", child: InviteWidget
+                  (container: _workspaceNavigator.showSharesForContainer))
             ],
             onPopPage: (route, result) {
               if (!route.didPop(result)) {

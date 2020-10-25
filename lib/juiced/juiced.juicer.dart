@@ -9,6 +9,7 @@ import "package:welist/juiced/auth/public_profile.dart" as jcr_i2;
 import "package:welist/juiced/workspace/list_container.dart" as jcr_i3;
 import "package:welist/juiced/list_item/list_item.dart" as jcr_i4;
 import "package:welist/juiced/common/access_log.dart" as jcr_i5;
+import "package:welist/juiced/invitation/invitation.dart" as jcr_i6;
 import 'package:juicer/juicer.dart';
 export "package:welist/juiced/juiced.dart";
 
@@ -19,6 +20,7 @@ export "package:welist/juiced/juiced.dart";
 // package:welist/juiced/common/access_log.dart AccessEntry
 // package:welist/juiced/common/access_log.dart ChangeSet
 // package:welist/juiced/common/access_log.dart AccessLog
+// package:welist/juiced/invitation/invitation.dart Invitation
 class _$UserJuicer extends ClassMapper<jcr_i1.User> {
   const _$UserJuicer();
   @override
@@ -256,6 +258,52 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i5.AccessLog> {
   }
 }
 
+class _$InvitationJuicer extends ClassMapper<jcr_i6.Invitation> {
+  const _$InvitationJuicer();
+  @override
+  jcr_i6.Invitation newInstance() => jcr_i6.Invitation();
+  @override
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i6.Invitation val) =>
+      juicer.removeNullValues({
+// reference is ignored
+        "senderUid": val.senderUid,
+        "recipientUid": val.recipientUid,
+        "recipientEmail": val.recipientEmail,
+        "subjectId": val.subjectId,
+        "payload": val.payload == null
+            ? null
+            : Map.fromIterable(val.payload.keys,
+                value: (k) => juicer.encode(val.payload[k])),
+        "accessLog": juicer.encode(val.accessLog),
+        "recipientAcceptedTime": val.recipientAcceptedTime,
+        "recipientRejectedTime": val.recipientRejectedTime,
+// collectionName is ignored
+      });
+  @override
+  jcr_i6.Invitation fromMap(Juicer juicer, Map map, jcr_i6.Invitation empty) {
+// reference is ignored
+    if (map.containsKey("senderUid")) empty.senderUid = map["senderUid"];
+    if (map.containsKey("recipientUid"))
+      empty.recipientUid = map["recipientUid"];
+    if (map.containsKey("recipientEmail"))
+      empty.recipientEmail = map["recipientEmail"];
+    if (map.containsKey("subjectId")) empty.subjectId = map["subjectId"];
+    if (map.containsKey("payload"))
+      empty.payload =
+          juicer.decodeMap(map["payload"], null, <String, dynamic>{})
+              as Map<String, dynamic>;
+    if (map.containsKey("accessLog"))
+      empty.accessLog =
+          juicer.decode(map["accessLog"], (_) => jcr_i5.AccessLog());
+    if (map.containsKey("recipientAcceptedTime"))
+      empty.recipientAcceptedTime = map["recipientAcceptedTime"]?.toInt();
+    if (map.containsKey("recipientRejectedTime"))
+      empty.recipientRejectedTime = map["recipientRejectedTime"]?.toInt();
+// collectionName is ignored
+    return empty;
+  }
+}
+
 const Juicer juicer = const Juicer(const {
   jcr_i1.User: const _$UserJuicer(),
   jcr_i2.PublicProfile: const _$PublicProfileJuicer(),
@@ -264,4 +312,5 @@ const Juicer juicer = const Juicer(const {
   jcr_i5.AccessEntry: const _$AccessEntryJuicer(),
   jcr_i5.ChangeSet: const _$ChangeSetJuicer(),
   jcr_i5.AccessLog: const _$AccessLogJuicer(),
+  jcr_i6.Invitation: const _$InvitationJuicer(),
 });

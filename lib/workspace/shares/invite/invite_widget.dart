@@ -3,20 +3,37 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
+import '../../../auth/auth.dart';
 import '../../../juiced/juiced.dart';
 import '../../../profile/user_info_widget.dart';
 import 'invite.dart';
+import 'invite_service.dart';
 
 class InviteWidget extends StatelessWidget {
+  final ListContainer container;
+
+  const InviteWidget({Key key, this.container}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) =>
-      MultiProvider(providers: [Provider<Invite>(create: (_) => Invite())], child: InviteInnerWidget());
+  Widget build(BuildContext context) {
+    Auth _auth = Provider.of(context);
+    return MultiProvider(providers: [
+      Provider<Invite>(create: (_) => Invite()),
+      Provider<InviteService>(create: (_) => InviteService(_auth))
+    ], child: InviteInnerWidget(container: container));
+  }
 }
 
 class InviteInnerWidget extends StatelessWidget {
+  final ListContainer container;
+
+  const InviteInnerWidget({Key key, this.container}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final Invite _invite = Provider.of(context);
+    final Invite invite = Provider.of(context);
+    final InviteService inviteService = Provider.of(context);
+
     return Scaffold(
         appBar: AppBar(title: Text("Add accessor"), actions: [UserInfoWidget()]),
         body: Form(
@@ -35,7 +52,7 @@ class InviteInnerWidget extends StatelessWidget {
                           padding: EdgeInsets.all(15),
                           child: TextField(
                             decoration: InputDecoration(labelText: "Enter email address"),
-                            onChanged: (value) => _invite.setRecipientEmail(value),
+                            onChanged: (value) => invite.setRecipientEmail(value),
                           ),
                         ),
                       ),
@@ -51,8 +68,8 @@ class InviteInnerWidget extends StatelessWidget {
                                           title: Text(ContainerAccess.labels[level]),
                                           leading: Radio(
                                               value: level,
-                                              groupValue: _invite.accessLevel,
-                                              onChanged: (String value) => _invite.setAccessLevel(value)),
+                                              groupValue: invite.accessLevel,
+                                              onChanged: (String value) => invite.setAccessLevel(value)),
                                           subtitle: Text("Some explanation about this role"),
                                           visualDensity: VisualDensity.compact),
                                   ],
@@ -62,7 +79,12 @@ class InviteInnerWidget extends StatelessWidget {
                           alignment: Alignment.center,
                           margin: EdgeInsets.only(top: 25),
                           child: ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                inviteService.send(
+                                    recipientEmail: invite.recipientEmail,
+                                    accessLevel: invite.accessLevel,
+                                    subjectUid: container.reference.id);
+                              },
                               child: Container(
                                   margin: EdgeInsets.only(left: 20, right: 20),
                                   child: Text("Invite", textScaleFactor: 1.5))))
