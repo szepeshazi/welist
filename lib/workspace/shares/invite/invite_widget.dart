@@ -28,7 +28,7 @@ class InviteInnerWidget extends StatelessWidget {
                           alignment: Alignment.center,
                           margin: EdgeInsets.only(bottom: 20),
                           child:
-                              Text("Invite users to access this list", style: Theme.of(context).textTheme.headline5)),
+                              Text("Invite users to access this list", style: Theme.of(context).textTheme.headline6)),
                       Card(
                         child: Container(
                           color: Color(0xFFF8F8FF),
@@ -61,7 +61,11 @@ class InviteInnerWidget extends StatelessWidget {
                       Container(
                           alignment: Alignment.center,
                           margin: EdgeInsets.only(top: 25),
-                          child: ElevatedButton(onPressed: () {}, child: Text("Invite", textScaleFactor: 1.5)))
+                          child: ElevatedButton(
+                              onPressed: () {},
+                              child: Container(
+                                  margin: EdgeInsets.only(left: 20, right: 20),
+                                  child: Text("Invite", textScaleFactor: 1.5))))
                     ])))));
   }
 }
