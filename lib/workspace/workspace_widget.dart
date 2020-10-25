@@ -5,12 +5,15 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
 import '../auth/auth.dart';
+import '../juiced/common/accessors.dart';
 import '../juiced/juiced.dart';
 import '../profile/user_info_widget.dart';
 import '../view_list/view_list_widget.dart';
 import '../workspace/workspace.dart';
 import 'create_list_widget.dart';
+import 'shares/invite/invite_widget.dart';
 import 'shares/list_container_shares_widget.dart';
+import 'shares/shares_navigator.dart';
 import 'workspace_navigator.dart';
 
 class WorkspaceWidget extends StatelessWidget {
@@ -18,7 +21,8 @@ class WorkspaceWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       Provider<Workspace>(create: (_) => Workspace(context.read<Auth>())..initialize()),
-      Provider<WorkspaceNavigator>(create: (_) => WorkspaceNavigator())
+      Provider<WorkspaceNavigator>(create: (_) => WorkspaceNavigator()),
+      Provider<SharesNavigator>(create: (_) => SharesNavigator())
     ], child: WorkspaceNavigatorWidget());
   }
 }
@@ -27,50 +31,56 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
+    final SharesNavigator _sharesNavigator = Provider.of(context);
     return Observer(
         builder: (context) => Navigator(
-                key: GlobalKey(debugLabel: "first"),
-                pages: [
-                  MaterialPage(
-                      key: ValueKey("containerList"),
-                      name: "containerList",
-                      child: WorkspaceScaffoldWidget(
-                        body: ListContainersWidget(),
-                      )),
-                  if (_workspaceNavigator.showAddContainerWidget)
-                    MaterialPage(
-                        key: ValueKey("addContainer"),
-                        name: "addContainer",
-                        child: WorkspaceScaffoldWidget(body: CreateListContainerWidget())),
-                  if (_workspaceNavigator.selectedContainer != null)
-                    MaterialPage(
-                        key: ValueKey("containerDetails"),
-                        name: "containerDetails",
-                        child: ViewListWidget(container: _workspaceNavigator.selectedContainer)),
-                  if (_workspaceNavigator.showSharesForContainer != null)
-                    MaterialPage(
-                        key: ValueKey("containerShares"),
-                        name: "containerShares",
-                        child: ListContainerSharesWidget(container: _workspaceNavigator.showSharesForContainer))
-                ],
-                onPopPage: (route, result) {
-                  if (!route.didPop(result)) {
-                    return false;
-                  }
-                  print("WorkspaceNavigator widget, popping: ${route.settings.name}");
-                  switch (route.settings.name) {
-                    case "addContainer":
-                      _workspaceNavigator.toggleAddContainerWidget(false);
-                      break;
-                    case "containerDetails":
-                      _workspaceNavigator.toggleSelectedContainer(null);
-                      break;
-                    case "containerShares":
-                      _workspaceNavigator.toggleSharesForContainer(null);
-                      break;
-                  }
-                  return true;
-                }));
+            key: GlobalKey(debugLabel: "first"),
+            pages: [
+              MaterialPage(
+                  key: ValueKey("containerList"),
+                  name: "containerList",
+                  child: WorkspaceScaffoldWidget(
+                    body: ListContainersWidget(),
+                  )),
+              if (_workspaceNavigator.showAddContainerWidget)
+                MaterialPage(
+                    key: ValueKey("addContainer"),
+                    name: "addContainer",
+                    child: WorkspaceScaffoldWidget(body: CreateListContainerWidget())),
+              if (_workspaceNavigator.selectedContainer != null)
+                MaterialPage(
+                    key: ValueKey("containerDetails"),
+                    name: "containerDetails",
+                    child: ViewListWidget(container: _workspaceNavigator.selectedContainer)),
+              if (_workspaceNavigator.showSharesForContainer != null)
+                MaterialPage(
+                    key: ValueKey("containerShares"),
+                    name: "containerShares",
+                    child: ListContainerSharesWidget(container: _workspaceNavigator.showSharesForContainer)),
+              if (_sharesNavigator.showAddAccessorForm)
+                MaterialPage(key: ValueKey("containerShares/add"), name: "containerShares/add", child: InviteWidget())
+            ],
+            onPopPage: (route, result) {
+              if (!route.didPop(result)) {
+                return false;
+              }
+              print("WorkspaceNavigator widget, popping: ${route.settings.name}");
+              switch (route.settings.name) {
+                case "addContainer":
+                  _workspaceNavigator.toggleAddContainerWidget(false);
+                  break;
+                case "containerDetails":
+                  _workspaceNavigator.toggleSelectedContainer(null);
+                  break;
+                case "containerShares":
+                  _workspaceNavigator.toggleSharesForContainer(null);
+                  break;
+                case "containerShares/add":
+                  _sharesNavigator.toggleAddAccessorForm(false);
+                  break;
+              }
+              return true;
+            }));
   }
 }
 
@@ -132,7 +142,13 @@ class ListContainerRowWidget extends StatelessWidget {
                   onTap: () {
                     _workspaceNavigator.toggleSharesForContainer(container);
                   }, // TODO: show shares for container
-                  child: Row(children: [Icon(Icons.people), Text("(1)")]),
+                  child: container.accessors[AccessorUtils.anyLevelKey].length == 1
+                      ? Icon(Icons.person)
+                      : Row(children: [
+                          Text("${container.accessors[AccessorUtils.anyLevelKey].length} ", style: Theme.of(context)
+                              .textTheme.bodyText1),
+                          Icon(Icons.group)
+                        ]),
                 )),
           ],
         ),
