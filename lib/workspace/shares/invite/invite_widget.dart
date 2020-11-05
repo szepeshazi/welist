@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../auth/auth_service.dart';
 import '../../../juiced/juiced.dart';
 import '../../../profile/user_info_widget.dart';
+import '../shares_navigator.dart';
 import 'invite.dart';
 import 'invite_service.dart';
 
@@ -33,6 +34,7 @@ class InviteInnerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final Invite invite = Provider.of(context);
     final InviteService inviteService = Provider.of(context);
+    final SharesNavigator sharesNavigator = Provider.of(context);
 
     return Scaffold(
         appBar: AppBar(title: Text("Add accessor"), actions: [UserInfoWidget()]),
@@ -78,16 +80,21 @@ class InviteInnerWidget extends StatelessWidget {
                       Container(
                           alignment: Alignment.center,
                           margin: EdgeInsets.only(top: 25),
-                          child: ElevatedButton(
-                              onPressed: () {
-                                inviteService.send(
-                                    recipientEmail: invite.recipientEmail,
-                                    accessLevel: invite.accessLevel,
-                                    subjectUid: container.reference.id);
-                              },
-                              child: Container(
-                                  margin: EdgeInsets.only(left: 20, right: 20),
-                                  child: Text("Invite", textScaleFactor: 1.5))))
+                          child: Observer(
+                            builder: (context) => ElevatedButton(
+                                onPressed: () {
+                                  sharesNavigator.toggleAddAccessorButton(true);
+                                  inviteService
+                                      .send(
+                                          recipientEmail: invite.recipientEmail,
+                                          accessLevel: invite.accessLevel,
+                                          subjectUid: container.reference.id)
+                                      .then((_) => sharesNavigator.toggleAddAccessorForm(false));
+                                },
+                                child: Container(
+                                    margin: EdgeInsets.only(left: 20, right: 20),
+                                    child: Text("Invite", textScaleFactor: 1.5))),
+                          ))
                     ])))));
   }
 }

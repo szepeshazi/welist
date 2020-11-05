@@ -8,6 +8,15 @@ abstract class _SharesNavigator with Store {
   @observable
   bool showAddAccessorForm = false;
 
+  @observable
+  bool disableAddAccessorButton = false;
+
   @action
-  void toggleAddAccessorForm(bool newValue) => showAddAccessorForm = newValue;
+  void toggleAddAccessorForm(bool newValue) {
+    showAddAccessorForm = newValue;
+    disableAddAccessorButton = !newValue;
+  }
+
+  @action
+  void toggleAddAccessorButton(bool newValue) => disableAddAccessorButton = newValue;
 }

@@ -64,7 +64,7 @@ abstract class _SharesService with Store {
           role: ContainerAccess.labels[invite.payload["accessLevel"]],
           invitedTime: invite.accessLog.timeCreated,
           revokeCallback: () async {
-            print("removing invite for ${invite.recipientEmail}");
+            print("removing invite for ${invite.recipientEmail} from container ${container.name}");
           }));
     }
     shares = containerShares;
