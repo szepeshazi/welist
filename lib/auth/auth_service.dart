@@ -108,6 +108,7 @@ abstract class _AuthService with Store {
     DocumentSnapshot publicProfileSnapshot =
         await _fs.collection(we.PublicProfile.collectionName).doc(_fbAuth.currentUser.uid).get();
     if (!publicProfileSnapshot.exists) {
+      print("creating public profile for ${_fbAuth.currentUser.email}");
       DocumentReference publicProfileRef = _fs.collection(we.PublicProfile.collectionName).doc(_fbAuth.currentUser.uid);
       String displayName = _fbAuth.currentUser.displayName ?? _fbAuth.currentUser.email.split("@").first;
       final newPublicProfile = we.PublicProfile()
@@ -118,6 +119,8 @@ abstract class _AuthService with Store {
       await publicProfileRef.set(encodedPublicProfile);
       currentPublicProfile = newPublicProfile;
     } else {
+      print("Found public profile for ${_fbAuth.currentUser.email}");
+
       currentPublicProfile = j.juicer
           .decode(publicProfileSnapshot.data(), (_) => we.PublicProfile()..reference = publicProfileSnapshot.reference);
     }
