@@ -3,11 +3,11 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import '../juiced/juiced.dart';
 import '../profile/user_info_widget.dart';
 import 'create_multi_item_widget.dart';
-import 'view_list.dart';
+import 'list_item_service.dart';
 
 class ViewListWidget extends StatelessWidget {
   final ListContainer container;
@@ -16,16 +16,16 @@ class ViewListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [Provider<ViewList>(create: (_) => ViewList(container, context.read<Auth>())..initialize())],
-        child: ViewListWidgetInner());
+    return MultiProvider(providers: [
+      Provider<ListItemService>(create: (_) => ListItemService(container, context.read<AuthService>())..initialize())
+    ], child: ViewListWidgetInner());
   }
 }
 
 class ViewListWidgetInner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final ViewList viewList = Provider.of(context);
+    final ListItemService viewList = Provider.of(context);
     return Scaffold(
         appBar: AppBar(title: Text(viewList.container.name), actions: [UserInfoWidget()]),
         body: ViewListWrapperWidget(),
@@ -46,16 +46,18 @@ class ViewListWidgetInner extends StatelessWidget {
 class ViewListWrapperWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final ViewList viewList = Provider.of(context);
-    return Provider(create: (_) => null, child: Observer(
-        builder: (context) => Column(children: [
-              if (viewList.multiEditMode) CreateMultiItemWidget(),
-              ListView.builder(
-                  padding: const EdgeInsets.all(8),
-                  shrinkWrap: true,
-                  itemCount: viewList.items?.length ?? 0,
-                  itemBuilder: (BuildContext context, index) => ListItemRowWidget(item: viewList.items[index]))
-            ])));
+    final ListItemService viewList = Provider.of(context);
+    return Provider(
+        create: (_) => null,
+        child: Observer(
+            builder: (context) => Column(children: [
+                  if (viewList.multiEditMode) CreateMultiItemWidget(),
+                  ListView.builder(
+                      padding: const EdgeInsets.all(8),
+                      shrinkWrap: true,
+                      itemCount: viewList.items?.length ?? 0,
+                      itemBuilder: (BuildContext context, index) => ListItemRowWidget(item: viewList.items[index]))
+                ])));
   }
 }
 
@@ -66,7 +68,7 @@ class ListItemRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ViewList viewList = Provider.of(context);
+    final ListItemService viewList = Provider.of(context);
     return CheckboxListTile(
         controlAffinity: ListTileControlAffinity.leading,
         value: item.completed,

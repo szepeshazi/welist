@@ -4,12 +4,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import '../juiced/common/accessors.dart';
 import '../juiced/juiced.dart';
 import '../profile/user_info_widget.dart';
 import '../view_list/view_list_widget.dart';
-import '../workspace/workspace.dart';
+import '../workspace/list_container_service.dart';
 import 'create_list_widget.dart';
 import 'shares/invite/invite_widget.dart';
 import 'shares/list_container_shares_widget.dart';
@@ -20,7 +20,7 @@ class WorkspaceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
-      Provider<Workspace>(create: (_) => Workspace(context.read<Auth>())..initialize()),
+      Provider<ListContainerService>(create: (_) => ListContainerService(context.read<AuthService>())..initialize()),
       Provider<WorkspaceNavigator>(create: (_) => WorkspaceNavigator()),
       Provider<SharesNavigator>(create: (_) => SharesNavigator())
     ], child: WorkspaceNavigatorWidget());
@@ -58,8 +58,10 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
                     name: "containerShares",
                     child: ListContainerSharesWidget(container: _workspaceNavigator.showSharesForContainer)),
               if (_sharesNavigator.showAddAccessorForm)
-                MaterialPage(key: ValueKey("containerShares/add"), name: "containerShares/add", child: InviteWidget
-                  (container: _workspaceNavigator.showSharesForContainer))
+                MaterialPage(
+                    key: ValueKey("containerShares/add"),
+                    name: "containerShares/add",
+                    child: InviteWidget(container: _workspaceNavigator.showSharesForContainer))
             ],
             onPopPage: (route, result) {
               if (!route.didPop(result)) {
@@ -107,7 +109,7 @@ class WorkspaceScaffoldWidget extends StatelessWidget {
 class ListContainersWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Workspace workspace = Provider.of(context);
+    final ListContainerService workspace = Provider.of(context);
     return Observer(
         builder: (context) => ListView.builder(
             padding: const EdgeInsets.only(left: 8),
@@ -125,7 +127,7 @@ class ListContainerRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Workspace _workspace = Provider.of(context);
+    final ListContainerService _workspace = Provider.of(context);
     final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
     return ListTile(
         title: Row(
@@ -146,8 +148,8 @@ class ListContainerRowWidget extends StatelessWidget {
                   child: container.accessors[AccessorUtils.anyLevelKey].length == 1
                       ? Icon(Icons.person)
                       : Row(children: [
-                          Text("${container.accessors[AccessorUtils.anyLevelKey].length} ", style: Theme.of(context)
-                              .textTheme.bodyText1),
+                          Text("${container.accessors[AccessorUtils.anyLevelKey].length} ",
+                              style: Theme.of(context).textTheme.bodyText1),
                           Icon(Icons.group)
                         ]),
                 )),

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../juiced/juiced.dart';
 import '../observable_input_value/observable_input.dart';
-import 'view_list.dart';
+import 'list_item_service.dart';
 
 class CreateMultiItemWidget extends StatelessWidget {
   final ObservableInput oInput = ObservableInput();
@@ -13,7 +13,7 @@ class CreateMultiItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ViewList viewList = Provider.of(context);
+    final ListItemService viewList = Provider.of(context);
     final controller = TextEditingController(text: "");
 
     return Observer(

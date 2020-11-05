@@ -27,4 +27,7 @@ class ListItem with AccessLogUtils {
 
   @override
   String toString() => "$name ($stateName)";
+
+  // Collection name
+  static const collectionName = "items";
 }

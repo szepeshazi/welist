@@ -3,26 +3,26 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import '../juiced/juiced.dart';
 import '../juiced/juiced.juicer.dart' as j;
 import '../shared/service_base.dart';
 
-part 'workspace.g.dart';
+part 'list_container_service.g.dart';
 
-class Workspace = _Workspace with _$Workspace;
+class ListContainerService = _ListContainerService with _$ListContainerService;
 
-abstract class _Workspace with Store {
+abstract class _ListContainerService with Store {
   @observable
   List<ListContainer> containers;
 
   final FirebaseFirestore _fs;
 
-  final Auth auth;
+  final AuthService _authService;
 
   StreamSubscription<QuerySnapshot> containerChangeListener;
 
-  _Workspace(this.auth) : _fs = FirebaseFirestore.instance;
+  _ListContainerService(this._authService) : _fs = FirebaseFirestore.instance;
 
   void initialize() {
     containerChangeListener = subscribeToContainerChanges();
@@ -33,7 +33,7 @@ abstract class _Workspace with Store {
     return _fs
         .collection(ListContainer.collectionName)
         .notDeleted
-        .hasAccess(auth.user.reference.id)
+        .hasAccess(_authService.user.reference.id)
         .snapshots()
         .listen((update) => _updateContainers(update));
   }
@@ -52,9 +52,9 @@ abstract class _Workspace with Store {
     container
       ..itemCount = 0
       ..accessLog = AccessLog()
-      ..addAccessor(auth.user.reference.id, ContainerAccess.owners);
+      ..addAccessor(_authService.user.reference.id, ContainerAccess.owners);
     var encoded = j.juicer.encode(container);
-    container.log(auth.user.reference.id, encoded);
+    container.log(_authService.user.reference.id, encoded);
     encoded["accessLog"] = j.juicer.encode(container.accessLog);
     await _fs.collection(ListContainer.collectionName).add(encoded);
   }
@@ -62,7 +62,7 @@ abstract class _Workspace with Store {
   @action
   Future<void> delete(ListContainer container) async {
     var encoded = j.juicer.encode(container);
-    container.log(auth.user.reference.id, encoded, deleteEntity: true);
+    container.log(_authService.user.reference.id, encoded, deleteEntity: true);
     dynamic encodedAccess = j.juicer.encode(container.accessLog);
     await container.reference.update({"accessLog": encodedAccess});
   }

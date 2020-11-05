@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:juicer/juicer.dart';
 import 'package:juicer/metadata.dart';
-import '../common/accessors.dart';
 
 import '../../shared/enum_codec.dart';
 import '../common/access_log.dart';
+import '../common/accessors.dart';
 import '../juiced.dart';
 
 enum ContainerType { shopping, todo }
@@ -27,7 +27,7 @@ class ListContainer with AccessLogUtils, AccessorUtils {
 
   @override
   Map<String, List<dynamic>> accessors;
-  
+
   @Property(ignore: true)
   final EnumCodec<ContainerType> _containerTypeCodec = EnumCodec(ContainerType.values);
 

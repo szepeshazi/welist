@@ -1,13 +1,13 @@
 import 'package:mobx/mobx.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 
 part 'main_page_navigator.g.dart';
 
 class MainPageNavigator = _MainPageNavigator with _$MainPageNavigator;
 
 abstract class _MainPageNavigator with Store {
-  final Auth _auth;
+  final AuthService _authService;
 
   /// Main widget to display based on internal states
   @observable
@@ -20,12 +20,12 @@ abstract class _MainPageNavigator with Store {
   bool _splashModuleActive = true;
   bool _loginModuleActive = false;
 
-  _MainPageNavigator(this._auth) {
-    reaction((_) => _auth.status, (authStatus) {
+  _MainPageNavigator(this._authService) {
+    reaction((_) => _authService.status, (authStatus) {
       _userStatus = authStatus;
       _computeState();
     });
-    reaction((_) => _auth.initialized, (authInitialized) {
+    reaction((_) => _authService.initialized, (authInitialized) {
       _authInitialized = authInitialized;
       _computeState();
     });

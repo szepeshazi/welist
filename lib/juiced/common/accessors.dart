@@ -1,4 +1,3 @@
-
 abstract class HasAccessors {
   Map<String, List<dynamic>> get accessors;
 
@@ -6,7 +5,6 @@ abstract class HasAccessors {
 }
 
 mixin AccessorUtils implements HasAccessors {
-
   void addAccessor(String uid, String level) {
     accessors ??= {};
     accessors[level] ??= [];

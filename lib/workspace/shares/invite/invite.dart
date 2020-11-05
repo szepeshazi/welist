@@ -6,7 +6,6 @@ part 'invite.g.dart';
 class Invite = _Invite with _$Invite;
 
 abstract class _Invite with Store {
-
   final String senderUid;
 
   final String containerId;

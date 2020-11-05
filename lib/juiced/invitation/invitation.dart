@@ -5,7 +5,6 @@ import '../common/access_log.dart';
 
 @juiced
 class Invitation with AccessLogUtils {
-
   @Property(ignore: true)
   DocumentReference reference;
 

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import '../shared/common.dart';
 import 'confirm_registration_widget.dart';
 import 'login_register_navigator.dart';
@@ -18,7 +18,7 @@ class LoginRegisterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       Provider<LoginRegisterNavigator>(
-          create: (_) => LoginRegisterNavigator(auth: context.read<Auth>(), notifyParent: notifyParent))
+          create: (_) => LoginRegisterNavigator(authService: context.read<AuthService>(), notifyParent: notifyParent))
     ], child: Scaffold(body: LoginRegisterWrapper()));
   }
 }

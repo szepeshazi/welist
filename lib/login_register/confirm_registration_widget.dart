@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import 'login_register_navigator.dart';
 
 class ConfirmRegistrationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginRegisterNavigator _loginRegisterNavigator = Provider.of(context);
-    final Auth _auth = Provider.of(context);
+    final AuthService _authService = Provider.of(context);
 
     return Container(
       color: Theme.of(context).primaryColor,
@@ -41,7 +41,7 @@ class ConfirmRegistrationWidget extends StatelessWidget {
                             width: 150,
                             height: 150,
                             fit: BoxFit.fill,
-                            isLoading: _auth.status == UserStatus.verificationRequired,
+                            isLoading: _authService.status == UserStatus.verificationRequired,
                             onSuccess: (_) {
                               _loginRegisterNavigator.confirmScreenDone();
                             },
@@ -57,10 +57,10 @@ class ConfirmRegistrationWidget extends StatelessWidget {
                       child: ElevatedButton(
                           child: Text("Resend email"),
                           //onPressed: null)),
-                          onPressed: _auth.resendVerificationEmailDisabled
+                          onPressed: _authService.resendVerificationEmailDisabled
                               ? null
                               : () {
-                                  _auth.sendVerificationEmailIfPermitted();
+                                  _authService.sendVerificationEmailIfPermitted();
                                   Scaffold.of(context).showSnackBar(SnackBar(
                                     content: Text("Verification email sent"),
                                   ));
@@ -73,7 +73,7 @@ class ConfirmRegistrationWidget extends StatelessWidget {
                       child: ElevatedButton(
                           child: Text("Log in with another account"),
                           onPressed: () {
-                            _auth.signOut();
+                            _authService.signOut();
                           }))
                 ]),
               )),

@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 
 class UserInfoWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final Auth auth = Provider.of(context);
+    final AuthService auth = Provider.of(context);
     return Row(children: [
       Text(auth.user.displayName ?? auth.user.email.split("@").first),
       Container(padding: EdgeInsets.only(left: 10), child: Icon(Icons.account_circle)),

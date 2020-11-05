@@ -1,6 +1,4 @@
-
 class ContainerAccess {
-
   static const String readers = "readers";
   static const String performers = "performers";
   static const String editors = "editors";

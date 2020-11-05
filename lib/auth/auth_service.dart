@@ -9,11 +9,11 @@ import 'package:pedantic/pedantic.dart';
 import '../juiced/juiced.dart' as we;
 import '../juiced/juiced.juicer.dart' as j;
 
-part 'auth.g.dart';
+part 'auth_service.g.dart';
 
-class Auth = _Auth with _$Auth;
+class AuthService = _AuthService with _$AuthService;
 
-abstract class _Auth with Store {
+abstract class _AuthService with Store {
   FirebaseAuth _fbAuth;
   FirebaseFirestore _fs;
 
@@ -22,6 +22,9 @@ abstract class _Auth with Store {
 
   @observable
   we.User user;
+
+  @observable
+  we.PublicProfile publicProfile;
 
   @observable
   bool resendVerificationEmailDisabled = false;
@@ -55,6 +58,7 @@ abstract class _Auth with Store {
       // Visitor is logged out
       status = UserStatus.loggedOut;
       user = null;
+      publicProfile = null;
       return;
     }
     if (!_fbAuth.currentUser.emailVerified) {
@@ -62,9 +66,9 @@ abstract class _Auth with Store {
       status = UserStatus.verificationRequired;
       if (verificationStatusTimer == null) {
         unawaited(sendVerificationEmailIfPermitted());
-        verificationStatusTimer = Timer.periodic(Duration(seconds: 5), (timer) {
+        verificationStatusTimer = Timer.periodic(verificationStatusPollPeriod, (timer) {
           int now = DateTime.now().millisecondsSinceEpoch;
-          if (now - (lastVerificationEmailSent ?? 0) > verificationEmailPeriod) {
+          if (now - (lastVerificationEmailSent ?? 0) > verificationEmailDelay) {
             resendVerificationEmailDisabled = false;
           }
           _fbAuth.currentUser.reload();
@@ -81,10 +85,14 @@ abstract class _Auth with Store {
     await fetchUserAccount();
   }
 
+  /// Fetches or creates user and publicProfile documents for currently logged in Firebase user
   Future<void> fetchUserAccount() async {
-    DocumentSnapshot userSnapshot = await _fs.collection("users").doc(_fbAuth.currentUser.uid).get();
+    we.User currentUser;
+    we.PublicProfile currentPublicProfile;
+
+    DocumentSnapshot userSnapshot = await _fs.collection(we.User.collectionName).doc(_fbAuth.currentUser.uid).get();
     if (!userSnapshot.exists) {
-      DocumentReference userRef = _fs.collection("users").doc(_fbAuth.currentUser.uid);
+      DocumentReference userRef = _fs.collection(we.User.collectionName).doc(_fbAuth.currentUser.uid);
       String displayName = _fbAuth.currentUser.displayName ?? _fbAuth.currentUser.email.split("@").first;
       final newUser = we.User()
         ..email = _fbAuth.currentUser.email
@@ -92,10 +100,30 @@ abstract class _Auth with Store {
         ..reference = userRef;
       final encodedUser = j.juicer.encode(newUser);
       await userRef.set(encodedUser);
-      user = newUser;
+      currentUser = newUser;
     } else {
-      user = j.juicer.decode(userSnapshot.data(), (_) => we.User()..reference = userSnapshot.reference);
+      currentUser = j.juicer.decode(userSnapshot.data(), (_) => we.User()..reference = userSnapshot.reference);
     }
+
+    DocumentSnapshot publicProfileSnapshot =
+        await _fs.collection(we.PublicProfile.collectionName).doc(_fbAuth.currentUser.uid).get();
+    if (!publicProfileSnapshot.exists) {
+      DocumentReference publicProfileRef = _fs.collection(we.PublicProfile.collectionName).doc(_fbAuth.currentUser.uid);
+      String displayName = _fbAuth.currentUser.displayName ?? _fbAuth.currentUser.email.split("@").first;
+      final newPublicProfile = we.PublicProfile()
+        ..email = _fbAuth.currentUser.email
+        ..displayName = displayName
+        ..reference = publicProfileRef;
+      final encodedPublicProfile = j.juicer.encode(newPublicProfile);
+      await publicProfileRef.set(encodedPublicProfile);
+      currentPublicProfile = newPublicProfile;
+    } else {
+      currentPublicProfile = j.juicer
+          .decode(publicProfileSnapshot.data(), (_) => we.PublicProfile()..reference = publicProfileSnapshot.reference);
+    }
+    // Update observable user and publicProfile in a sync atomic operation
+    user = currentUser;
+    publicProfile = currentPublicProfile;
     status = UserStatus.loggedIn;
   }
 
@@ -121,7 +149,7 @@ abstract class _Auth with Store {
 
   Future<void> sendVerificationEmailIfPermitted() async {
     int now = DateTime.now().millisecondsSinceEpoch;
-    if (now - (lastVerificationEmailSent ?? 0) > verificationEmailPeriod) {
+    if (now - (lastVerificationEmailSent ?? 0) > verificationEmailDelay) {
       try {
         await _fbAuth.currentUser.sendEmailVerification();
       } on FirebaseAuthException catch (e) {
@@ -137,7 +165,8 @@ abstract class _Auth with Store {
     }
   }
 
-  static final verificationEmailPeriod = Duration(seconds: 10).inMilliseconds;
+  static final verificationEmailDelay = Duration(seconds: 10).inMilliseconds;
+  static final verificationStatusPollPeriod = Duration(seconds: 3);
 }
 
 enum UserStatus { loggedOut, verificationRequired, loggedIn }

@@ -24,5 +24,4 @@ abstract class _WorkspaceNavigator with Store {
 
   @action
   void toggleSharesForContainer(ListContainer selected) => showSharesForContainer = selected;
-
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:provider/provider.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import 'constants.dart';
 import 'login_register_navigator.dart';
 
@@ -11,7 +11,7 @@ class LoginWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginRegisterNavigator _loginRegisterNavigator = Provider.of(context);
-    final Auth _auth = Provider.of(context);
+    final AuthService _authService = Provider.of(context);
 
     return FlutterLogin(
       title: Constants.appName,
@@ -36,15 +36,15 @@ class LoginWidget extends StatelessWidget {
         }
         return null;
       },
-      onLogin: _loginFunction(_auth),
-      onSignup: _registerFunction(_auth),
+      onLogin: _loginFunction(_authService),
+      onSignup: _registerFunction(_authService),
       onSubmitAnimationCompleted: () => _loginRegisterNavigator.loginScreenDone(),
-      onRecoverPassword: _recoverPasswordFunction(_auth),
+      onRecoverPassword: _recoverPasswordFunction(_authService),
       showDebugButtons: false,
     );
   }
 
-  final AuthCallback Function(Auth) _registerFunction = (Auth auth) => (LoginData loginData) async {
+  final AuthCallback Function(AuthService) _registerFunction = (AuthService auth) => (LoginData loginData) async {
         String result;
         try {
           await auth.register(loginData.name, loginData.password);
@@ -60,7 +60,7 @@ class LoginWidget extends StatelessWidget {
         return result;
       };
 
-  final AuthCallback Function(Auth) _loginFunction = (Auth auth) => (LoginData loginData) async {
+  final AuthCallback Function(AuthService) _loginFunction = (AuthService auth) => (LoginData loginData) async {
         String result;
         try {
           await auth.login(loginData.name, loginData.password);
@@ -74,7 +74,7 @@ class LoginWidget extends StatelessWidget {
         return result;
       };
 
-  final RecoverCallback Function(Auth) _recoverPasswordFunction = (Auth auth) => (String email) async {
+  final RecoverCallback Function(AuthService) _recoverPasswordFunction = (AuthService auth) => (String email) async {
         String result;
         try {
           await auth.resetPassword(email);

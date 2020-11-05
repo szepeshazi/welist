@@ -3,15 +3,16 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import '../juiced/juiced.dart';
 import '../juiced/juiced.juicer.dart' as j;
+import '../shared/service_base.dart';
 
-part 'view_list.g.dart';
+part 'list_item_service.g.dart';
 
-class ViewList = _ViewList with _$ViewList;
+class ListItemService = _ListItemService with _$ListItemService;
 
-abstract class _ViewList with Store {
+abstract class _ListItemService with Store {
   @observable
   List<ListItem> items = [];
 
@@ -23,18 +24,17 @@ abstract class _ViewList with Store {
 
   final FirebaseFirestore fs;
 
-  final Auth auth;
+  final AuthService _authService;
 
   StreamSubscription<QuerySnapshot> listChangeListener;
 
-  _ViewList(this.container, this.auth) : fs = FirebaseFirestore.instance;
+  _ListItemService(this.container, this._authService) : fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to authentication changes
-    print("Setup container items listener");
     listChangeListener = container.reference
-        .collection("items")
-        .where('accessLog.deleted', isEqualTo: false)
+        .collection(ListItem.collectionName)
+        .notDeleted
         .snapshots()
         .listen((updates) => _updateViewList(updates));
   }
@@ -69,14 +69,14 @@ abstract class _ViewList with Store {
       ..timeCompleted = null
       ..accessLog = AccessLog();
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.user.reference.id, encodedItem);
+    item.log(_authService.user.reference.id, encodedItem);
     encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
 
     // pseudo increment to be included in access log
     // real increment operation will happen on FB, and changes will be pushed to the obj
     container.itemCount++;
     dynamic encodedContainer = j.juicer.encode(container);
-    container.log(auth.user.reference.id, encodedContainer);
+    container.log(_authService.user.reference.id, encodedContainer);
     dynamic containerAccess = j.juicer.encode(container.accessLog);
 
     await fs.runTransaction((transaction) async {
@@ -89,7 +89,7 @@ abstract class _ViewList with Store {
   Future<void> update(ListItem item) async {
     // TODO: input sanity check, transaction
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.user.reference.id, encodedItem);
+    item.log(_authService.user.reference.id, encodedItem);
     encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
     await item.reference.set(encodedItem);
   }
@@ -98,7 +98,7 @@ abstract class _ViewList with Store {
   Future<void> delete(ListItem item) async {
     // TODO: input sanity check, transaction
     dynamic encodedItem = j.juicer.encode(item);
-    item.log(auth.user.reference.id, encodedItem, deleteEntity: true);
+    item.log(_authService.user.reference.id, encodedItem, deleteEntity: true);
     dynamic encodedAccess = j.juicer.encode(item.accessLog);
     await fs.runTransaction((transaction) async {
       await item.reference.update({"accessLog": encodedAccess});

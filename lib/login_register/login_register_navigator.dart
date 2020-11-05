@@ -1,6 +1,6 @@
 import 'package:mobx/mobx.dart';
 
-import '../auth/auth.dart';
+import '../auth/auth_service.dart';
 import '../shared/common.dart';
 
 part 'login_register_navigator.g.dart';
@@ -8,22 +8,22 @@ part 'login_register_navigator.g.dart';
 class LoginRegisterNavigator = _LoginRegisterNavigator with _$LoginRegisterNavigator;
 
 abstract class _LoginRegisterNavigator with Store {
-  final Auth auth;
+  final AuthService authService;
 
   final NotifyParent notifyParent;
 
   @observable
   LoginWidgetKind loginWidgetKind = LoginWidgetKind.login;
 
-  _LoginRegisterNavigator({this.auth, this.notifyParent}) {
-    if (auth.status == UserStatus.verificationRequired) {
+  _LoginRegisterNavigator({this.authService, this.notifyParent}) {
+    if (authService.status == UserStatus.verificationRequired) {
       loginWidgetKind = LoginWidgetKind.confirm;
     }
   }
 
   @action
   void loginScreenDone() {
-    if (auth.status == UserStatus.loggedIn) {
+    if (authService.status == UserStatus.loggedIn) {
       notifyParent();
     } else {
       loginWidgetKind = LoginWidgetKind.confirm;
@@ -32,7 +32,7 @@ abstract class _LoginRegisterNavigator with Store {
 
   @action
   void confirmScreenDone() {
-    if (auth.status == UserStatus.loggedIn) {
+    if (authService.status == UserStatus.loggedIn) {
       notifyParent();
     } else {
       loginWidgetKind = LoginWidgetKind.login;

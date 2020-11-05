@@ -27,7 +27,8 @@ class AnimationDirector {
                   bool completed = _parts.values.where((ctrl) => ctrl.status != AnimationStatus.completed).isEmpty;
                   if (!completeController.isClosed) {
                     completeController.add(completed);
-                  } if (completed) {
+                  }
+                  if (completed) {
                     completeController.close();
                   }
                 }

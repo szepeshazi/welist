@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../juiced/juiced.dart';
-import '../workspace/workspace.dart';
+import '../workspace/list_container_service.dart';
 import 'workspace_navigator.dart';
 
 class CreateListContainerWidget extends StatefulWidget {
@@ -26,7 +26,7 @@ class AddListContainerFormState extends State<CreateListContainerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final Workspace _workspace = Provider.of(context);
+    final ListContainerService _workspace = Provider.of(context);
     final WorkspaceNavigator _workspaceNavigator = Provider.of(context);
 
     // Build a Form widget using the _formKey created above.

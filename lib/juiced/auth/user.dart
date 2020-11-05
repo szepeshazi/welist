@@ -3,7 +3,6 @@ import 'package:juicer/metadata.dart';
 
 @juiced
 class User {
-
   @Property(ignore: true)
   DocumentReference reference;
 

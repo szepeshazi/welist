@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../juiced/juiced.dart';
 import '../../profile/user_info_widget.dart';
-import 'list_container_shares.dart';
 import 'shares_navigator.dart';
+import 'shares_service.dart';
 
 class ListContainerSharesWidget extends StatelessWidget {
   final ListContainer container;
@@ -16,7 +16,7 @@ class ListContainerSharesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-        providers: [Provider<ListContainerShares>(create: (_) => ListContainerShares(container)..load())],
+        providers: [Provider<SharesService>(create: (_) => SharesService(container)..load())],
         child: ListContainerShareListWidget(container: container));
   }
 }
@@ -28,7 +28,7 @@ class ListContainerShareListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ListContainerShares shares = Provider.of(context);
+    final SharesService shares = Provider.of(context);
     final SharesNavigator _sharesNavigator = Provider.of(context);
 
     return Scaffold(
