@@ -6,6 +6,7 @@ import '../../juiced/common/accessors.dart';
 import '../../juiced/juiced.dart';
 import '../../juiced/juiced.juicer.dart' as j;
 import '../../shared/service_base.dart';
+import 'invite/invite_service.dart';
 import 'shares_list.dart';
 
 part 'shares_service.g.dart';
@@ -19,10 +20,12 @@ abstract class _SharesService with Store {
 
   final AuthService _authService;
 
+  final InviteService _inviteService;
+
   @observable
   List<ShareListItem> shares;
 
-  _SharesService(this.container, this._authService) : _fs = FirebaseFirestore.instance;
+  _SharesService(this.container, this._authService, this._inviteService) : _fs = FirebaseFirestore.instance;
 
   Future<void> load() async {
     if (container == null) {
@@ -33,11 +36,12 @@ abstract class _SharesService with Store {
     List<ShareListItem> containerShares = [];
 
     List<String> accessorKeys = container.accessors[AccessorUtils.anyLevelKey].cast<String>();
-    List<PublicProfile> accessorProfiles = await getAccessorProfiles(accessorKeys);
+    List<PublicProfile> accessorProfiles = await _getAccessorProfiles(accessorKeys);
 
-    List<Invitation> invitations = await getInvitationsForContainer();
-    List<String> emails = invitations.map((invite) => invite.recipientEmail).toList();
-    List<PublicProfile> invitedProfiles = emails.isNotEmpty ? await getInvitedProfiles(emails) : [];
+    List<Invitation> invitations = await _getInvitationsForContainer();
+
+    //List<String> emails = invitations.map((invite) => invite.recipientEmail).toList();
+    //List<PublicProfile> invitedProfiles = emails.isNotEmpty ? await _getInvitedProfiles(emails) : [];
 
     Map<String, PublicProfile> accessorProfileMap =
         Map.fromIterable(accessorProfiles, key: (profile) => profile.reference.id);
@@ -57,20 +61,23 @@ abstract class _SharesService with Store {
     }
     containerShares.add(SectionItem("Pending invitations"));
 
-    Map<String, PublicProfile> invitedProfileMap = Map.fromIterable(invitedProfiles, key: (profile) => profile.email);
+    //Map<String, PublicProfile> invitedProfileMap = Map.fromIterable(invitedProfiles, key: (profile) => profile.email);
     for (final invite in invitations) {
       containerShares.add(InviteItem(
-          email: invitedProfileMap[invite.recipientEmail].email,
+          email: invite.recipientEmail,
           role: ContainerAccess.labels[invite.payload["accessLevel"]],
           invitedTime: invite.accessLog.timeCreated,
-          revokeCallback: () async {
-            print("removing invite for ${invite.recipientEmail} from container ${container.name}");
-          }));
+          revokeCallback: () async => await _inviteService.revoke(invite)));
     }
     shares = containerShares;
   }
 
-  Future<List<Invitation>> getInvitationsForContainer() async {
+  /// Remove accessor from current container
+  Future<void> remove(String uid) async {
+
+  }
+
+  Future<List<Invitation>> _getInvitationsForContainer() async {
     QuerySnapshot invitesSnapshot = await _fs
         .collection(Invitation.collectionName)
         .notDeleted
@@ -86,7 +93,7 @@ abstract class _SharesService with Store {
     return invitations;
   }
 
-  Future<List<PublicProfile>> getAccessorProfiles(List<String> uids) async {
+  Future<List<PublicProfile>> _getAccessorProfiles(List<String> uids) async {
     List<DocumentReference> profileRefs =
         uids.map((uid) => _fs.collection(PublicProfile.collectionName).doc(uid)).toList();
     List<Future<DocumentSnapshot>> profileFutures = [];
@@ -101,12 +108,12 @@ abstract class _SharesService with Store {
     return profileSnapshots.map(fromSnapshot).toList();
   }
 
-  Future<List<PublicProfile>> getInvitedProfiles(List<String> emails) async {
-    QuerySnapshot querySnapshot =
-        await _fs.collection(PublicProfile.collectionName).where("email", whereIn: emails).get();
-    print("getInvitedProfiles docs: ${querySnapshot.docs.length}");
-    return querySnapshot.docs.map(fromSnapshot).toList();
-  }
+  // Future<List<PublicProfile>> _getInvitedProfiles(List<String> emails) async {
+  //   QuerySnapshot querySnapshot =
+  //       await _fs.collection(PublicProfile.collectionName).where("email", whereIn: emails).get();
+  //   print("getInvitedProfiles docs: ${querySnapshot.docs.length}");
+  //   return querySnapshot.docs.map(fromSnapshot).toList();
+  // }
 
   PublicProfile fromSnapshot(DocumentSnapshot snapshot) =>
       j.juicer.decode(snapshot.data(), (_) => PublicProfile()..reference = snapshot.reference);

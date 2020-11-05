@@ -34,4 +34,16 @@ abstract class _InviteService with Store {
     encoded["accessLog"] = j.juicer.encode(invitation.accessLog);
     await _fs.collection(Invitation.collectionName).add(encoded);
   }
+
+  Future<void> revoke(Invitation invitation) async {
+    var encoded = j.juicer.encode(invitation);
+    invitation.log(_authService.user.reference.id, encoded, deleteEntity: true);
+    dynamic encodedAccess = j.juicer.encode(invitation.accessLog);
+    await invitation.reference.update({"accessLog": encodedAccess});
+  }
+
+  Future<void> accept(Invitation invitation) async {
+
+  }
+
 }
