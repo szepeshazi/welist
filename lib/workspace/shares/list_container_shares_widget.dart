@@ -47,6 +47,7 @@ class ListContainerShareListWidget extends StatelessWidget {
                       return ListTile(
                         title: item.buildTitle(context),
                         subtitle: item.buildSubtitle(context),
+                        trailing: item.buildTrailing(context),
                       );
                     })),
         floatingActionButton: FloatingActionButton(

@@ -37,20 +37,35 @@ abstract class _SharesService with Store {
 
     List<Invitation> invitations = await getInvitationsForContainer();
     List<String> emails = invitations.map((invite) => invite.recipientEmail).toList();
-    print("invited emails: $emails");
     List<PublicProfile> invitedProfiles = emails.isNotEmpty ? await getInvitedProfiles(emails) : [];
 
-    Map<String, PublicProfile> profileMap = Map.fromIterable(accessorProfiles, key: (profile) => profile.reference.id);
-
+    Map<String, PublicProfile> accessorProfileMap =
+        Map.fromIterable(accessorProfiles, key: (profile) => profile.reference.id);
     for (String level in container.accessors.keys) {
       if (level == AccessorUtils.anyLevelKey) continue;
       for (String uid in container.accessors[level]) {
-        containerShares.add(ShareItem(profileMap[uid].email, ContainerAccess.labels[level]));
+        bool allowRemoveCallback = level != ContainerAccess.owners || container.accessors[level].length > 1;
+        containerShares.add(ShareItem(
+            email: accessorProfileMap[uid].email,
+            role: ContainerAccess.labels[level],
+            removeCallback: allowRemoveCallback
+                ? () async {
+                    print("removing accessor $uid from container ${container.name}");
+                  }
+                : null));
       }
     }
     containerShares.add(SectionItem("Pending invitations"));
-    for (final profile in invitedProfiles) {
-      containerShares.add(ShareItem(profile.email, "something"));
+
+    Map<String, PublicProfile> invitedProfileMap = Map.fromIterable(invitedProfiles, key: (profile) => profile.email);
+    for (final invite in invitations) {
+      containerShares.add(InviteItem(
+          email: invitedProfileMap[invite.recipientEmail].email,
+          role: ContainerAccess.labels[invite.payload["accessLevel"]],
+          invitedTime: invite.accessLog.timeCreated,
+          revokeCallback: () async {
+            print("removing invite for ${invite.recipientEmail}");
+          }));
     }
     shares = containerShares;
   }
