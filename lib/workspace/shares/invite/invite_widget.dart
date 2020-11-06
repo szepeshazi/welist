@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:welist/auth/auth_service.dart';
 
 import '../../../juiced/juiced.dart';
 import '../../../profile/user_info_widget.dart';
@@ -16,8 +17,11 @@ class InviteWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [Provider<Invite>(create: (_) => Invite())], child: InviteInnerWidget(container: container));
+    final AuthService _authService = Provider.of(context);
+    return MultiProvider(providers: [
+      Provider<InviteService>(create: (_) => InviteService(_authService)),
+      Provider<Invite>(create: (_) => Invite())
+    ], child: InviteInnerWidget(container: container));
   }
 }
 
