@@ -34,7 +34,7 @@ class ListContainerInnerWidget extends StatelessWidget {
     final AuthService _authService = Provider.of(context);
     final InviteService _inviteService = Provider.of(context);
     return MultiProvider(providers: [
-      Provider<SharesService>(create: (_) => SharesService(container, _authService, _inviteService)..load())
+      Provider<SharesService>(create: (_) => SharesService(container, _authService, _inviteService)..initialize())
     ], child: ListContainerShareListWidget(container: container));
   }
 }

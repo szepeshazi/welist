@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import '../common/access_log.dart';
 
@@ -20,7 +21,7 @@ class ListItem with AccessLogUtils {
 
   @Property(ignore: true)
   String get stateName =>
-      completed ? "Completed at ${DateTime.fromMillisecondsSinceEpoch(timeCompleted).toIso8601String()}" : "Open";
+      completed ? "Completed ${timeago.format(DateTime.fromMillisecondsSinceEpoch(timeCompleted))}" : "Open";
 
   @Property(ignore: true)
   void setState(bool state) => timeCompleted = state ? DateTime.now().millisecondsSinceEpoch : null;

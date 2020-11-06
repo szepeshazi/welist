@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 
@@ -25,42 +27,37 @@ abstract class _SharesService with Store {
   @observable
   List<ShareListItem> shares;
 
+  StreamSubscription<DocumentSnapshot> containerChangeListener;
+
   _SharesService(this.container, this._authService, this._inviteService) : _fs = FirebaseFirestore.instance;
 
-  Future<void> load() async {
-    if (container == null) {
-      shares = null;
-      return;
-    }
+  void initialize() {
+    // Listen to authentication changes
+    containerChangeListener = container.reference.snapshots().listen((update) => _containerUpdated(update));
+  }
 
-    List<ShareListItem> containerShares = [];
-
-    List<String> accessorKeys = container.accessors[AccessorUtils.anyLevelKey].cast<String>();
+  Future<void> _containerUpdated(DocumentSnapshot snapshot) async {
+    ListContainer updatedContainer = j.juicer.decode(snapshot.data(), (_) => ListContainer());
+    List<String> accessorKeys = updatedContainer.accessors[AccessorUtils.anyLevelKey].cast<String>();
     List<PublicProfile> accessorProfiles = await _getAccessorProfiles(accessorKeys);
-
-    List<Invitation> invitations = await _getInvitationsForContainer();
-
-    //List<String> emails = invitations.map((invite) => invite.recipientEmail).toList();
-    //List<PublicProfile> invitedProfiles = emails.isNotEmpty ? await _getInvitedProfiles(emails) : [];
-
+    List<ShareListItem> containerShares = [];
     Map<String, PublicProfile> accessorProfileMap =
         Map.fromIterable(accessorProfiles, key: (profile) => profile.reference.id);
-    for (String level in container.accessors.keys) {
+    for (String level in updatedContainer.accessors.keys) {
       if (level == AccessorUtils.anyLevelKey) continue;
-      for (String uid in container.accessors[level]) {
-        bool allowRemoveCallback = level != ContainerAccess.owners || container.accessors[level].length > 1;
+      for (String uid in updatedContainer.accessors[level]) {
+        bool allowRemoveCallback = level != ContainerAccess.owners || updatedContainer.accessors[level].length > 1;
         containerShares.add(ShareItem(
             email: accessorProfileMap[uid].email,
             role: ContainerAccess.labels[level],
-            removeCallback: allowRemoveCallback
-                ? () async {
-                    print("removing accessor $uid from container ${container.name}");
-                  }
-                : null));
+            removeCallback: allowRemoveCallback ? () async => await remove(updatedContainer, uid) : null));
       }
     }
+
+    // Add list divider
     containerShares.add(SectionItem("Pending invitations"));
 
+    List<Invitation> invitations = await _getInvitationsForContainer();
     //Map<String, PublicProfile> invitedProfileMap = Map.fromIterable(invitedProfiles, key: (profile) => profile.email);
     for (final invite in invitations) {
       containerShares.add(InviteItem(
@@ -73,8 +70,14 @@ abstract class _SharesService with Store {
   }
 
   /// Remove accessor from current container
-  Future<void> remove(String uid) async {
-
+  Future<void> remove(ListContainer updatedContainer, String uid) async {
+    for (final level in updatedContainer.accessors.keys) {
+      updatedContainer.accessors[level].remove(uid);
+    }
+    dynamic encodedContainer = j.juicer.encode(updatedContainer);
+    updatedContainer.log(_authService.user.reference.id, encodedContainer);
+    encodedContainer["accessLog"] = j.juicer.encode(updatedContainer.accessLog);
+    await container.reference.set(encodedContainer);
   }
 
   Future<List<Invitation>> _getInvitationsForContainer() async {
@@ -114,6 +117,10 @@ abstract class _SharesService with Store {
   //   print("getInvitedProfiles docs: ${querySnapshot.docs.length}");
   //   return querySnapshot.docs.map(fromSnapshot).toList();
   // }
+
+  void cleanUp() {
+    containerChangeListener?.cancel();
+  }
 
   PublicProfile fromSnapshot(DocumentSnapshot snapshot) =>
       j.juicer.decode(snapshot.data(), (_) => PublicProfile()..reference = snapshot.reference);

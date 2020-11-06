@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:welist/auth/auth_service.dart';
 
+import '../../../auth/auth_service.dart';
 import '../../../juiced/juiced.dart';
 import '../../../profile/user_info_widget.dart';
 import '../shares_navigator.dart';
@@ -82,15 +82,17 @@ class InviteInnerWidget extends StatelessWidget {
                           margin: EdgeInsets.only(top: 25),
                           child: Observer(
                             builder: (context) => ElevatedButton(
-                                onPressed: () {
-                                  sharesNavigator.toggleAddAccessorButton(true);
-                                  inviteService
-                                      .send(
-                                          recipientEmail: invite.recipientEmail,
-                                          accessLevel: invite.accessLevel,
-                                          subjectUid: container.reference.id)
-                                      .then((_) => sharesNavigator.toggleAddAccessorForm(false));
-                                },
+                                onPressed: sharesNavigator.disableAddAccessorButton
+                                    ? null
+                                    : () {
+                                        sharesNavigator.toggleAddAccessorButton(true);
+                                        inviteService
+                                            .send(
+                                                recipientEmail: invite.recipientEmail,
+                                                accessLevel: invite.accessLevel,
+                                                subjectUid: container.reference.id)
+                                            .then((_) => sharesNavigator.toggleAddAccessorForm(false));
+                                      },
                                 child: Container(
                                     margin: EdgeInsets.only(left: 20, right: 20),
                                     child: Text("Invite", textScaleFactor: 1.5))),
