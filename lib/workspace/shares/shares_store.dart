@@ -28,7 +28,7 @@ abstract class _SharesStore with Store {
       : userId = authService.user.reference.id;
 
   void initialize() {
-    final dispose = mainContext.onReactionError((a, b) {
+    mainContext.onReactionError((a, b) {
       print("$a, $b");
     });
     autorun((_) {

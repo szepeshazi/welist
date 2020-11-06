@@ -98,5 +98,20 @@ abstract class _InviteService with Store {
     await invitation.reference.update({"accessLog": encodedAccess});
   }
 
-  Future<void> accept(Invitation invitation) async {}
+  Future<void> accept(Invitation invitation) => _acceptOrReject(invitation, true);
+
+  Future<void> reject(Invitation invitation) => _acceptOrReject(invitation, false);
+
+  Future<void> _acceptOrReject(Invitation invitation, bool accepted) async {
+    if (accepted) {
+      invitation.recipientAcceptedTime = DateTime.now().millisecondsSinceEpoch;
+    } else {
+      invitation.recipientRejectedTime = DateTime.now().millisecondsSinceEpoch;
+    }
+    invitation.recipientResponded = true;
+    dynamic encoded = j.juicer.encode(invitation);
+    invitation.log(_authService.user.reference.id, encoded);
+    encoded["accessLog"] = j.juicer.encode(invitation.accessLog);
+    await invitation.reference.set(encoded);
+  }
 }

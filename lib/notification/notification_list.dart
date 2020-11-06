@@ -14,9 +14,11 @@ class NotificationItem implements ListItemBase {
 
   final DateTime invitedDate;
 
-  final NotificationOperationCallback revokeCallback;
+  final NotificationOperationCallback acceptCallback;
 
-  NotificationItem({this.message, this.from, this.role, int invitedTime, this.revokeCallback})
+  final NotificationOperationCallback rejectCallback;
+
+  NotificationItem({this.message, this.from, this.role, int invitedTime, this.acceptCallback, this.rejectCallback})
       : invitedDate = DateTime.fromMillisecondsSinceEpoch(invitedTime);
 
   @override
@@ -29,7 +31,7 @@ class NotificationItem implements ListItemBase {
   @override
   Widget buildTrailing(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
         IconButton(
-            onPressed: () {},
+            onPressed: acceptCallback,
             icon: Icon(Icons.check),
             visualDensity: VisualDensity.compact,
             iconSize: 18,
@@ -37,7 +39,7 @@ class NotificationItem implements ListItemBase {
             padding: EdgeInsets.all(0),
             splashRadius: 25),
         IconButton(
-            onPressed: () {},
+            onPressed: rejectCallback,
             icon: Icon(Icons.remove_circle_outline),
             visualDensity: VisualDensity.compact,
             iconSize: 18,

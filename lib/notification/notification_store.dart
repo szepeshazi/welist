@@ -26,5 +26,6 @@ abstract class _NotificationStore with Store {
       from: invite.senderName ?? invite.senderEmail,
       role: ContainerAccess.labels[invite.payload["accessLevel"]],
       invitedTime: invite.accessLog.timeCreated,
-      revokeCallback: () async => await _inviteService.revoke(invite));
+      acceptCallback: () async => await _inviteService.accept(invite),
+      rejectCallback: () async => await _inviteService.reject(invite));
 }
