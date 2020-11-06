@@ -25,6 +25,7 @@ dependencies:
   google_fonts: 1.1.0
   flare_loading: 2.1.1
   timeago: 2.0.0
+  equatable: 1.2.5
 
 dev_dependencies:
   flutter_test:

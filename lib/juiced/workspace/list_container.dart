@@ -43,13 +43,19 @@ class ListContainer with AccessLogUtils, AccessorUtils {
   @Property(ignore: true)
   Icon get icon => _icons[type] ?? _defaultIcon;
 
-  @Property(ignore: true)
+  void copyPropertiesFrom(ListContainer other) {
+    name = other.name;
+    itemCount = other.itemCount;
+    type = other.type;
+    accessLog = other.accessLog;
+    accessors = other.accessors;
+  }
+
   static const Map<ContainerType, String> containerTypeLabels = {
     ContainerType.shopping: "Shopping list",
     ContainerType.todo: "Todo list"
   };
 
-  @Property(ignore: true)
   static const Map<ContainerType, Icon> _icons = {
     ContainerType.shopping: Icon(Icons.shopping_cart),
     ContainerType.todo: Icon(Icons.check_box)

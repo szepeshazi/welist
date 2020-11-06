@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'shares_store.dart';
 
 import '../../auth/auth_service.dart';
 import '../../juiced/juiced.dart';
@@ -18,9 +19,10 @@ class ListContainerSharesWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthService _authService = Provider.of(context);
-    return MultiProvider(
-        providers: [Provider<InviteService>(create: (_) => InviteService(_authService))],
-        child: ListContainerInnerWidget(container: container));
+    return MultiProvider(providers: [
+      Provider<InviteService>(create: (_) => InviteService(_authService)..initialize()),
+      Provider<SharesService>(create: (_) => SharesService(container, _authService)..initialize())
+    ], child: ListContainerInnerWidget(container: container));
   }
 }
 
@@ -32,10 +34,12 @@ class ListContainerInnerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AuthService _authService = Provider.of(context);
+    final SharesService _sharesService = Provider.of(context);
     final InviteService _inviteService = Provider.of(context);
-    return MultiProvider(providers: [
-      Provider<SharesService>(create: (_) => SharesService(container, _authService, _inviteService)..initialize())
-    ], child: ListContainerShareListWidget(container: container));
+    return MultiProvider(
+        providers: [Provider<SharesStore>(create: (_) => SharesStore(container, _authService, _sharesService, _inviteService)
+          ..initialize())],
+        child: ListContainerShareListWidget(container: container));
   }
 }
 
@@ -46,20 +50,20 @@ class ListContainerShareListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SharesService shares = Provider.of(context);
+    final SharesStore _sharesStore = Provider.of(context);
     final SharesNavigator _sharesNavigator = Provider.of(context);
 
     return Scaffold(
         appBar: AppBar(title: Text("${container.name} accessors"), actions: [UserInfoWidget()]),
         body: Observer(
-            builder: (context) => shares.shares == null
+            builder: (context) => _sharesStore.sharesAndInvites == null
                 ? Center(child: Text("soon"))
                 : ListView.builder(
                     padding: const EdgeInsets.only(left: 8),
                     shrinkWrap: true,
-                    itemCount: shares.shares.length,
+                    itemCount: _sharesStore.sharesAndInvites.length,
                     itemBuilder: (BuildContext context, index) {
-                      final item = shares.shares[index];
+                      final item = _sharesStore.sharesAndInvites[index];
                       return ListTile(
                         title: item.buildTitle(context),
                         subtitle: item.buildSubtitle(context),

@@ -7,9 +7,7 @@ import '../../auth/auth_service.dart';
 import '../../juiced/common/accessors.dart';
 import '../../juiced/juiced.dart';
 import '../../juiced/juiced.juicer.dart' as j;
-import '../../shared/service_base.dart';
-import 'invite/invite_service.dart';
-import 'shares_list.dart';
+import 'accessor_profile.dart';
 
 part 'shares_service.g.dart';
 
@@ -22,14 +20,12 @@ abstract class _SharesService with Store {
 
   final AuthService _authService;
 
-  final InviteService _inviteService;
-
   @observable
-  List<ShareListItem> shares;
+  List<AccessorProfile> accessors = [];
 
   StreamSubscription<DocumentSnapshot> containerChangeListener;
 
-  _SharesService(this.container, this._authService, this._inviteService) : _fs = FirebaseFirestore.instance;
+  _SharesService(this.container, this._authService) : _fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to authentication changes
@@ -38,62 +34,42 @@ abstract class _SharesService with Store {
 
   Future<void> _containerUpdated(DocumentSnapshot snapshot) async {
     ListContainer updatedContainer = j.juicer.decode(snapshot.data(), (_) => ListContainer());
-    List<String> accessorKeys = updatedContainer.accessors[AccessorUtils.anyLevelKey].cast<String>();
-    List<PublicProfile> accessorProfiles = await _getAccessorProfiles(accessorKeys);
-    List<ShareListItem> containerShares = [];
-    Map<String, PublicProfile> accessorProfileMap =
-        Map.fromIterable(accessorProfiles, key: (profile) => profile.reference.id);
-    for (String level in updatedContainer.accessors.keys) {
-      if (level == AccessorUtils.anyLevelKey) continue;
-      for (String uid in updatedContainer.accessors[level]) {
-        bool allowRemoveCallback = level != ContainerAccess.owners || updatedContainer.accessors[level].length > 1;
-        containerShares.add(ShareItem(
-            email: accessorProfileMap[uid].email,
-            role: ContainerAccess.labels[level],
-            removeCallback: allowRemoveCallback ? () async => await remove(updatedContainer, uid) : null));
+    container.copyPropertiesFrom(updatedContainer);
+    List<String> accessorKeys = container.accessors[AccessorUtils.anyLevelKey].cast<String>();
+
+    Map<String, AccessorProfile> accessorMap = Map.fromIterable(accessors, key: (accessor) => accessor.uid);
+    List<AccessorProfile> _accessors = List.from(accessors);
+    // Remove accessors that are not present any more in the container accessor list
+    _accessors.removeWhere((accessor) => !accessorKeys.contains(accessor.uid));
+
+    // Fetch public profiles for newly added accessors
+    List<String> newAccessorKeys = accessorKeys.where((key) => !accessorMap.containsKey(key)).toList();
+    if (newAccessorKeys.isNotEmpty) {
+      List<PublicProfile> newAccessorProfiles = await _getAccessorProfiles(newAccessorKeys);
+      Map<String, PublicProfile> profileMap =
+          Map.fromIterable(newAccessorProfiles, key: (profile) => profile.reference.id);
+
+      Iterable<String> levels = container.accessors.keys.where((key) => key != AccessorUtils.anyLevelKey);
+      for (final level in levels) {
+        for (final uid in container.accessors[level]) {
+          if (!accessorMap.containsKey(uid)) {
+            _accessors.add(AccessorProfile(level, profileMap[uid]));
+          }
+        }
       }
     }
-
-    // Add list divider
-    containerShares.add(SectionItem("Pending invitations"));
-
-    List<Invitation> invitations = await _getInvitationsForContainer();
-    //Map<String, PublicProfile> invitedProfileMap = Map.fromIterable(invitedProfiles, key: (profile) => profile.email);
-    for (final invite in invitations) {
-      containerShares.add(InviteItem(
-          email: invite.recipientEmail,
-          role: ContainerAccess.labels[invite.payload["accessLevel"]],
-          invitedTime: invite.accessLog.timeCreated,
-          revokeCallback: () async => await _inviteService.revoke(invite)));
-    }
-    shares = containerShares;
+    accessors = _accessors;
   }
 
   /// Remove accessor from current container
-  Future<void> remove(ListContainer updatedContainer, String uid) async {
-    for (final level in updatedContainer.accessors.keys) {
-      updatedContainer.accessors[level].remove(uid);
+  Future<void> remove(String uid) async {
+    for (final level in container.accessors.keys) {
+      container.accessors[level].remove(uid);
     }
-    dynamic encodedContainer = j.juicer.encode(updatedContainer);
-    updatedContainer.log(_authService.user.reference.id, encodedContainer);
-    encodedContainer["accessLog"] = j.juicer.encode(updatedContainer.accessLog);
+    dynamic encodedContainer = j.juicer.encode(container);
+    container.log(_authService.user.reference.id, encodedContainer);
+    encodedContainer["accessLog"] = j.juicer.encode(container.accessLog);
     await container.reference.set(encodedContainer);
-  }
-
-  Future<List<Invitation>> _getInvitationsForContainer() async {
-    QuerySnapshot invitesSnapshot = await _fs
-        .collection(Invitation.collectionName)
-        .notDeleted
-        .where("subjectId", isEqualTo: container.reference.id)
-        .where("senderUid", isEqualTo: _authService.user.reference.id)
-        .get();
-    List<Invitation> invitations = [];
-    if (invitesSnapshot.docs.isNotEmpty) {
-      for (final doc in invitesSnapshot.docs) {
-        invitations.add(j.juicer.decode(doc.data(), (_) => Invitation()..reference = doc.reference));
-      }
-    }
-    return invitations;
   }
 
   Future<List<PublicProfile>> _getAccessorProfiles(List<String> uids) async {
@@ -110,13 +86,6 @@ abstract class _SharesService with Store {
     await Future.wait(profileFutures);
     return profileSnapshots.map(fromSnapshot).toList();
   }
-
-  // Future<List<PublicProfile>> _getInvitedProfiles(List<String> emails) async {
-  //   QuerySnapshot querySnapshot =
-  //       await _fs.collection(PublicProfile.collectionName).where("email", whereIn: emails).get();
-  //   print("getInvitedProfiles docs: ${querySnapshot.docs.length}");
-  //   return querySnapshot.docs.map(fromSnapshot).toList();
-  // }
 
   void cleanUp() {
     containerChangeListener?.cancel();

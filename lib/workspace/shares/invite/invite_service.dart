@@ -6,6 +6,7 @@ import '../../../juiced/common/access_log.dart';
 import '../../../juiced/invitation/invitation.dart';
 import '../../../juiced/juiced.dart';
 import '../../../juiced/juiced.juicer.dart' as j;
+import '../../../shared/service_base.dart';
 
 part 'invite_service.g.dart';
 
@@ -19,16 +20,16 @@ abstract class _InviteService with Store {
   List<Invitation> invites = [];
 
   @computed
-  List<Invitation> get sent => invites.where((invite) => invite.senderUid == _authService.user.reference.id);
+  Iterable<Invitation> get sent => invites.where((invite) => invite.senderUid == _authService.user.reference.id);
 
   @computed
-  List<Invitation> get received => invites.where((invite) => invite.senderUid == _authService.user.reference.id);
+  Iterable<Invitation> get received => invites.where((invite) => invite.senderUid == _authService.user.reference.id);
 
   _InviteService(this._authService) : _fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to invitation changes that were either sent or received by current user
-    _fs.collection(Invitation.collectionName).snapshots().listen(_handleUpdates);
+    _fs.collection(Invitation.collectionName).notDeleted.snapshots().listen(_handleUpdates);
   }
 
   Future<void> _handleUpdates(QuerySnapshot updates) async {

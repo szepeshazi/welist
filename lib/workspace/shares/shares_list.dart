@@ -75,11 +75,9 @@ class InviteItem implements ShareListItem {
 
   final DateTime invitedDate;
 
-  final Invitation inviteRef;
-
   final InviteOperationCallback revokeCallback;
 
-  InviteItem({this.email, this.role, int invitedTime, this.revokeCallback, this.inviteRef})
+  InviteItem({this.email, this.role, int invitedTime, this.revokeCallback})
       : invitedDate = DateTime.fromMillisecondsSinceEpoch(invitedTime);
 
   @override
