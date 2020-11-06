@@ -7,10 +7,12 @@ import 'package:provider/provider.dart';
 import '../auth/auth_service.dart';
 import '../juiced/common/accessors.dart';
 import '../juiced/juiced.dart';
+import '../notifications/notifications_widget.dart';
 import '../profile/user_info_widget.dart';
 import '../view_list/view_list_widget.dart';
 import '../workspace/list_container_service.dart';
 import 'create_list_widget.dart';
+import 'shares/invite/invite_service.dart';
 import 'shares/invite/invite_widget.dart';
 import 'shares/list_container_shares_widget.dart';
 import 'shares/shares_navigator.dart';
@@ -21,6 +23,7 @@ class WorkspaceWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       Provider<ListContainerService>(create: (_) => ListContainerService(context.read<AuthService>())..initialize()),
+      Provider<InviteService>(create: (_) => InviteService(context.read<AuthService>())..initialize()),
       Provider<WorkspaceNavigator>(create: (_) => WorkspaceNavigator()),
       Provider<SharesNavigator>(create: (_) => SharesNavigator())
     ], child: WorkspaceNavigatorWidget());
@@ -42,6 +45,8 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
                   child: WorkspaceScaffoldWidget(
                     body: ListContainersWidget(),
                   )),
+              if (_workspaceNavigator.showNotifications)
+                MaterialPage(key: ValueKey("notifications"), name: "notifications", child: NotificationsWidget()),
               if (_workspaceNavigator.showAddContainerWidget)
                 MaterialPage(
                     key: ValueKey("addContainer"),
@@ -69,6 +74,9 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
               }
               print("WorkspaceNavigator widget, popping: ${route.settings.name}");
               switch (route.settings.name) {
+                case "notifications":
+                  _workspaceNavigator.toggleNotifications(false);
+                  break;
                 case "addContainer":
                   _workspaceNavigator.toggleAddContainerWidget(false);
                   break;

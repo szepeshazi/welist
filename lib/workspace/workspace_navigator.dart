@@ -16,6 +16,9 @@ abstract class _WorkspaceNavigator with Store {
   @observable
   ListContainer showSharesForContainer;
 
+  @observable
+  bool showNotifications = false;
+
   @action
   void toggleAddContainerWidget(bool show) => showAddContainerWidget = show;
 
@@ -24,4 +27,7 @@ abstract class _WorkspaceNavigator with Store {
 
   @action
   void toggleSharesForContainer(ListContainer selected) => showSharesForContainer = selected;
+
+  @action
+  void toggleNotifications(bool newValue) => showNotifications = newValue;
 }
