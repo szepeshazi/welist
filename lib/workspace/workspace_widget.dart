@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../auth/auth_service.dart';
 import '../juiced/common/accessors.dart';
 import '../juiced/juiced.dart';
-import '../notifications/notifications_widget.dart';
+import '../notification/notification_widget.dart';
 import '../profile/user_info_widget.dart';
 import '../view_list/view_list_widget.dart';
 import '../workspace/list_container_service.dart';
@@ -46,7 +46,7 @@ class WorkspaceNavigatorWidget extends StatelessWidget {
                     body: ListContainersWidget(),
                   )),
               if (_workspaceNavigator.showNotifications)
-                MaterialPage(key: ValueKey("notifications"), name: "notifications", child: NotificationsWidget()),
+                MaterialPage(key: ValueKey("notifications"), name: "notifications", child: NotificationWidget()),
               if (_workspaceNavigator.showAddContainerWidget)
                 MaterialPage(
                     key: ValueKey("addContainer"),

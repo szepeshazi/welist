@@ -178,6 +178,8 @@ class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
       juicer.removeNullValues({
 // reference is ignored
         "senderUid": val.senderUid,
+        "senderEmail": val.senderEmail,
+        "senderName": val.senderName,
         "recipientUid": val.recipientUid,
         "recipientEmail": val.recipientEmail,
         "subjectId": val.subjectId,
@@ -186,6 +188,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
             : Map.fromIterable(val.payload.keys,
                 value: (k) => juicer.encode(val.payload[k])),
         "accessLog": juicer.encode(val.accessLog),
+        "recipientResponded": val.recipientResponded,
         "recipientAcceptedTime": val.recipientAcceptedTime,
         "recipientRejectedTime": val.recipientRejectedTime,
 // collectionName is ignored
@@ -194,6 +197,8 @@ class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
   jcr_i4.Invitation fromMap(Juicer juicer, Map map, jcr_i4.Invitation empty) {
 // reference is ignored
     if (map.containsKey("senderUid")) empty.senderUid = map["senderUid"];
+    if (map.containsKey("senderEmail")) empty.senderEmail = map["senderEmail"];
+    if (map.containsKey("senderName")) empty.senderName = map["senderName"];
     if (map.containsKey("recipientUid"))
       empty.recipientUid = map["recipientUid"];
     if (map.containsKey("recipientEmail"))
@@ -206,6 +211,8 @@ class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
     if (map.containsKey("accessLog"))
       empty.accessLog =
           juicer.decode(map["accessLog"], (_) => jcr_i3.AccessLog());
+    if (map.containsKey("recipientResponded"))
+      empty.recipientResponded = map["recipientResponded"];
     if (map.containsKey("recipientAcceptedTime"))
       empty.recipientAcceptedTime = map["recipientAcceptedTime"]?.toInt();
     if (map.containsKey("recipientRejectedTime"))

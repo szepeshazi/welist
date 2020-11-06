@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import '../../shared/list_base/list_item_base.dart';
 
 import '../../juiced/juiced.dart';
 
-/// The base class for the different types of items the shares list can contain.
-abstract class ShareListItem {
-  Widget buildTitle(BuildContext context);
-
-  Widget buildSubtitle(BuildContext context);
-
-  Widget buildTrailing(BuildContext context);
-}
-
-class SectionItem implements ShareListItem {
+class SectionItem implements ListItemBase {
   final String section;
 
   SectionItem(this.section);
@@ -34,7 +26,7 @@ class SectionItem implements ShareListItem {
   Widget buildTrailing(BuildContext context) => null;
 }
 
-class ShareItem implements ShareListItem {
+class ShareItem implements ListItemBase {
   final String email;
 
   final String role;
@@ -68,7 +60,7 @@ class ShareItem implements ShareListItem {
 }
 
 /// A ListItem that contains data to display a message.
-class InviteItem implements ShareListItem {
+class InviteItem implements ListItemBase {
   final String email;
 
   final String role;

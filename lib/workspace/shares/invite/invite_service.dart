@@ -17,51 +17,74 @@ abstract class _InviteService with Store {
   final AuthService _authService;
 
   @observable
-  List<Invitation> invites = [];
+  List<Invitation> sent = [];
 
-  @computed
-  Iterable<Invitation> get sent => invites.where((invite) => invite.senderUid == _authService.user.reference.id);
-
-  @computed
-  Iterable<Invitation> get received => invites.where((invite) => invite.senderUid == _authService.user.reference.id);
+  @observable
+  List<Invitation> received = [];
 
   _InviteService(this._authService) : _fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to invitation changes that were either sent or received by current user
-    _fs.collection(Invitation.collectionName).notDeleted.snapshots().listen(_handleUpdates);
+    _fs
+        .collection(Invitation.collectionName)
+        .notDeleted
+        .where("recipientEmail", isEqualTo: _authService.user.email)
+        .where("recipientResponded", isEqualTo: false)
+        .snapshots()
+        .listen(_handleReceivedUpdates);
+
+    _fs
+        .collection(Invitation.collectionName)
+        .notDeleted
+        .where("senderUid", isEqualTo: _authService.user.reference.id)
+        .where("recipientResponded", isEqualTo: false)
+        .snapshots()
+        .listen(_handleSentUpdates);
   }
 
-  Future<void> _handleUpdates(QuerySnapshot updates) async {
-    List<Invitation> _invites = List.from(invites);
+  Future<void> _handleReceivedUpdates(QuerySnapshot updates) async {
+    received = await _handleUpdates(updates, received);
+  }
+
+  Future<void> _handleSentUpdates(QuerySnapshot updates) async {
+    sent = await _handleUpdates(updates, sent);
+  }
+
+  Future<List<Invitation>> _handleUpdates(QuerySnapshot updates, List<Invitation> currentInvites) async {
+    List<Invitation> updatedInvites = List.from(currentInvites);
     if (updates.docChanges.isNotEmpty) {
       for (var change in updates.docChanges) {
         switch (change.type) {
           case DocumentChangeType.added:
             Invitation invitation =
                 j.juicer.decode(change.doc.data(), (_) => Invitation()..reference = change.doc.reference);
-            _invites.add(invitation);
+            updatedInvites.add(invitation);
             break;
           case DocumentChangeType.modified:
-            int index = invites.indexWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
-            _invites[index] = j.juicer.decode(change.doc.data(), (_) => Invitation()..reference = change.doc.reference);
+            int index =
+                currentInvites.indexWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
+            updatedInvites[index] =
+                j.juicer.decode(change.doc.data(), (_) => Invitation()..reference = change.doc.reference);
             break;
           case DocumentChangeType.removed:
-            _invites.removeWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
+            updatedInvites.removeWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
             break;
         }
       }
     }
-    invites = _invites;
+    return updatedInvites;
   }
 
-  Future<void> send({String recipientEmail, String subjectUid, String accessLevel}) async {
+  Future<void> send({ListContainer container, String recipientEmail, String subjectUid, String accessLevel}) async {
     Invitation invitation = Invitation()
       ..accessLog = AccessLog()
       ..recipientEmail = recipientEmail
       ..senderUid = _authService.user.reference.id
+      ..senderEmail = _authService.user.email
+      ..senderName = _authService.user.displayName
       ..subjectId = subjectUid
-      ..payload = {"accessLevel": accessLevel};
+      ..payload = {"containerName": container.name, "containerType": container.typeName, "accessLevel": accessLevel};
     dynamic encoded = j.juicer.encode(invitation);
     invitation.log(_authService.user.reference.id, encoded);
     encoded["accessLog"] = j.juicer.encode(invitation.accessLog);

@@ -10,6 +10,10 @@ class Invitation with AccessLogUtils {
 
   String senderUid;
 
+  String senderEmail;
+
+  String senderName;
+
   String recipientUid;
 
   String recipientEmail;
@@ -20,6 +24,8 @@ class Invitation with AccessLogUtils {
 
   @override
   AccessLog accessLog;
+
+  bool recipientResponded = false;
 
   int recipientAcceptedTime = 0;
 

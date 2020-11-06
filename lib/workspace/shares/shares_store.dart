@@ -2,6 +2,7 @@ import 'package:mobx/mobx.dart';
 
 import '../../auth/auth_service.dart';
 import '../../juiced/juiced.dart';
+import '../../shared/list_base/list_item_base.dart';
 import 'accessor_profile.dart';
 import 'invite/invite_service.dart';
 import 'shares_list.dart';
@@ -21,7 +22,7 @@ abstract class _SharesStore with Store {
   final String userId;
 
   @observable
-  List<ShareListItem> sharesAndInvites = [];
+  List<ListItemBase> sharesAndInvites = [];
 
   _SharesStore(this._container, AuthService authService, this._sharesService, this._inviteService)
       : userId = authService.user.reference.id;
@@ -31,11 +32,12 @@ abstract class _SharesStore with Store {
       print("$a, $b");
     });
     autorun((_) {
-      List<Invitation> currentContainerInvites = _inviteService.sent.where((invite) =>
-          invite.subjectId == _container.reference.id && invite.senderUid == userId).toList(growable: false);
+      List<Invitation> currentContainerInvites = _inviteService.sent
+          .where((invite) => invite.subjectId == _container.reference.id && invite.senderUid == userId)
+          .toList(growable: false);
       sharesAndInvites = [
         ..._sharesService.accessors.map(fromAccessorProfile),
-        if (_inviteService.invites.isNotEmpty) divider,
+        if (currentContainerInvites.isNotEmpty) divider,
         ...currentContainerInvites.map(fromInvitation)
       ];
     });

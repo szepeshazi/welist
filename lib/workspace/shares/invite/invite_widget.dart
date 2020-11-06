@@ -87,7 +87,7 @@ class InviteInnerWidget extends StatelessWidget {
                                     : () {
                                         sharesNavigator.toggleAddAccessorButton(true);
                                         inviteService
-                                            .send(
+                                            .send(container: container,
                                                 recipientEmail: invite.recipientEmail,
                                                 accessLevel: invite.accessLevel,
                                                 subjectUid: container.reference.id)
