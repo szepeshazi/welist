@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
 
 import '../../shared/enum_codec.dart';
@@ -28,13 +29,12 @@ class AccessEntry {
   }
 
   @Property(ignore: true)
-  final EnumCodec<AccessAction> _accessActionCodec = EnumCodec(AccessAction.values);
-
-  @Property(ignore: true)
   set action(AccessAction newValue) => actionName = _accessActionCodec.asString(newValue);
 
   @Property(ignore: true)
   AccessAction get action => _accessActionCodec.asEnum(actionName);
+
+  static final EnumCodec<AccessAction> _accessActionCodec = EnumCodec(AccessAction.values);
 }
 
 @juiced
@@ -70,20 +70,17 @@ class AccessLog {
 
 abstract class HasAccessLog {
   AccessLog get accessLog;
+
+  DocumentReference get reference;
+
+  String get collection;
+
+  void log(String userId, dynamic encoded, AccessAction action);
 }
 
 mixin AccessLogUtils implements HasAccessLog {
-  void log(String userId, dynamic encoded, {bool deleteEntity = false, bool restoreEntity = false}) {
-    AccessAction action;
-    if (deleteEntity) {
-      action = AccessAction.delete;
-    } else if (restoreEntity) {
-      action = AccessAction.restore;
-    } else if (accessLog.entries.isEmpty) {
-      action = AccessAction.create;
-    } else {
-      action = AccessAction.update;
-    }
+  @override
+  void log(String userId, dynamic encoded, AccessAction action) {
 
     ChangeSet changeSet;
     Map<String, dynamic> flattenedProperties = flatten(encoded..remove("accessLog"));

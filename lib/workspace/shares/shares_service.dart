@@ -7,16 +7,18 @@ import '../../auth/auth_service.dart';
 import '../../juiced/common/accessors.dart';
 import '../../juiced/juiced.dart';
 import '../../juiced/juiced.juicer.dart' as j;
+import '../../shared/service_base.dart';
 import 'accessor_profile.dart';
 
 part 'shares_service.g.dart';
 
 class SharesService = _SharesService with _$SharesService;
 
-abstract class _SharesService with Store {
+abstract class _SharesService extends ServiceBase<ListContainer> with Store {
   final ListContainer container;
 
-  final FirebaseFirestore _fs;
+  @override
+  final FirebaseFirestore fs;
 
   final AuthService _authService;
 
@@ -25,7 +27,7 @@ abstract class _SharesService with Store {
 
   StreamSubscription<DocumentSnapshot> containerChangeListener;
 
-  _SharesService(this.container, this._authService) : _fs = FirebaseFirestore.instance;
+  _SharesService(this.container, this._authService) : fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to authentication changes
@@ -66,15 +68,12 @@ abstract class _SharesService with Store {
     for (final level in container.accessors.keys) {
       container.accessors[level].remove(uid);
     }
-    dynamic encodedContainer = j.juicer.encode(container);
-    container.log(_authService.user.reference.id, encodedContainer);
-    encodedContainer["accessLog"] = j.juicer.encode(container.accessLog);
-    await container.reference.set(encodedContainer);
+    await upsert(container, _authService.user.reference.id);
   }
 
   Future<List<PublicProfile>> _getAccessorProfiles(List<String> uids) async {
     List<DocumentReference> profileRefs =
-        uids.map((uid) => _fs.collection(PublicProfile.collectionName).doc(uid)).toList();
+        uids.map((uid) => fs.collection(PublicProfile.collectionName).doc(uid)).toList();
     List<Future<DocumentSnapshot>> profileFutures = [];
     List<DocumentSnapshot> profileSnapshots = [];
     for (var ref in profileRefs) {

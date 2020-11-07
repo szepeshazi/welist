@@ -6,6 +6,7 @@ import '../common/access_log.dart';
 
 @juiced
 class ListItem with AccessLogUtils {
+  @override
   @Property(ignore: true)
   DocumentReference reference;
 
@@ -29,6 +30,8 @@ class ListItem with AccessLogUtils {
   @override
   String toString() => "$name ($stateName)";
 
-  // Collection name
-  static const collectionName = "items";
+  @override
+  String get collection => ListItem.collectionName;
+
+  static const String collectionName = "items";
 }

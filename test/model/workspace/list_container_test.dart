@@ -14,7 +14,7 @@ void main() {
 
       Map<String, dynamic> result = j.juicer.encode(container);
       dynamic flattened = flatten(result);
-      container.log("user_1", flattened);
+      container.log("user_1", flattened, AccessAction.create);
       expect(result['accessLog'], isNotNull);
     });
   });

@@ -7,12 +7,13 @@ import '../auth/auth_service.dart';
 import '../juiced/juiced.dart';
 import '../juiced/juiced.juicer.dart' as j;
 import '../shared/service_base.dart';
+import '../workspace/list_container_service.dart';
 
 part 'list_item_service.g.dart';
 
 class ListItemService = _ListItemService with _$ListItemService;
 
-abstract class _ListItemService with Store {
+abstract class _ListItemService extends ServiceBase<ListItem> with Store {
   @observable
   List<ListItem> items = [];
 
@@ -22,13 +23,16 @@ abstract class _ListItemService with Store {
   /// The host ListContainer for this specific list
   final ListContainer container;
 
+  @override
   final FirebaseFirestore fs;
 
   final AuthService _authService;
 
+  final ListContainerService containerService;
+
   StreamSubscription<QuerySnapshot> listChangeListener;
 
-  _ListItemService(this.container, this._authService) : fs = FirebaseFirestore.instance;
+  _ListItemService(this.container, this._authService, this.containerService) : fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to authentication changes
@@ -68,41 +72,31 @@ abstract class _ListItemService with Store {
     item
       ..timeCompleted = null
       ..accessLog = AccessLog();
-    dynamic encodedItem = j.juicer.encode(item);
-    item.log(_authService.user.reference.id, encodedItem);
-    encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
 
     // pseudo increment to be included in access log
     // real increment operation will happen on FB, and changes will be pushed to the obj
     container.itemCount++;
-    dynamic encodedContainer = j.juicer.encode(container);
-    container.log(_authService.user.reference.id, encodedContainer);
-    dynamic containerAccess = j.juicer.encode(container.accessLog);
-
     await fs.runTransaction((transaction) async {
-      await container.reference.collection("items").add(j.juicer.encode(item));
-      await container.reference.update({"itemCount": FieldValue.increment(1), "accessLog": containerAccess});
+      await upsert(item, _authService.user.reference.id, parent: container.reference);
+      await containerService
+          .updateFields(container, _authService.user.reference.id, {"itemCount": FieldValue.increment(1)});
     });
   }
 
   @action
   Future<void> update(ListItem item) async {
     // TODO: input sanity check, transaction
-    dynamic encodedItem = j.juicer.encode(item);
-    item.log(_authService.user.reference.id, encodedItem);
-    encodedItem["accessLog"] = j.juicer.encode(item.accessLog);
-    await item.reference.set(encodedItem);
+    await upsert(item, _authService.user.reference.id);
   }
 
   @action
   Future<void> delete(ListItem item) async {
     // TODO: input sanity check, transaction
-    dynamic encodedItem = j.juicer.encode(item);
-    item.log(_authService.user.reference.id, encodedItem, deleteEntity: true);
-    dynamic encodedAccess = j.juicer.encode(item.accessLog);
+    container.itemCount--;
     await fs.runTransaction((transaction) async {
-      await item.reference.update({"accessLog": encodedAccess});
-      await container.reference.update({"itemCount": FieldValue.increment(-1)});
+      await upsert(item, _authService.user.reference.id, action: AccessAction.delete);
+      await containerService
+          .updateFields(container, _authService.user.reference.id, {"itemCount": FieldValue.increment(-1)});
     });
   }
 

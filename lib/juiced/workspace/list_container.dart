@@ -13,6 +13,7 @@ enum ContainerType { shopping, todo }
 
 @juiced
 class ListContainer with AccessLogUtils, AccessorUtils {
+  @override
   @Property(ignore: true)
   DocumentReference reference;
 
@@ -69,8 +70,10 @@ class ListContainer with AccessLogUtils, AccessorUtils {
 
   static const Icon _defaultIcon = Icon(Icons.not_interested);
 
-  // Collection name
-  static const collectionName = "listContainers";
+  @override
+  String get collection => ListContainer.collectionName;
+
+  static const String collectionName = "listContainers";
 
   // Property names
   static const String nameField = "name";

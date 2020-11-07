@@ -12,8 +12,10 @@ part 'invite_service.g.dart';
 
 class InviteService = _InviteService with _$InviteService;
 
-abstract class _InviteService with Store {
-  final FirebaseFirestore _fs;
+abstract class _InviteService extends ServiceBase<Invitation> with Store {
+  @override
+  final FirebaseFirestore fs;
+
   final AuthService _authService;
 
   @observable
@@ -22,11 +24,11 @@ abstract class _InviteService with Store {
   @observable
   List<Invitation> received = [];
 
-  _InviteService(this._authService) : _fs = FirebaseFirestore.instance;
+  _InviteService(this._authService) : fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to invitation changes that were either sent or received by current user
-    _fs
+    fs
         .collection(Invitation.collectionName)
         .notDeleted
         .where("recipientEmail", isEqualTo: _authService.user.email)
@@ -34,7 +36,7 @@ abstract class _InviteService with Store {
         .snapshots()
         .listen(_handleReceivedUpdates);
 
-    _fs
+    fs
         .collection(Invitation.collectionName)
         .notDeleted
         .where("senderUid", isEqualTo: _authService.user.reference.id)
@@ -85,33 +87,20 @@ abstract class _InviteService with Store {
       ..senderName = _authService.user.displayName
       ..subjectId = subjectUid
       ..payload = {"containerName": container.name, "containerType": container.typeName, "accessLevel": accessLevel};
-    dynamic encoded = j.juicer.encode(invitation);
-    invitation.log(_authService.user.reference.id, encoded);
-    encoded["accessLog"] = j.juicer.encode(invitation.accessLog);
-    await _fs.collection(Invitation.collectionName).add(encoded);
+    await upsert(invitation, _authService.user.reference.id, action: AccessAction.create);
   }
 
   Future<void> revoke(Invitation invitation) async {
-    var encoded = j.juicer.encode(invitation);
-    invitation.log(_authService.user.reference.id, encoded, deleteEntity: true);
-    dynamic encodedAccess = j.juicer.encode(invitation.accessLog);
-    await invitation.reference.update({"accessLog": encodedAccess});
+    await upsert(invitation, _authService.user.reference.id, action: AccessAction.delete);
   }
 
-  Future<void> accept(Invitation invitation) => _acceptOrReject(invitation, true);
+  Future<void> accept(Invitation invitation) async {
+    invitation.recipientAcceptedTime = DateTime.now().millisecondsSinceEpoch;
+    await upsert(invitation, _authService.user.reference.id);
+  }
 
-  Future<void> reject(Invitation invitation) => _acceptOrReject(invitation, false);
-
-  Future<void> _acceptOrReject(Invitation invitation, bool accepted) async {
-    if (accepted) {
-      invitation.recipientAcceptedTime = DateTime.now().millisecondsSinceEpoch;
-    } else {
-      invitation.recipientRejectedTime = DateTime.now().millisecondsSinceEpoch;
-    }
-    invitation.recipientResponded = true;
-    dynamic encoded = j.juicer.encode(invitation);
-    invitation.log(_authService.user.reference.id, encoded);
-    encoded["accessLog"] = j.juicer.encode(invitation.accessLog);
-    await invitation.reference.set(encoded);
+  Future<void> reject(Invitation invitation) async {
+    invitation.recipientRejectedTime = DateTime.now().millisecondsSinceEpoch;
+    await upsert(invitation, _authService.user.reference.id);
   }
 }

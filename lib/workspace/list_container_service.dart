@@ -12,17 +12,18 @@ part 'list_container_service.g.dart';
 
 class ListContainerService = _ListContainerService with _$ListContainerService;
 
-abstract class _ListContainerService with Store {
+abstract class _ListContainerService extends ServiceBase<ListContainer> with Store {
   @observable
   List<ListContainer> containers;
 
-  final FirebaseFirestore _fs;
+  @override
+  final FirebaseFirestore fs;
 
   final AuthService _authService;
 
   StreamSubscription<QuerySnapshot> containerChangeListener;
 
-  _ListContainerService(this._authService) : _fs = FirebaseFirestore.instance;
+  _ListContainerService(this._authService) : fs = FirebaseFirestore.instance;
 
   void initialize() {
     containerChangeListener = subscribeToContainerChanges();
@@ -30,7 +31,7 @@ abstract class _ListContainerService with Store {
 
   StreamSubscription<QuerySnapshot> subscribeToContainerChanges() {
     // Listen to containers the current user has access to
-    return _fs
+    return fs
         .collection(ListContainer.collectionName)
         .notDeleted
         .hasAccess(_authService.user.reference.id)
@@ -53,18 +54,12 @@ abstract class _ListContainerService with Store {
       ..itemCount = 0
       ..accessLog = AccessLog()
       ..addAccessor(_authService.user.reference.id, ContainerAccess.owners);
-    var encoded = j.juicer.encode(container);
-    container.log(_authService.user.reference.id, encoded);
-    encoded["accessLog"] = j.juicer.encode(container.accessLog);
-    await _fs.collection(ListContainer.collectionName).add(encoded);
+    await upsert(container, _authService.user.reference.id);
   }
 
   @action
   Future<void> delete(ListContainer container) async {
-    var encoded = j.juicer.encode(container);
-    container.log(_authService.user.reference.id, encoded, deleteEntity: true);
-    dynamic encodedAccess = j.juicer.encode(container.accessLog);
-    await container.reference.update({"accessLog": encodedAccess});
+    await upsert(container, _authService.user.reference.id, action: AccessAction.delete);
   }
 
   void cleanUp() {

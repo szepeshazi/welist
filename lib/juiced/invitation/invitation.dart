@@ -5,6 +5,7 @@ import '../common/access_log.dart';
 
 @juiced
 class Invitation with AccessLogUtils {
+  @override
   @Property(ignore: true)
   DocumentReference reference;
 
@@ -30,6 +31,9 @@ class Invitation with AccessLogUtils {
   int recipientAcceptedTime = 0;
 
   int recipientRejectedTime = 0;
+
+  @override
+  String get collection => Invitation.collectionName;
 
   static const String collectionName = "invitations";
 }

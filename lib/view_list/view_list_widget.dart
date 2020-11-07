@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import '../workspace/list_container_service.dart';
 
 import '../auth/auth_service.dart';
 import '../juiced/juiced.dart';
@@ -17,7 +18,9 @@ class ViewListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
-      Provider<ListItemService>(create: (_) => ListItemService(container, context.read<AuthService>())..initialize())
+      Provider<ListItemService>(
+          create: (_) => ListItemService(container, context.read<AuthService>(), context.read<ListContainerService>())
+            ..initialize())
     ], child: ViewListWidgetInner());
   }
 }
