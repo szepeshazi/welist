@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobx/mobx.dart';
 import 'package:welist_common/common.dart';
+import 'package:welist_common/common.juicer.dart' as j;
 
 import '../../auth/auth_service.dart';
-import '../../juiced/juiced.juicer.dart' as j;
 import '../../shared/service_base.dart';
 import 'accessor_profile.dart';
 

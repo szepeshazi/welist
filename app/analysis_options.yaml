@@ -6,17 +6,10 @@ analyzer:
     - .dart_tool/**
     - build/**
     - test/**.g.dart
-    - lib/**.pb.dart
-    - lib/**.template.pb.dart
-    - lib/i18n/message_bundles/**.dart
-    - lib/**.juicer.dart
     - modules/**
   errors:
     uri_has_not_been_generated: ignore
     prefer_relative_imports: warning
-
-  plugins:
-    - angular
 
 linter:
   rules:

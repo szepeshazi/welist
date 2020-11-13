@@ -1,6 +1,6 @@
-# app
+# welist
 
-A new Flutter project.
+Shared todo list
 
 ## Getting Started
 
