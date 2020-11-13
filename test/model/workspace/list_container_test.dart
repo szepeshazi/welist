@@ -1,8 +1,7 @@
 @TestOn('vm')
 import 'package:flutter_test/flutter_test.dart';
-import 'package:welist/juiced/common/utils.dart';
-import 'package:welist/juiced/juiced.dart';
-import 'package:welist/juiced/juiced.juicer.dart' as j;
+import 'package:welist_common/common.dart';
+import 'package:welist_common/common.juicer.dart' as j;
 
 void main() {
   group("ListContainer serialization", () {

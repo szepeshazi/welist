@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
-
-import '../../juiced/juiced.dart';
+import 'package:welist_common/common.dart';
 
 class AccessorProfile extends Equatable {
   final String role;

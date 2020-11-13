@@ -1,6 +1,6 @@
 import 'package:mobx/mobx.dart';
+import 'package:welist_common/common.dart';
 
-import '../juiced/juiced.dart';
 import '../shared/list_base/list_item_base.dart';
 import '../workspace/shares/invite/invite_service.dart';
 import 'notification_list.dart';
@@ -18,11 +18,13 @@ abstract class _NotificationStore with Store {
   _NotificationStore(this._inviteService);
 
   Future<void> initialize() async {
-    autorun((_) => notifications = _inviteService.received.map(fromInvitation).toList());
+    autorun((_) =>
+        notifications = _inviteService.received.map(fromInvitation).toList());
   }
 
   NotificationItem fromInvitation(Invitation invite) => NotificationItem(
-      message: "Access ${invite.payload['containerName']} ${invite.payload['containerType']} list",
+      message:
+          "Access ${invite.payload['containerName']} ${invite.payload['containerType']} list",
       from: invite.senderName ?? invite.senderEmail,
       role: ContainerAccess.labels[invite.payload["accessLevel"]],
       invitedTime: invite.accessLog.timeCreated,

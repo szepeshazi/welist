@@ -50,7 +50,7 @@ class SplashWidget extends StatelessWidget {
                   setupComplete: true),
               child: Container(
                   margin: EdgeInsets.only(top: 20),
-                  child: Text("Universal, shared lists for everyonce",
+                  child: Text("Universal, shared lists for everyone",
                       textAlign: TextAlign.center, style: Theme.of(context).textTheme.subtitle2)))
         ]));
   }

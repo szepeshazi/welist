@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:welist_common/common.dart';
 
 import '../auth/auth_service.dart';
-import '../juiced/common/accessors.dart';
-import '../juiced/juiced.dart';
 import '../notification/notification_widget.dart';
 import '../profile/user_info_widget.dart';
 import '../view_list/view_list_widget.dart';
@@ -143,7 +142,7 @@ class ListContainerRowWidget extends StatelessWidget {
           children: [
             Expanded(
                 child: Row(children: [
-              Container(padding: EdgeInsets.only(right: 5.0), child: container.icon),
+              Container(padding: EdgeInsets.only(right: 5.0), child: icon),
               Text(container.name),
               if ((container.itemCount ?? 0) > 0) Text(" (${container.itemCount})")
             ])),
@@ -184,6 +183,15 @@ class ListContainerRowWidget extends StatelessWidget {
           _workspaceNavigator.toggleSelectedContainer(container);
         });
   }
+
+  Icon get icon => _containerIcons[container.type] ?? _defaultIcon;
+
+  static const Map<ContainerType, Icon> _containerIcons = {
+    ContainerType.todo: Icon(Icons.check_box),
+    ContainerType.shopping: Icon(Icons.shopping_cart)
+  };
+
+  static const Icon _defaultIcon = Icon(Icons.highlight);
 }
 
 enum ListContainerMenuItem { delete }

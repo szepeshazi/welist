@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:welist_common/common.dart';
 
 import '../../../auth/auth_service.dart';
-import '../../../juiced/juiced.dart';
 import '../../../profile/user_info_widget.dart';
 import '../shares_navigator.dart';
 import 'invite.dart';
@@ -37,7 +37,8 @@ class InviteInnerWidget extends StatelessWidget {
     final SharesNavigator sharesNavigator = Provider.of(context);
 
     return Scaffold(
-        appBar: AppBar(title: Text("Add accessor"), actions: [UserInfoWidget()]),
+        appBar:
+            AppBar(title: Text("Add accessor"), actions: [UserInfoWidget()]),
         body: Form(
             child: Center(
                 child: Container(
@@ -46,15 +47,17 @@ class InviteInnerWidget extends StatelessWidget {
                       Container(
                           alignment: Alignment.center,
                           margin: EdgeInsets.only(bottom: 20),
-                          child:
-                              Text("Invite users to access this list", style: Theme.of(context).textTheme.headline6)),
+                          child: Text("Invite users to access this list",
+                              style: Theme.of(context).textTheme.headline6)),
                       Card(
                         child: Container(
                           color: Color(0xFFF8F8FF),
                           padding: EdgeInsets.all(15),
                           child: TextField(
-                            decoration: InputDecoration(labelText: "Enter email address"),
-                            onChanged: (value) => invite.setRecipientEmail(value),
+                            decoration: InputDecoration(
+                                labelText: "Enter email address"),
+                            onChanged: (value) =>
+                                invite.setRecipientEmail(value),
                           ),
                         ),
                       ),
@@ -67,12 +70,15 @@ class InviteInnerWidget extends StatelessWidget {
                                   children: [
                                     for (final level in ContainerAccess.levels)
                                       ListTile(
-                                          title: Text(ContainerAccess.labels[level]),
+                                          title: Text(
+                                              ContainerAccess.labels[level]),
                                           leading: Radio(
                                               value: level,
                                               groupValue: invite.accessLevel,
-                                              onChanged: (String value) => invite.setAccessLevel(value)),
-                                          subtitle: Text("Some explanation about this role"),
+                                              onChanged: (String value) =>
+                                                  invite.setAccessLevel(value)),
+                                          subtitle: Text(
+                                              "Some explanation about this role"),
                                           visualDensity: VisualDensity.compact),
                                   ],
                                 )),
@@ -82,20 +88,28 @@ class InviteInnerWidget extends StatelessWidget {
                           margin: EdgeInsets.only(top: 25),
                           child: Observer(
                             builder: (context) => ElevatedButton(
-                                onPressed: sharesNavigator.disableAddAccessorButton
+                                onPressed: sharesNavigator
+                                        .disableAddAccessorButton
                                     ? null
                                     : () {
-                                        sharesNavigator.toggleAddAccessorButton(true);
+                                        sharesNavigator
+                                            .toggleAddAccessorButton(true);
                                         inviteService
-                                            .send(container: container,
-                                                recipientEmail: invite.recipientEmail,
+                                            .send(
+                                                container: container,
+                                                recipientEmail:
+                                                    invite.recipientEmail,
                                                 accessLevel: invite.accessLevel,
-                                                subjectUid: container.reference.id)
-                                            .then((_) => sharesNavigator.toggleAddAccessorForm(false));
+                                                subjectUid:
+                                                    container.reference.id)
+                                            .then((_) => sharesNavigator
+                                                .toggleAddAccessorForm(false));
                                       },
                                 child: Container(
-                                    margin: EdgeInsets.only(left: 20, right: 20),
-                                    child: Text("Invite", textScaleFactor: 1.5))),
+                                    margin:
+                                        EdgeInsets.only(left: 20, right: 20),
+                                    child:
+                                        Text("Invite", textScaleFactor: 1.5))),
                           ))
                     ])))));
   }

@@ -1,6 +1,6 @@
 import 'package:mobx/mobx.dart';
 
-import '../juiced/workspace/list_container.dart';
+import 'package:welist_common/common.dart';
 
 part 'workspace_navigator.g.dart';
 

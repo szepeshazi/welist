@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:welist_common/common.dart';
 
-import '../juiced/juiced.dart';
 import '../workspace/list_container_service.dart';
 import 'workspace_navigator.dart';
 

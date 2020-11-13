@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import '../../shared/list_base/list_item_base.dart';
+import 'package:welist_common/common.dart';
 
-import '../../juiced/juiced.dart';
+import '../../shared/list_base/list_item_base.dart';
 
 class SectionItem implements ListItemBase {
   final String section;
@@ -14,9 +14,15 @@ class SectionItem implements ListItemBase {
   Widget buildTitle(BuildContext context) {
     return Container(
         alignment: Alignment.center,
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.deepOrange, width: 1))),
+        decoration: BoxDecoration(
+            border:
+                Border(bottom: BorderSide(color: Colors.deepOrange, width: 1))),
         padding: EdgeInsets.only(top: 5, bottom: 5),
-        child: Text(section, style: Theme.of(context).textTheme.headline6.apply(color: Colors.deepOrange)));
+        child: Text(section,
+            style: Theme.of(context)
+                .textTheme
+                .headline6
+                .apply(color: Colors.deepOrange)));
   }
 
   @override
@@ -37,7 +43,12 @@ class ShareItem implements ListItemBase {
 
   final InviteOperationCallback removeCallback;
 
-  ShareItem({@required this.email, this.role, this.removeCallback, this.userId, this.container});
+  ShareItem(
+      {@required this.email,
+      this.role,
+      this.removeCallback,
+      this.userId,
+      this.container});
 
   @override
   Widget buildTitle(BuildContext context) => Row(
@@ -45,18 +56,23 @@ class ShareItem implements ListItemBase {
         children: [
           Expanded(
               child: Row(children: [
-            Container(padding: EdgeInsets.only(right: 5.0), child: Icon(Icons.account_circle)),
+            Container(
+                padding: EdgeInsets.only(right: 5.0),
+                child: Icon(Icons.account_circle)),
             Text(email),
           ]))
         ],
       );
 
   @override
-  Widget buildSubtitle(BuildContext context) => Container(margin: EdgeInsets.only(left: 30), child: Text(role));
+  Widget buildSubtitle(BuildContext context) =>
+      Container(margin: EdgeInsets.only(left: 30), child: Text(role));
 
   @override
-  Widget buildTrailing(BuildContext context) =>
-      removeCallback == null ? null : IconButton(icon: const Icon(Icons.highlight_remove), onPressed: removeCallback);
+  Widget buildTrailing(BuildContext context) => removeCallback == null
+      ? null
+      : IconButton(
+          icon: const Icon(Icons.highlight_remove), onPressed: removeCallback);
 }
 
 /// A ListItem that contains data to display a message.
@@ -78,19 +94,22 @@ class InviteItem implements ListItemBase {
         children: [
           Expanded(
               child: Row(children: [
-            Container(padding: EdgeInsets.only(right: 5.0), child: Icon(Icons.account_circle)),
+            Container(
+                padding: EdgeInsets.only(right: 5.0),
+                child: Icon(Icons.account_circle)),
             Text(email),
           ]))
         ],
       );
 
   @override
-  Widget buildSubtitle(BuildContext context) =>
-      Container(margin: EdgeInsets.only(left: 30), child: Text("$role (sent: ${timeago.format(invitedDate)})"));
+  Widget buildSubtitle(BuildContext context) => Container(
+      margin: EdgeInsets.only(left: 30),
+      child: Text("$role (sent: ${timeago.format(invitedDate)})"));
 
   @override
-  Widget buildTrailing(BuildContext context) =>
-      IconButton(icon: const Icon(Icons.highlight_remove), onPressed: revokeCallback);
+  Widget buildTrailing(BuildContext context) => IconButton(
+      icon: const Icon(Icons.highlight_remove), onPressed: revokeCallback);
 }
 
 typedef InviteOperationCallback = Future<void> Function();
