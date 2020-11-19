@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -6,10 +5,6 @@ import '../access/access_log.dart';
 
 @juiced
 class ListItem with AccessLogUtils {
-  @override
-  @Property(ignore: true)
-  DocumentReference reference;
-
   String name;
 
   int timeCompleted;

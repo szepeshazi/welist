@@ -6,6 +6,7 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../../auth/auth_service.dart';
+import '../../common/common.dart';
 import '../../shared/service_base.dart';
 import 'accessor_profile.dart';
 
@@ -13,8 +14,8 @@ part 'shares_service.g.dart';
 
 class SharesService = _SharesService with _$SharesService;
 
-abstract class _SharesService extends ServiceBase<ListContainer> with Store {
-  final ListContainer container;
+abstract class _SharesService extends ServiceBase<FirestoreEntity<ListContainer>> with Store {
+  final FirestoreEntity<ListContainer> container;
 
   @override
   final FirebaseFirestore fs;
@@ -35,8 +36,8 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
 
   Future<void> _containerUpdated(DocumentSnapshot snapshot) async {
     ListContainer updatedContainer = j.juicer.decode(snapshot.data(), (_) => ListContainer());
-    container.copyPropertiesFrom(updatedContainer);
-    List<String> accessorKeys = container.accessors[AccessorUtils.anyLevelKey].cast<String>();
+    container.entity.copyPropertiesFrom(updatedContainer);
+    List<String> accessorKeys = container.entity.accessors[AccessorUtils.anyLevelKey].cast<String>();
 
     Map<String, AccessorProfile> accessorMap = Map.fromIterable(accessors, key: (accessor) => accessor.uid);
     List<AccessorProfile> _accessors = List.from(accessors);
@@ -50,11 +51,11 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
       Map<String, PublicProfile> profileMap =
           Map.fromIterable(newAccessorProfiles, key: (profile) => profile.reference.id);
 
-      Iterable<String> levels = container.accessors.keys.where((key) => key != AccessorUtils.anyLevelKey);
+      Iterable<String> levels = container.entity.accessors.keys.where((key) => key != AccessorUtils.anyLevelKey);
       for (final level in levels) {
-        for (final uid in container.accessors[level]) {
+        for (final uid in container.entity.accessors[level]) {
           if (!accessorMap.containsKey(uid)) {
-            _accessors.add(AccessorProfile(level, profileMap[uid]));
+            _accessors.add(AccessorProfile(level, FirestoreEntity<PublicProfile>(profileMap[uid], null)));
           }
         }
       }
@@ -64,8 +65,8 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
 
   /// Remove accessor from current container
   Future<void> remove(String uid) async {
-    for (final level in container.accessors.keys) {
-      container.accessors[level].remove(uid);
+    for (final level in container.entity.accessors.keys) {
+      container.entity.accessors[level].remove(uid);
     }
     await upsert(container, _authService.user.reference.id);
   }
@@ -89,6 +90,5 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
     containerChangeListener?.cancel();
   }
 
-  PublicProfile fromSnapshot(DocumentSnapshot snapshot) =>
-      j.juicer.decode(snapshot.data(), (_) => PublicProfile()..reference = snapshot.reference);
+  PublicProfile fromSnapshot(DocumentSnapshot snapshot) => j.juicer.decode(snapshot.data(), (_) => PublicProfile());
 }

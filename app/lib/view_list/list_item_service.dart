@@ -6,6 +6,7 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../auth/auth_service.dart';
+import '../common/common.dart';
 import '../shared/service_base.dart';
 import '../workspace/list_container_service.dart';
 
@@ -13,15 +14,15 @@ part 'list_item_service.g.dart';
 
 class ListItemService = _ListItemService with _$ListItemService;
 
-abstract class _ListItemService extends ServiceBase<ListItem> with Store {
+abstract class _ListItemService extends ServiceBase<FirestoreEntity<ListItem>> with Store {
   @observable
-  List<ListItem> items = [];
+  List<FirestoreEntity<ListItem>> items = [];
 
   @observable
   bool multiEditMode = false;
 
   /// The host ListContainer for this specific list
-  final ListContainer container;
+  final FirestoreEntity<ListContainer> container;
 
   @override
   final FirebaseFirestore fs;
@@ -32,8 +33,7 @@ abstract class _ListItemService extends ServiceBase<ListItem> with Store {
 
   StreamSubscription<QuerySnapshot> listChangeListener;
 
-  _ListItemService(this.container, this._authService, this.containerService)
-      : fs = FirebaseFirestore.instance;
+  _ListItemService(this.container, this._authService, this.containerService) : fs = FirebaseFirestore.instance;
 
   void initialize() {
     // Listen to authentication changes
@@ -45,25 +45,24 @@ abstract class _ListItemService extends ServiceBase<ListItem> with Store {
   }
 
   Future<void> _updateViewList(QuerySnapshot updates) async {
-    List<ListItem> _items = List.from(items);
+    List<FirestoreEntity<ListItem>> _items = List.from(items);
     print("_updateViewList received items ${updates.docChanges.length}");
     if (updates.docChanges.isNotEmpty) {
       for (var change in updates.docChanges) {
         switch (change.type) {
           case DocumentChangeType.added:
-            ListItem item = j.juicer.decode(change.doc.data(),
-                (_) => ListItem()..reference = change.doc.reference);
+            FirestoreEntity<ListItem> item =
+                FirestoreEntity<ListItem>(j.juicer.decode(change.doc.data(), (_) => ListItem()), change.doc.reference);
             _items.add(item);
             break;
           case DocumentChangeType.modified:
-            int index = items.indexWhere((ListItem item) =>
-                item.reference.path == change.doc.reference.path);
-            _items[index] = j.juicer.decode(change.doc.data(),
-                (_) => ListItem()..reference = change.doc.reference);
+            int index =
+                items.indexWhere((FirestoreEntity<ListItem> item) => item.reference.path == change.doc.reference.path);
+            _items[index] =
+                FirestoreEntity<ListItem>(j.juicer.decode(change.doc.data(), (_) => ListItem()), change.doc.reference);
             break;
           case DocumentChangeType.removed:
-            _items.removeWhere(
-                (item) => item.reference.path == change.doc.reference.path);
+            _items.removeWhere((item) => item.reference.path == change.doc.reference.path);
             break;
         }
       }
@@ -80,34 +79,28 @@ abstract class _ListItemService extends ServiceBase<ListItem> with Store {
 
     // pseudo increment to be included in access log
     // real increment operation will happen on FB, and changes will be pushed to the obj
-    container.itemCount++;
+    container.entity.itemCount++;
     await fs.runTransaction((transaction) async {
-      await upsert(item, _authService.user.reference.id,
-          parent: container.reference);
-      await containerService.updateFields(
-          container,
-          _authService.user.reference.id,
-          {"itemCount": FieldValue.increment(1)});
+      await upsert(FirestoreEntity<ListItem>(item, null), _authService.user.reference.id, parent: container.reference);
+      await containerService
+          .updateFields(container, _authService.user.reference.id, {"itemCount": FieldValue.increment(1)});
     });
   }
 
   @action
-  Future<void> update(ListItem item) async {
+  Future<void> update(FirestoreEntity<ListItem> item) async {
     // TODO: input sanity check, transaction
     await upsert(item, _authService.user.reference.id);
   }
 
   @action
-  Future<void> delete(ListItem item) async {
+  Future<void> delete(FirestoreEntity<ListItem> item) async {
     // TODO: input sanity check, transaction
-    container.itemCount--;
+    container.entity.itemCount--;
     await fs.runTransaction((transaction) async {
-      await upsert(item, _authService.user.reference.id,
-          action: AccessAction.delete);
-      await containerService.updateFields(
-          container,
-          _authService.user.reference.id,
-          {"itemCount": FieldValue.increment(-1)});
+      await upsert(item, _authService.user.reference.id, action: AccessAction.delete);
+      await containerService
+          .updateFields(container, _authService.user.reference.id, {"itemCount": FieldValue.increment(-1)});
     });
   }
 

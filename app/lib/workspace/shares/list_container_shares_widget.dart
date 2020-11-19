@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:welist_common/common.dart';
 
 import '../../auth/auth_service.dart';
+import '../../common/common.dart';
 import '../../profile/user_info_widget.dart';
 import 'invite/invite_service.dart';
 import 'shares_navigator.dart';
@@ -12,22 +13,21 @@ import 'shares_service.dart';
 import 'shares_store.dart';
 
 class ListContainerSharesWidget extends StatelessWidget {
-  final ListContainer container;
+  final FirestoreEntity<ListContainer> container;
 
   const ListContainerSharesWidget({Key key, this.container}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final AuthService _authService = Provider.of(context);
-    return MultiProvider(providers: [
-      Provider<SharesService>(
-          create: (_) => SharesService(container, _authService)..initialize())
-    ], child: ListContainerInnerWidget(container: container));
+    return MultiProvider(
+        providers: [Provider<SharesService>(create: (_) => SharesService(container, _authService)..initialize())],
+        child: ListContainerInnerWidget(container: container));
   }
 }
 
 class ListContainerInnerWidget extends StatelessWidget {
-  final ListContainer container;
+  final FirestoreEntity<ListContainer> container;
 
   const ListContainerInnerWidget({Key key, this.container}) : super(key: key);
 
@@ -38,18 +38,15 @@ class ListContainerInnerWidget extends StatelessWidget {
     final InviteService _inviteService = Provider.of(context);
     return MultiProvider(providers: [
       Provider<SharesStore>(
-          create: (_) => SharesStore(
-              container, _authService, _sharesService, _inviteService)
-            ..initialize())
+          create: (_) => SharesStore(container, _authService, _sharesService, _inviteService)..initialize())
     ], child: ListContainerShareListWidget(container: container));
   }
 }
 
 class ListContainerShareListWidget extends StatelessWidget {
-  final ListContainer container;
+  final FirestoreEntity<ListContainer> container;
 
-  const ListContainerShareListWidget({Key key, this.container})
-      : super(key: key);
+  const ListContainerShareListWidget({Key key, this.container}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,9 +54,7 @@ class ListContainerShareListWidget extends StatelessWidget {
     final SharesNavigator _sharesNavigator = Provider.of(context);
 
     return Scaffold(
-        appBar: AppBar(
-            title: Text("${container.name} accessors"),
-            actions: [UserInfoWidget()]),
+        appBar: AppBar(title: Text("${container.entity.name} accessors"), actions: [UserInfoWidget()]),
         body: Observer(
             builder: (context) => _sharesStore.sharesAndInvites == null
                 ? Center(child: Text("soon"))

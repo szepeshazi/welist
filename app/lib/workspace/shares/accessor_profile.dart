@@ -1,10 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:welist_common/common.dart';
 
+import '../../common/common.dart';
+
 class AccessorProfile extends Equatable {
   final String role;
 
-  final PublicProfile profile;
+  final FirestoreEntity<PublicProfile> profile;
 
   final String uid;
 

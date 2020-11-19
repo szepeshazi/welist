@@ -1,14 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
 
 import '../access/access_log.dart';
 
 @juiced
 class Invitation with AccessLogUtils {
-  @override
-  @Property(ignore: true)
-  DocumentReference reference;
-
   String senderUid;
 
   String senderEmail;

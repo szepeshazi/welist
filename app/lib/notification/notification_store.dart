@@ -1,6 +1,7 @@
 import 'package:mobx/mobx.dart';
 import 'package:welist_common/common.dart';
 
+import '../common/common.dart';
 import '../shared/list_base/list_item_base.dart';
 import '../workspace/shares/invite/invite_service.dart';
 import 'notification_list.dart';
@@ -18,16 +19,14 @@ abstract class _NotificationStore with Store {
   _NotificationStore(this._inviteService);
 
   Future<void> initialize() async {
-    autorun((_) =>
-        notifications = _inviteService.received.map(fromInvitation).toList());
+    autorun((_) => notifications = _inviteService.received.map(fromInvitation).toList());
   }
 
-  NotificationItem fromInvitation(Invitation invite) => NotificationItem(
-      message:
-          "Access ${invite.payload['containerName']} ${invite.payload['containerType']} list",
-      from: invite.senderName ?? invite.senderEmail,
-      role: ContainerAccess.labels[invite.payload["accessLevel"]],
-      invitedTime: invite.accessLog.timeCreated,
+  NotificationItem fromInvitation(FirestoreEntity<Invitation> invite) => NotificationItem(
+      message: "Access ${invite.entity.payload['containerName']} ${invite.entity.payload['containerType']} list",
+      from: invite.entity.senderName ?? invite.entity.senderEmail,
+      role: ContainerAccess.labels[invite.entity.payload["accessLevel"]],
+      invitedTime: invite.entity.accessLog.timeCreated,
       acceptCallback: () async => await _inviteService.accept(invite),
       rejectCallback: () async => await _inviteService.reject(invite));
 }

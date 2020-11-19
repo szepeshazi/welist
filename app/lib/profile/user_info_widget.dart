@@ -17,7 +17,7 @@ class UserInfoWidget extends StatelessWidget {
     final WorkspaceNavigator _navigator = Provider.of(context);
 
     return Observer(builder: (context) => Row(children: [
-      Text(_authService.user.displayName ?? _authService.user.email
+      Text(_authService.user.entity.displayName ?? _authService.user.entity.email
           .split("@")
           .first),
       Container(padding: EdgeInsets.only(left: 10), child: Icon(Icons.account_circle)),

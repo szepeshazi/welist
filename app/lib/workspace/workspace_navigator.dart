@@ -1,6 +1,7 @@
 import 'package:mobx/mobx.dart';
-
 import 'package:welist_common/common.dart';
+
+import '../common/common.dart';
 
 part 'workspace_navigator.g.dart';
 
@@ -11,10 +12,10 @@ abstract class _WorkspaceNavigator with Store {
   bool showAddContainerWidget = false;
 
   @observable
-  ListContainer selectedContainer;
+  FirestoreEntity<ListContainer> selectedContainer;
 
   @observable
-  ListContainer showSharesForContainer;
+  FirestoreEntity<ListContainer> showSharesForContainer;
 
   @observable
   bool showNotifications = false;
@@ -23,10 +24,10 @@ abstract class _WorkspaceNavigator with Store {
   void toggleAddContainerWidget(bool show) => showAddContainerWidget = show;
 
   @action
-  void toggleSelectedContainer(ListContainer selected) => selectedContainer = selected;
+  void toggleSelectedContainer(FirestoreEntity<ListContainer> selected) => selectedContainer = selected;
 
   @action
-  void toggleSharesForContainer(ListContainer selected) => showSharesForContainer = selected;
+  void toggleSharesForContainer(FirestoreEntity<ListContainer> selected) => showSharesForContainer = selected;
 
   @action
   void toggleNotifications(bool newValue) => showNotifications = newValue;

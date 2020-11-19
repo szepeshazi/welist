@@ -1,4 +1,5 @@
 import 'package:mobx/mobx.dart';
+import 'package:welist/common/common.dart';
 import 'package:welist_common/common.dart';
 
 import '../../auth/auth_service.dart';
@@ -13,7 +14,7 @@ part 'shares_store.g.dart';
 class SharesStore = _SharesStore with _$SharesStore;
 
 abstract class _SharesStore with Store {
-  final ListContainer _container;
+  final FirestoreEntity<ListContainer> _container;
 
   final SharesService _sharesService;
 
@@ -32,8 +33,8 @@ abstract class _SharesStore with Store {
       print("$a, $b");
     });
     autorun((_) {
-      List<Invitation> currentContainerInvites = _inviteService.sent
-          .where((invite) => invite.subjectId == _container.reference.id && invite.senderUid == userId)
+      List<FirestoreEntity<Invitation>> currentContainerInvites = _inviteService.sent
+          .where((invite) => invite.entity.subjectId == _container.reference.id && invite.entity.senderUid == userId)
           .toList(growable: false);
       sharesAndInvites = [
         ..._sharesService.accessors.map(fromAccessorProfile),
@@ -43,14 +44,14 @@ abstract class _SharesStore with Store {
     });
   }
 
-  InviteItem fromInvitation(Invitation invite) => InviteItem(
-      email: invite.recipientEmail,
-      role: ContainerAccess.labels[invite.payload["accessLevel"]],
-      invitedTime: invite.accessLog.timeCreated,
+  InviteItem fromInvitation(FirestoreEntity<Invitation> invite) => InviteItem(
+      email: invite.entity.recipientEmail,
+      role: ContainerAccess.labels[invite.entity.payload["accessLevel"]],
+      invitedTime: invite.entity.accessLog.timeCreated,
       revokeCallback: () async => await _inviteService.revoke(invite));
 
   ShareItem fromAccessorProfile(AccessorProfile accessorProfile, {bool allowRemoveCallback = true}) => ShareItem(
-      email: accessorProfile.profile.email,
+      email: accessorProfile.profile.entity.email,
       role: accessorProfile.role,
       removeCallback: allowRemoveCallback ? () async => await _sharesService.remove(accessorProfile.uid) : null);
 

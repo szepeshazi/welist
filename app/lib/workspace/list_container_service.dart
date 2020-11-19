@@ -6,15 +6,16 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../auth/auth_service.dart';
+import '../common/common.dart';
 import '../shared/service_base.dart';
 
 part 'list_container_service.g.dart';
 
 class ListContainerService = _ListContainerService with _$ListContainerService;
 
-abstract class _ListContainerService extends ServiceBase<ListContainer> with Store {
+abstract class _ListContainerService extends ServiceBase<FirestoreEntity<ListContainer>> with Store {
   @observable
-  List<ListContainer> containers;
+  List<FirestoreEntity<ListContainer>> containers;
 
   @override
   final FirebaseFirestore fs;
@@ -40,9 +41,10 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
   }
 
   Future<void> _updateContainers(QuerySnapshot update) async {
-    List<ListContainer> _containers = [];
+    List<FirestoreEntity<ListContainer>> _containers = [];
     for (var doc in update.docs) {
-      ListContainer container = await ListContainer.fromSnapshot(doc, j.juicer);
+      FirestoreEntity<ListContainer> container =
+          FirestoreEntity<ListContainer>(j.juicer.decode(doc.data(), (_) => ListContainer()), doc.reference);
       _containers.add(container);
     }
     containers = _containers;
@@ -54,11 +56,11 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
       ..itemCount = 0
       ..accessLog = AccessLog()
       ..addAccessor(_authService.user.reference.id, ContainerAccess.owners);
-    await upsert(container, _authService.user.reference.id);
+    await upsert(FirestoreEntity<ListContainer>(container, null), _authService.user.reference.id);
   }
 
   @action
-  Future<void> delete(ListContainer container) async {
+  Future<void> delete(FirestoreEntity<ListContainer> container) async {
     await upsert(container, _authService.user.reference.id, action: AccessAction.delete);
   }
 

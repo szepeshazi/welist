@@ -5,13 +5,14 @@ import 'package:provider/provider.dart';
 import 'package:welist_common/common.dart';
 
 import '../auth/auth_service.dart';
+import '../common/common.dart';
 import '../profile/user_info_widget.dart';
 import '../workspace/list_container_service.dart';
 import 'create_multi_item_widget.dart';
 import 'list_item_service.dart';
 
 class ViewListWidget extends StatelessWidget {
-  final ListContainer container;
+  final FirestoreEntity<ListContainer> container;
 
   const ViewListWidget({Key key, this.container}) : super(key: key);
 
@@ -19,8 +20,7 @@ class ViewListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(providers: [
       Provider<ListItemService>(
-          create: (_) => ListItemService(container, context.read<AuthService>(),
-              context.read<ListContainerService>())
+          create: (_) => ListItemService(container, context.read<AuthService>(), context.read<ListContainerService>())
             ..initialize())
     ], child: ViewListWidgetInner());
   }
@@ -31,8 +31,7 @@ class ViewListWidgetInner extends StatelessWidget {
   Widget build(BuildContext context) {
     final ListItemService viewList = Provider.of(context);
     return Scaffold(
-        appBar: AppBar(
-            title: Text(viewList.container.name), actions: [UserInfoWidget()]),
+        appBar: AppBar(title: Text(viewList.container.entity.name), actions: [UserInfoWidget()]),
         body: ViewListWrapperWidget(),
         floatingActionButton: Observer(
             builder: (context) => InkWell(
@@ -41,8 +40,7 @@ class ViewListWidgetInner extends StatelessWidget {
                   viewList.setMultiEditMode(!viewList.multiEditMode);
                 },
                 child: FloatingActionButton(
-                    child:
-                        Icon(viewList.multiEditMode ? Icons.remove : Icons.add),
+                    child: Icon(viewList.multiEditMode ? Icons.remove : Icons.add),
                     onPressed: () {
                       // TODO: add a single item to list
                     }))));
@@ -62,14 +60,13 @@ class ViewListWrapperWidget extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       shrinkWrap: true,
                       itemCount: viewList.items?.length ?? 0,
-                      itemBuilder: (BuildContext context, index) =>
-                          ListItemRowWidget(item: viewList.items[index]))
+                      itemBuilder: (BuildContext context, index) => ListItemRowWidget(item: viewList.items[index]))
                 ])));
   }
 }
 
 class ListItemRowWidget extends StatelessWidget {
-  final ListItem item;
+  final FirestoreEntity<ListItem> item;
 
   const ListItemRowWidget({Key key, this.item}) : super(key: key);
 
@@ -78,24 +75,21 @@ class ListItemRowWidget extends StatelessWidget {
     final ListItemService viewList = Provider.of(context);
     return CheckboxListTile(
         controlAffinity: ListTileControlAffinity.leading,
-        value: item.completed,
+        value: item.entity.completed,
         onChanged: (bool newValue) {
-          item.setState(newValue);
+          item..entity.setState(newValue);
           viewList.update(item);
         },
         title: Row(
           children: <Widget>[
             Expanded(
                 child: Text(
-              item.name,
+              item.entity.name,
               overflow: TextOverflow.ellipsis,
             )),
-            IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () => viewList.delete(item))
+            IconButton(icon: const Icon(Icons.delete), onPressed: () => viewList.delete(item))
           ],
         ),
-        subtitle: Text(item.stateName,
-            textAlign: TextAlign.start, overflow: TextOverflow.ellipsis));
+        subtitle: Text(item.entity.stateName, textAlign: TextAlign.start, overflow: TextOverflow.ellipsis));
   }
 }

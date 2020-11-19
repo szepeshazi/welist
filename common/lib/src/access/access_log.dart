@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
 
 import '../shared/enum_codec.dart';
@@ -71,8 +70,6 @@ class AccessLog {
 abstract class HasAccessLog {
   AccessLog get accessLog;
 
-  DocumentReference get reference;
-
   String get collection;
 
   void log(String userId, dynamic encoded, AccessAction action);
@@ -81,7 +78,6 @@ abstract class HasAccessLog {
 mixin AccessLogUtils implements HasAccessLog {
   @override
   void log(String userId, dynamic encoded, AccessAction action) {
-
     ChangeSet changeSet;
     Map<String, dynamic> flattenedProperties = flatten(encoded..remove("accessLog"));
     if (accessLog.entries.isEmpty) {

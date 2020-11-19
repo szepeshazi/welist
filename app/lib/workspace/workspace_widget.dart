@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:welist/common/common.dart';
 import 'package:welist_common/common.dart';
 
 import '../auth/auth_service.dart';
@@ -128,7 +129,7 @@ class ListContainersWidget extends StatelessWidget {
 }
 
 class ListContainerRowWidget extends StatelessWidget {
-  final ListContainer container;
+  final FirestoreEntity<ListContainer> container;
 
   const ListContainerRowWidget({Key key, this.container}) : super(key: key);
 
@@ -143,8 +144,8 @@ class ListContainerRowWidget extends StatelessWidget {
             Expanded(
                 child: Row(children: [
               Container(padding: EdgeInsets.only(right: 5.0), child: icon),
-              Text(container.name),
-              if ((container.itemCount ?? 0) > 0) Text(" (${container.itemCount})")
+              Text(container.entity.name),
+              if ((container.entity.itemCount ?? 0) > 0) Text(" (${container.entity.itemCount})")
             ])),
             Container(
                 margin: EdgeInsets.only(left: 5.0),
@@ -152,10 +153,10 @@ class ListContainerRowWidget extends StatelessWidget {
                   onTap: () {
                     _workspaceNavigator.toggleSharesForContainer(container);
                   }, // TODO: show shares for container
-                  child: container.accessors[AccessorUtils.anyLevelKey].length == 1
+                  child: container.entity.accessors[AccessorUtils.anyLevelKey].length == 1
                       ? Icon(Icons.person)
                       : Row(children: [
-                          Text("${container.accessors[AccessorUtils.anyLevelKey].length} ",
+                          Text("${container.entity.accessors[AccessorUtils.anyLevelKey].length} ",
                               style: Theme.of(context).textTheme.bodyText1),
                           Icon(Icons.group)
                         ]),
@@ -167,7 +168,9 @@ class ListContainerRowWidget extends StatelessWidget {
                   PopupMenuItem(
                     value: ListContainerMenuItem.delete,
                     child: Row(children: [
-                      Container(padding: EdgeInsets.only(left: 10, right: 10), child: Text("Delete ${container.name}")),
+                      Container(
+                          padding: EdgeInsets.only(left: 10, right: 10),
+                          child: Text("Delete ${container.entity.name}")),
                       Icon(Icons.delete)
                     ]),
                   )
@@ -184,7 +187,7 @@ class ListContainerRowWidget extends StatelessWidget {
         });
   }
 
-  Icon get icon => _containerIcons[container.type] ?? _defaultIcon;
+  Icon get icon => _containerIcons[container.entity.type] ?? _defaultIcon;
 
   static const Map<ContainerType, Icon> _containerIcons = {
     ContainerType.todo: Icon(Icons.check_box),
