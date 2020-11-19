@@ -1,0 +1,28 @@
+builders:
+  customentrypoint:
+    import: "package:build_node_compilers/builders.dart"
+    builder_factories:
+      - nodeEntrypointBuilder
+    build_extensions:
+      .dart:
+        - .dart.bootstrap.js
+        - .dart.js
+        - .dart.js.map
+        - .digests
+    required_inputs:
+      - .dart
+      - .ddc_node.js
+      - .ddc_node.module
+      - .dart2js_node.module
+    build_to: source
+    auto_apply: root_package
+    defaults:
+      generate_for:
+        include:
+          - lib/**
+        exclude:
+          - test/**.vm_test.dart
+      options:
+        compiler: dart2js
+        dart2js_args:
+          - -O0

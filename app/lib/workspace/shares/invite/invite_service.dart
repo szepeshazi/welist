@@ -110,7 +110,7 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     await upsert(invitation, _authService.user.reference.id);
     HttpsCallable addPrivilegesToContainer =
         FirebaseFunctions.instanceFor(region: "europe-west2")
-            .httpsCallable('acceptInvitation');
+            .httpsCallable('accept');
     await addPrivilegesToContainer({"invitationId": invitation.reference.id});
   }
 
