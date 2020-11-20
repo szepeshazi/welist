@@ -13,6 +13,8 @@ dependencies:
       url: git://github.com/Skquark/firebase-functions-interop
       ref: 3f6a9f919585fae9a3ed25d0315225c6043f2723
   firebase_admin_interop: ^2.1.0
+  welist_common:
+    path: '../common'
 
 dev_dependencies:
   # Needed to compile Dart to valid Node.js module.
