@@ -64,9 +64,8 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
             updatedInvites.add(invitation);
             break;
           case DocumentChangeType.modified:
-            int index =
-                currentInvites.indexWhere((Invitation invite) => getFirestoreDocRef(invite).path == change.doc.reference
-                    .path);
+            int index = currentInvites
+                .indexWhere((Invitation invite) => getFirestoreDocRef(invite).path == change.doc.reference.path);
             updatedInvites[index] =
                 setFirestoreDocRef(j.juicer.decode(change.doc.data(), (_) => Invitation()), change.doc.reference);
             break;
@@ -100,8 +99,17 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     invitation.recipientAcceptedTime = DateTime.now().millisecondsSinceEpoch;
     await upsert(invitation, getFirestoreDocRef(_authService.user).id);
     HttpsCallable addPrivilegesToContainer =
-        FirebaseFunctions.instanceFor(region: "europe-west2").httpsCallable('accept');
-    await addPrivilegesToContainer({"invitationId": getFirestoreDocRef(invitation).id});
+        FirebaseFunctions.instanceFor(region: "europe-west2").httpsCallable('acceptInvitation');
+    AcceptInvitationRequest request = AcceptInvitationRequest()..invitationId = getFirestoreDocRef(invitation).id;
+
+    Map<String, dynamic> encoded = j.juicer.encode(request);
+    encoded.forEach((key, value) {
+      print("key: $key (${key.runtimeType}), value: $value (${value.runtimeType})");
+    });
+    final result = await addPrivilegesToContainer(j.juicer.encode(request));
+    AcceptInvitationResponse response = j.juicer.decode(result.data, (_) => AcceptInvitationResponse());
+    print(
+        "accept invitation response, id: ${response.invitationId}, error: ${response.error.mnemonic}, ${response.error.message}");
   }
 
   Future<void> reject(Invitation invitation) async {

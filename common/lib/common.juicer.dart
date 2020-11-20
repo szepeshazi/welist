@@ -4,29 +4,69 @@
 // JuiceGenerator
 // **************************************************************************
 
-import "package:welist_common/src/access/access_log.dart" as jcr_i1;
-import "package:welist_common/src/auth/public_profile.dart" as jcr_i2;
-import "package:welist_common/src/auth/user.dart" as jcr_i3;
-import "package:welist_common/src/invitation/invitation.dart" as jcr_i4;
-import "package:welist_common/src/list_item/list_item.dart" as jcr_i5;
-import "package:welist_common/src/workspace/list_container.dart" as jcr_i6;
+import "package:welist_common/src/error_response/error_response.dart" as jcr_i1;
+import "package:welist_common/src/access/access_log.dart" as jcr_i2;
+import "package:welist_common/src/auth/public_profile.dart" as jcr_i3;
+import "package:welist_common/src/auth/user.dart" as jcr_i4;
+import "package:welist_common/src/invitation/invitation.dart" as jcr_i5;
+import "package:welist_common/src/invitation/invitations.dart" as jcr_i6;
+import "package:welist_common/src/list_item/list_item.dart" as jcr_i7;
+import "package:welist_common/src/workspace/list_container.dart" as jcr_i8;
 import 'package:juicer/juicer.dart';
 export "package:welist_common/common.dart";
 
+// package:welist_common/src/error_response/error_response.dart ErrorResponse
 // package:welist_common/src/access/access_log.dart AccessEntry
 // package:welist_common/src/access/access_log.dart ChangeSet
 // package:welist_common/src/access/access_log.dart AccessLog
 // package:welist_common/src/auth/public_profile.dart PublicProfile
 // package:welist_common/src/auth/user.dart User
 // package:welist_common/src/invitation/invitation.dart Invitation
+// package:welist_common/src/invitation/invitations.dart AcceptInvitationRequest
+// package:welist_common/src/invitation/invitations.dart AcceptInvitationResponse
 // package:welist_common/src/list_item/list_item.dart ListItem
 // package:welist_common/src/workspace/list_container.dart ListContainer
-class _$AccessEntryJuicer extends ClassMapper<jcr_i1.AccessEntry> {
+class _$ErrorResponseJuicer extends ClassMapper<jcr_i1.ErrorResponse> {
+  const _$ErrorResponseJuicer();
+  @override
+  jcr_i1.ErrorResponse newInstance() => jcr_i1.ErrorResponse();
+  @override
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i1.ErrorResponse val) =>
+      juicer.removeNullValues({
+        "mnemonic": val.mnemonic,
+        "message": val.message,
+        "payload": val.payload == null
+            ? null
+            : Map.fromIterable(val.payload.keys,
+                value: (k) => juicer.encode(val.payload[k])),
+// accessDeniedMnemonic is ignored
+// accessDeniedMessage is ignored
+// notFoundMnemonic is ignored
+// notFoundMessage is ignored
+      });
+  @override
+  jcr_i1.ErrorResponse fromMap(
+      Juicer juicer, Map map, jcr_i1.ErrorResponse empty) {
+    if (map.containsKey("mnemonic")) empty.mnemonic = map["mnemonic"];
+    if (map.containsKey("message")) empty.message = map["message"];
+    if (map.containsKey("payload"))
+      empty.payload =
+          juicer.decodeMap(map["payload"], null, <String, dynamic>{})
+              as Map<String, dynamic>;
+// accessDeniedMnemonic is ignored
+// accessDeniedMessage is ignored
+// notFoundMnemonic is ignored
+// notFoundMessage is ignored
+    return empty;
+  }
+}
+
+class _$AccessEntryJuicer extends ClassMapper<jcr_i2.AccessEntry> {
   const _$AccessEntryJuicer();
   @override
-  jcr_i1.AccessEntry newInstance() => jcr_i1.AccessEntry();
+  jcr_i2.AccessEntry newInstance() => jcr_i2.AccessEntry();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i1.AccessEntry val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i2.AccessEntry val) =>
       juicer.removeNullValues({
         "userId": val.userId,
         "timestamp": val.timestamp,
@@ -36,26 +76,26 @@ class _$AccessEntryJuicer extends ClassMapper<jcr_i1.AccessEntry> {
 // action is ignored
       });
   @override
-  jcr_i1.AccessEntry fromMap(Juicer juicer, Map map, jcr_i1.AccessEntry empty) {
+  jcr_i2.AccessEntry fromMap(Juicer juicer, Map map, jcr_i2.AccessEntry empty) {
     if (map.containsKey("userId")) empty.userId = map["userId"];
     if (map.containsKey("timestamp"))
       empty.timestamp = map["timestamp"]?.toInt();
     if (map.containsKey("actionName")) empty.actionName = map["actionName"];
     if (map.containsKey("changeSet"))
       empty.changeSet =
-          juicer.decode(map["changeSet"], (_) => jcr_i1.ChangeSet());
+          juicer.decode(map["changeSet"], (_) => jcr_i2.ChangeSet());
 // _accessActionCodec is ignored
 // action is ignored
     return empty;
   }
 }
 
-class _$ChangeSetJuicer extends ClassMapper<jcr_i1.ChangeSet> {
+class _$ChangeSetJuicer extends ClassMapper<jcr_i2.ChangeSet> {
   const _$ChangeSetJuicer();
   @override
-  jcr_i1.ChangeSet newInstance() => jcr_i1.ChangeSet();
+  jcr_i2.ChangeSet newInstance() => jcr_i2.ChangeSet();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i1.ChangeSet val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i2.ChangeSet val) =>
       juicer.removeNullValues({
         "deletedProperties":
             val.deletedProperties?.map(juicer.encode)?.toList(),
@@ -69,7 +109,7 @@ class _$ChangeSetJuicer extends ClassMapper<jcr_i1.ChangeSet> {
                 value: (k) => juicer.encode(val.updatedProperties[k])),
       });
   @override
-  jcr_i1.ChangeSet fromMap(Juicer juicer, Map map, jcr_i1.ChangeSet empty) {
+  jcr_i2.ChangeSet fromMap(Juicer juicer, Map map, jcr_i2.ChangeSet empty) {
     if (map.containsKey("deletedProperties"))
       empty.deletedProperties = juicer.decodeIterable(map["deletedProperties"],
           (dynamic val) => val as String, <String>[]) as List<String>;
@@ -85,12 +125,12 @@ class _$ChangeSetJuicer extends ClassMapper<jcr_i1.ChangeSet> {
   }
 }
 
-class _$AccessLogJuicer extends ClassMapper<jcr_i1.AccessLog> {
+class _$AccessLogJuicer extends ClassMapper<jcr_i2.AccessLog> {
   const _$AccessLogJuicer();
   @override
-  jcr_i1.AccessLog newInstance() => jcr_i1.AccessLog();
+  jcr_i2.AccessLog newInstance() => jcr_i2.AccessLog();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i1.AccessLog val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i2.AccessLog val) =>
       juicer.removeNullValues({
         "entries": val.entries?.map(juicer.encode)?.toList(),
         "create": juicer.encode(val.create),
@@ -104,14 +144,14 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i1.AccessLog> {
         "deleted": val.deleted,
       });
   @override
-  jcr_i1.AccessLog fromMap(Juicer juicer, Map map, jcr_i1.AccessLog empty) {
+  jcr_i2.AccessLog fromMap(Juicer juicer, Map map, jcr_i2.AccessLog empty) {
     if (map.containsKey("entries"))
       empty.entries = juicer.decodeIterable(
           map["entries"],
-          (_) => jcr_i1.AccessEntry(),
-          <jcr_i1.AccessEntry>[]) as List<jcr_i1.AccessEntry>;
+          (_) => jcr_i2.AccessEntry(),
+          <jcr_i2.AccessEntry>[]) as List<jcr_i2.AccessEntry>;
     if (map.containsKey("create"))
-      empty.create = juicer.decode(map["create"], (_) => jcr_i1.AccessEntry());
+      empty.create = juicer.decode(map["create"], (_) => jcr_i2.AccessEntry());
     if (map.containsKey("lastFlattenedProperties"))
       empty.lastFlattenedProperties = juicer.decodeMap(
               map["lastFlattenedProperties"], null, <String, dynamic>{})
@@ -124,12 +164,12 @@ class _$AccessLogJuicer extends ClassMapper<jcr_i1.AccessLog> {
   }
 }
 
-class _$PublicProfileJuicer extends ClassMapper<jcr_i2.PublicProfile> {
+class _$PublicProfileJuicer extends ClassMapper<jcr_i3.PublicProfile> {
   const _$PublicProfileJuicer();
   @override
-  jcr_i2.PublicProfile newInstance() => jcr_i2.PublicProfile();
+  jcr_i3.PublicProfile newInstance() => jcr_i3.PublicProfile();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i2.PublicProfile val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i3.PublicProfile val) =>
       juicer.removeNullValues({
 // reference is ignored
         "displayName": val.displayName,
@@ -137,8 +177,8 @@ class _$PublicProfileJuicer extends ClassMapper<jcr_i2.PublicProfile> {
 // collectionName is ignored
       });
   @override
-  jcr_i2.PublicProfile fromMap(
-      Juicer juicer, Map map, jcr_i2.PublicProfile empty) {
+  jcr_i3.PublicProfile fromMap(
+      Juicer juicer, Map map, jcr_i3.PublicProfile empty) {
 // reference is ignored
     if (map.containsKey("displayName")) empty.displayName = map["displayName"];
     if (map.containsKey("email")) empty.email = map["email"];
@@ -147,12 +187,12 @@ class _$PublicProfileJuicer extends ClassMapper<jcr_i2.PublicProfile> {
   }
 }
 
-class _$UserJuicer extends ClassMapper<jcr_i3.User> {
+class _$UserJuicer extends ClassMapper<jcr_i4.User> {
   const _$UserJuicer();
   @override
-  jcr_i3.User newInstance() => jcr_i3.User();
+  jcr_i4.User newInstance() => jcr_i4.User();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i3.User val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i4.User val) =>
       juicer.removeNullValues({
 // reference is ignored
         "displayName": val.displayName,
@@ -160,7 +200,7 @@ class _$UserJuicer extends ClassMapper<jcr_i3.User> {
 // collectionName is ignored
       });
   @override
-  jcr_i3.User fromMap(Juicer juicer, Map map, jcr_i3.User empty) {
+  jcr_i4.User fromMap(Juicer juicer, Map map, jcr_i4.User empty) {
 // reference is ignored
     if (map.containsKey("displayName")) empty.displayName = map["displayName"];
     if (map.containsKey("email")) empty.email = map["email"];
@@ -169,12 +209,12 @@ class _$UserJuicer extends ClassMapper<jcr_i3.User> {
   }
 }
 
-class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
+class _$InvitationJuicer extends ClassMapper<jcr_i5.Invitation> {
   const _$InvitationJuicer();
   @override
-  jcr_i4.Invitation newInstance() => jcr_i4.Invitation();
+  jcr_i5.Invitation newInstance() => jcr_i5.Invitation();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i4.Invitation val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i5.Invitation val) =>
       juicer.removeNullValues({
 // reference is ignored
         "senderUid": val.senderUid,
@@ -195,7 +235,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
         "collection": val.collection,
       });
   @override
-  jcr_i4.Invitation fromMap(Juicer juicer, Map map, jcr_i4.Invitation empty) {
+  jcr_i5.Invitation fromMap(Juicer juicer, Map map, jcr_i5.Invitation empty) {
 // reference is ignored
     if (map.containsKey("senderUid")) empty.senderUid = map["senderUid"];
     if (map.containsKey("senderEmail")) empty.senderEmail = map["senderEmail"];
@@ -211,7 +251,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
               as Map<String, dynamic>;
     if (map.containsKey("accessLog"))
       empty.accessLog =
-          juicer.decode(map["accessLog"], (_) => jcr_i1.AccessLog());
+          juicer.decode(map["accessLog"], (_) => jcr_i2.AccessLog());
     if (map.containsKey("recipientResponded"))
       empty.recipientResponded = map["recipientResponded"];
     if (map.containsKey("recipientAcceptedTime"))
@@ -224,12 +264,57 @@ class _$InvitationJuicer extends ClassMapper<jcr_i4.Invitation> {
   }
 }
 
-class _$ListItemJuicer extends ClassMapper<jcr_i5.ListItem> {
+class _$AcceptInvitationRequestJuicer
+    extends ClassMapper<jcr_i6.AcceptInvitationRequest> {
+  const _$AcceptInvitationRequestJuicer();
+  @override
+  jcr_i6.AcceptInvitationRequest newInstance() =>
+      jcr_i6.AcceptInvitationRequest();
+  @override
+  Map<String, dynamic> toMap(
+          Juicer juicer, jcr_i6.AcceptInvitationRequest val) =>
+      juicer.removeNullValues({
+        "invitationId": val.invitationId,
+      });
+  @override
+  jcr_i6.AcceptInvitationRequest fromMap(
+      Juicer juicer, Map map, jcr_i6.AcceptInvitationRequest empty) {
+    if (map.containsKey("invitationId"))
+      empty.invitationId = map["invitationId"];
+    return empty;
+  }
+}
+
+class _$AcceptInvitationResponseJuicer
+    extends ClassMapper<jcr_i6.AcceptInvitationResponse> {
+  const _$AcceptInvitationResponseJuicer();
+  @override
+  jcr_i6.AcceptInvitationResponse newInstance() =>
+      jcr_i6.AcceptInvitationResponse();
+  @override
+  Map<String, dynamic> toMap(
+          Juicer juicer, jcr_i6.AcceptInvitationResponse val) =>
+      juicer.removeNullValues({
+        "error": juicer.encode(val.error),
+        "invitationId": val.invitationId,
+      });
+  @override
+  jcr_i6.AcceptInvitationResponse fromMap(
+      Juicer juicer, Map map, jcr_i6.AcceptInvitationResponse empty) {
+    if (map.containsKey("error"))
+      empty.error = juicer.decode(map["error"], (_) => jcr_i1.ErrorResponse());
+    if (map.containsKey("invitationId"))
+      empty.invitationId = map["invitationId"];
+    return empty;
+  }
+}
+
+class _$ListItemJuicer extends ClassMapper<jcr_i7.ListItem> {
   const _$ListItemJuicer();
   @override
-  jcr_i5.ListItem newInstance() => jcr_i5.ListItem();
+  jcr_i7.ListItem newInstance() => jcr_i7.ListItem();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i5.ListItem val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i7.ListItem val) =>
       juicer.removeNullValues({
 // reference is ignored
         "name": val.name,
@@ -241,14 +326,14 @@ class _$ListItemJuicer extends ClassMapper<jcr_i5.ListItem> {
         "collection": val.collection,
       });
   @override
-  jcr_i5.ListItem fromMap(Juicer juicer, Map map, jcr_i5.ListItem empty) {
+  jcr_i7.ListItem fromMap(Juicer juicer, Map map, jcr_i7.ListItem empty) {
 // reference is ignored
     if (map.containsKey("name")) empty.name = map["name"];
     if (map.containsKey("timeCompleted"))
       empty.timeCompleted = map["timeCompleted"]?.toInt();
     if (map.containsKey("accessLog"))
       empty.accessLog =
-          juicer.decode(map["accessLog"], (_) => jcr_i1.AccessLog());
+          juicer.decode(map["accessLog"], (_) => jcr_i2.AccessLog());
 // collectionName is ignored
 // completed is ignored
 // stateName is ignored
@@ -257,12 +342,12 @@ class _$ListItemJuicer extends ClassMapper<jcr_i5.ListItem> {
   }
 }
 
-class _$ListContainerJuicer extends ClassMapper<jcr_i6.ListContainer> {
+class _$ListContainerJuicer extends ClassMapper<jcr_i8.ListContainer> {
   const _$ListContainerJuicer();
   @override
-  jcr_i6.ListContainer newInstance() => jcr_i6.ListContainer();
+  jcr_i8.ListContainer newInstance() => jcr_i8.ListContainer();
   @override
-  Map<String, dynamic> toMap(Juicer juicer, jcr_i6.ListContainer val) =>
+  Map<String, dynamic> toMap(Juicer juicer, jcr_i8.ListContainer val) =>
       juicer.removeNullValues({
 // reference is ignored
         "name": val.name,
@@ -285,8 +370,8 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i6.ListContainer> {
         "collection": val.collection,
       });
   @override
-  jcr_i6.ListContainer fromMap(
-      Juicer juicer, Map map, jcr_i6.ListContainer empty) {
+  jcr_i8.ListContainer fromMap(
+      Juicer juicer, Map map, jcr_i8.ListContainer empty) {
 // reference is ignored
     if (map.containsKey("name")) empty.name = map["name"];
     if (map.containsKey("itemCount"))
@@ -294,7 +379,7 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i6.ListContainer> {
     if (map.containsKey("typeName")) empty.typeName = map["typeName"];
     if (map.containsKey("accessLog"))
       empty.accessLog =
-          juicer.decode(map["accessLog"], (_) => jcr_i1.AccessLog());
+          juicer.decode(map["accessLog"], (_) => jcr_i2.AccessLog());
     if (map.containsKey("accessors"))
       empty.accessors =
           juicer.decodeMap(map["accessors"], null, <String, List>{})
@@ -314,12 +399,15 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i6.ListContainer> {
 }
 
 const Juicer juicer = const Juicer(const {
-  jcr_i1.AccessEntry: const _$AccessEntryJuicer(),
-  jcr_i1.ChangeSet: const _$ChangeSetJuicer(),
-  jcr_i1.AccessLog: const _$AccessLogJuicer(),
-  jcr_i2.PublicProfile: const _$PublicProfileJuicer(),
-  jcr_i3.User: const _$UserJuicer(),
-  jcr_i4.Invitation: const _$InvitationJuicer(),
-  jcr_i5.ListItem: const _$ListItemJuicer(),
-  jcr_i6.ListContainer: const _$ListContainerJuicer(),
+  jcr_i1.ErrorResponse: const _$ErrorResponseJuicer(),
+  jcr_i2.AccessEntry: const _$AccessEntryJuicer(),
+  jcr_i2.ChangeSet: const _$ChangeSetJuicer(),
+  jcr_i2.AccessLog: const _$AccessLogJuicer(),
+  jcr_i3.PublicProfile: const _$PublicProfileJuicer(),
+  jcr_i4.User: const _$UserJuicer(),
+  jcr_i5.Invitation: const _$InvitationJuicer(),
+  jcr_i6.AcceptInvitationRequest: const _$AcceptInvitationRequestJuicer(),
+  jcr_i6.AcceptInvitationResponse: const _$AcceptInvitationResponseJuicer(),
+  jcr_i7.ListItem: const _$ListItemJuicer(),
+  jcr_i8.ListContainer: const _$ListContainerJuicer(),
 });
