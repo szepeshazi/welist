@@ -1,10 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:juicer/metadata.dart';
 
+import '../../common.dart';
+
 @juiced
-class PublicProfile {
+class PublicProfile extends HasDocumentReference {
+  @override
   @Property(ignore: true)
-  DocumentReference reference;
+  dynamic reference;
 
   String displayName;
 

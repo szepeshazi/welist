@@ -5,6 +5,7 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../../../auth/auth_service.dart';
+import '../../../shared/common.dart';
 import '../../../shared/service_base.dart';
 
 part 'invite_service.g.dart';
@@ -38,7 +39,7 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     fs
         .collection(Invitation.collectionName)
         .notDeleted
-        .where("senderUid", isEqualTo: _authService.user.reference.id)
+        .where("senderUid", isEqualTo: getFirestoreDocRef(_authService.user).id)
         .where("recipientResponded", isEqualTo: false)
         .snapshots()
         .listen(_handleSentUpdates);
@@ -52,26 +53,26 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     sent = await _handleUpdates(updates, sent);
   }
 
-  Future<List<Invitation>> _handleUpdates(
-      QuerySnapshot updates, List<Invitation> currentInvites) async {
+  Future<List<Invitation>> _handleUpdates(QuerySnapshot updates, List<Invitation> currentInvites) async {
     List<Invitation> updatedInvites = List.from(currentInvites);
     if (updates.docChanges.isNotEmpty) {
       for (var change in updates.docChanges) {
         switch (change.type) {
           case DocumentChangeType.added:
-            Invitation invitation = j.juicer.decode(change.doc.data(),
-                (_) => Invitation()..reference = change.doc.reference);
+            Invitation invitation =
+                setFirestoreDocRef(j.juicer.decode(change.doc.data(), (_) => Invitation()), change.doc.reference);
             updatedInvites.add(invitation);
             break;
           case DocumentChangeType.modified:
-            int index = currentInvites.indexWhere((Invitation invite) =>
-                invite.reference.path == change.doc.reference.path);
-            updatedInvites[index] = j.juicer.decode(change.doc.data(),
-                (_) => Invitation()..reference = change.doc.reference);
+            int index =
+                currentInvites.indexWhere((Invitation invite) => getFirestoreDocRef(invite).path == change.doc.reference
+                    .path);
+            updatedInvites[index] =
+                setFirestoreDocRef(j.juicer.decode(change.doc.data(), (_) => Invitation()), change.doc.reference);
             break;
           case DocumentChangeType.removed:
-            updatedInvites.removeWhere((Invitation invite) =>
-                invite.reference.path == change.doc.reference.path);
+            updatedInvites
+                .removeWhere((Invitation invite) => getFirestoreDocRef(invite).path == change.doc.reference.path);
             break;
         }
       }
@@ -79,43 +80,32 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     return updatedInvites;
   }
 
-  Future<void> send(
-      {ListContainer container,
-      String recipientEmail,
-      String subjectUid,
-      String accessLevel}) async {
+  Future<void> send({ListContainer container, String recipientEmail, String subjectUid, String accessLevel}) async {
     Invitation invitation = Invitation()
       ..accessLog = AccessLog()
       ..recipientEmail = recipientEmail
-      ..senderUid = _authService.user.reference.id
+      ..senderUid = getFirestoreDocRef(_authService.user).id
       ..senderEmail = _authService.user.email
       ..senderName = _authService.user.displayName
       ..subjectId = subjectUid
-      ..payload = {
-        "containerName": container.name,
-        "containerType": container.typeName,
-        "accessLevel": accessLevel
-      };
-    await upsert(invitation, _authService.user.reference.id,
-        action: AccessAction.create);
+      ..payload = {"containerName": container.name, "containerType": container.typeName, "accessLevel": accessLevel};
+    await upsert(invitation, getFirestoreDocRef(_authService.user).id, action: AccessAction.create);
   }
 
   Future<void> revoke(Invitation invitation) async {
-    await upsert(invitation, _authService.user.reference.id,
-        action: AccessAction.delete);
+    await upsert(invitation, getFirestoreDocRef(_authService.user).id, action: AccessAction.delete);
   }
 
   Future<void> accept(Invitation invitation) async {
     invitation.recipientAcceptedTime = DateTime.now().millisecondsSinceEpoch;
-    await upsert(invitation, _authService.user.reference.id);
+    await upsert(invitation, getFirestoreDocRef(_authService.user).id);
     HttpsCallable addPrivilegesToContainer =
-        FirebaseFunctions.instanceFor(region: "europe-west2")
-            .httpsCallable('accept');
-    await addPrivilegesToContainer({"invitationId": invitation.reference.id});
+        FirebaseFunctions.instanceFor(region: "europe-west2").httpsCallable('accept');
+    await addPrivilegesToContainer({"invitationId": getFirestoreDocRef(invitation).id});
   }
 
   Future<void> reject(Invitation invitation) async {
     invitation.recipientRejectedTime = DateTime.now().millisecondsSinceEpoch;
-    await upsert(invitation, _authService.user.reference.id);
+    await upsert(invitation, getFirestoreDocRef(_authService.user).id);
   }
 }

@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:welist_common/common.dart';
 
+import '../../shared/common.dart';
+
 class AccessorProfile extends Equatable {
   final String role;
 
@@ -8,7 +10,7 @@ class AccessorProfile extends Equatable {
 
   final String uid;
 
-  AccessorProfile(this.role, this.profile) : uid = profile.reference.id;
+  AccessorProfile(this.role, this.profile) : uid = getFirestoreDocRef(profile).id;
 
   @override
   List<Object> get props => [role, uid];

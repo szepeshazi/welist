@@ -6,6 +6,7 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../auth/auth_service.dart';
+import '../shared/common.dart';
 import '../shared/service_base.dart';
 
 part 'list_container_service.g.dart';
@@ -34,7 +35,7 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
     return fs
         .collection(ListContainer.collectionName)
         .notDeleted
-        .hasAccess(_authService.user.reference.id)
+        .hasAccess(getFirestoreDocRef(_authService.user).id)
         .snapshots()
         .listen((update) => _updateContainers(update));
   }
@@ -42,7 +43,7 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
   Future<void> _updateContainers(QuerySnapshot update) async {
     List<ListContainer> _containers = [];
     for (var doc in update.docs) {
-      ListContainer container = await ListContainer.fromSnapshot(doc, j.juicer);
+      ListContainer container = setFirestoreDocRef(j.juicer.decode(doc.data(), (_) => ListContainer()), doc.reference);
       _containers.add(container);
     }
     containers = _containers;
@@ -53,13 +54,13 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
     container
       ..itemCount = 0
       ..accessLog = AccessLog()
-      ..addAccessor(_authService.user.reference.id, ContainerAccess.owners);
-    await upsert(container, _authService.user.reference.id);
+      ..addAccessor(getFirestoreDocRef(_authService.user).id, ContainerAccess.owners);
+    await upsert(container, getFirestoreDocRef(_authService.user).id);
   }
 
   @action
   Future<void> delete(ListContainer container) async {
-    await upsert(container, _authService.user.reference.id, action: AccessAction.delete);
+    await upsert(container, getFirestoreDocRef(_authService.user).id, action: AccessAction.delete);
   }
 
   void cleanUp() {

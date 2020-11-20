@@ -2,6 +2,7 @@ import 'package:mobx/mobx.dart';
 import 'package:welist_common/common.dart';
 
 import '../../auth/auth_service.dart';
+import '../../shared/common.dart';
 import '../../shared/list_base/list_item_base.dart';
 import 'accessor_profile.dart';
 import 'invite/invite_service.dart';
@@ -25,7 +26,7 @@ abstract class _SharesStore with Store {
   List<ListItemBase> sharesAndInvites = [];
 
   _SharesStore(this._container, AuthService authService, this._sharesService, this._inviteService)
-      : userId = authService.user.reference.id;
+      : userId = getFirestoreDocRef(authService.user).id;
 
   void initialize() {
     mainContext.onReactionError((a, b) {
@@ -33,7 +34,7 @@ abstract class _SharesStore with Store {
     });
     autorun((_) {
       List<Invitation> currentContainerInvites = _inviteService.sent
-          .where((invite) => invite.subjectId == _container.reference.id && invite.senderUid == userId)
+          .where((invite) => invite.subjectId == getFirestoreDocRef(_container).id && invite.senderUid == userId)
           .toList(growable: false);
       sharesAndInvites = [
         ..._sharesService.accessors.map(fromAccessorProfile),
