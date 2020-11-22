@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 @TestOn('vm')
 import 'package:flutter_test/flutter_test.dart';
 import 'package:matcher/matcher.dart';
@@ -9,7 +8,7 @@ class AccessLogTest with AccessLogUtils implements HasAccessLog {
   AccessLog accessLog;
 
   @override
-  DocumentReference reference;
+  dynamic dynamicReference;
 
   @override
   String get collection => "accessLogTest";

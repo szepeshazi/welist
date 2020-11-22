@@ -2,6 +2,7 @@ import 'package:mobx/mobx.dart';
 import 'package:welist_common/common.dart';
 
 import '../../auth/auth_service.dart';
+import '../../shared/common.dart';
 import '../../shared/list_base/list_item_base.dart';
 import 'accessor_profile.dart';
 import 'invite/invite_service.dart';

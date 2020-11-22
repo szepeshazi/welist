@@ -1,10 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:juicer/juicer.dart';
 import 'package:juicer/metadata.dart';
 
-import '../shared/enum_codec.dart';
 import '../access/access_log.dart';
 import '../access/accessors.dart';
+import '../shared/enum_codec.dart';
 
 enum ContainerType { shopping, todo }
 
@@ -12,7 +10,7 @@ enum ContainerType { shopping, todo }
 class ListContainer with AccessLogUtils, AccessorUtils {
   @override
   @Property(ignore: true)
-  DocumentReference reference;
+  dynamic dynamicReference;
 
   String name;
 
@@ -51,12 +49,6 @@ class ListContainer with AccessLogUtils, AccessorUtils {
     ContainerType.todo: "Todo list"
   };
 
-  static Future<ListContainer> fromSnapshot(DocumentSnapshot snapshot, Juicer juicer) async {
-    ListContainer container = juicer.decode(snapshot.data(), (_) => ListContainer()..reference = snapshot.reference);
-    // TODO: accessor details should only be fetched when going to list sharing page
-    return container;
-  }
-
   @override
   String get collection => ListContainer.collectionName;
 
@@ -71,5 +63,3 @@ class ListContainer with AccessLogUtils, AccessorUtils {
   @override
   String toString() => "ListContainer(name: $name, type: $type)";
 }
-
-typedef FetchUserCallback = Future<DocumentSnapshot> Function(String userId);

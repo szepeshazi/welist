@@ -6,6 +6,7 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../../auth/auth_service.dart';
+import '../../shared/common.dart';
 import '../../shared/service_base.dart';
 import 'accessor_profile.dart';
 
@@ -47,8 +48,12 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
     List<String> newAccessorKeys = accessorKeys.where((key) => !accessorMap.containsKey(key)).toList();
     if (newAccessorKeys.isNotEmpty) {
       List<PublicProfile> newAccessorProfiles = await _getAccessorProfiles(newAccessorKeys);
-      Map<String, PublicProfile> profileMap =
-          Map.fromIterable(newAccessorProfiles, key: (profile) => profile.reference.id);
+      for (PublicProfile profile in newAccessorProfiles) {
+        print("public profile: ${profile.reference?.id} : ${profile.displayName}");
+      }
+      Map<String, PublicProfile> profileMap = {
+        for (final profile in newAccessorProfiles) profile.reference.id: profile
+      };
 
       Iterable<String> levels = container.accessors.keys.where((key) => key != AccessorUtils.anyLevelKey);
       for (final level in levels) {

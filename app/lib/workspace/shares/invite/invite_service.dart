@@ -5,6 +5,7 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../../../auth/auth_service.dart';
+import '../../../shared/common.dart';
 import '../../../shared/service_base.dart';
 
 part 'invite_service.g.dart';
@@ -52,26 +53,24 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     sent = await _handleUpdates(updates, sent);
   }
 
-  Future<List<Invitation>> _handleUpdates(
-      QuerySnapshot updates, List<Invitation> currentInvites) async {
+  Future<List<Invitation>> _handleUpdates(QuerySnapshot updates, List<Invitation> currentInvites) async {
     List<Invitation> updatedInvites = List.from(currentInvites);
     if (updates.docChanges.isNotEmpty) {
       for (var change in updates.docChanges) {
         switch (change.type) {
           case DocumentChangeType.added:
-            Invitation invitation = j.juicer.decode(change.doc.data(),
-                (_) => Invitation()..reference = change.doc.reference);
+            Invitation invitation =
+                j.juicer.decode(change.doc.data(), (_) => Invitation()..reference = change.doc.reference);
             updatedInvites.add(invitation);
             break;
           case DocumentChangeType.modified:
-            int index = currentInvites.indexWhere((Invitation invite) =>
-                invite.reference.path == change.doc.reference.path);
-            updatedInvites[index] = j.juicer.decode(change.doc.data(),
-                (_) => Invitation()..reference = change.doc.reference);
+            int index =
+                currentInvites.indexWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
+            updatedInvites[index] =
+                j.juicer.decode(change.doc.data(), (_) => Invitation()..reference = change.doc.reference);
             break;
           case DocumentChangeType.removed:
-            updatedInvites.removeWhere((Invitation invite) =>
-                invite.reference.path == change.doc.reference.path);
+            updatedInvites.removeWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
             break;
         }
       }
@@ -79,11 +78,7 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     return updatedInvites;
   }
 
-  Future<void> send(
-      {ListContainer container,
-      String recipientEmail,
-      String subjectUid,
-      String accessLevel}) async {
+  Future<void> send({ListContainer container, String recipientEmail, String subjectUid, String accessLevel}) async {
     Invitation invitation = Invitation()
       ..accessLog = AccessLog()
       ..recipientEmail = recipientEmail
@@ -91,27 +86,29 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
       ..senderEmail = _authService.user.email
       ..senderName = _authService.user.displayName
       ..subjectId = subjectUid
-      ..payload = {
-        "containerName": container.name,
-        "containerType": container.typeName,
-        "accessLevel": accessLevel
-      };
-    await upsert(invitation, _authService.user.reference.id,
-        action: AccessAction.create);
+      ..payload = {"containerName": container.name, "containerType": container.typeName, "accessLevel": accessLevel};
+    await upsert(invitation, _authService.user.reference.id, action: AccessAction.create);
   }
 
   Future<void> revoke(Invitation invitation) async {
-    await upsert(invitation, _authService.user.reference.id,
-        action: AccessAction.delete);
+    await upsert(invitation, _authService.user.reference.id, action: AccessAction.delete);
   }
 
   Future<void> accept(Invitation invitation) async {
     invitation.recipientAcceptedTime = DateTime.now().millisecondsSinceEpoch;
     await upsert(invitation, _authService.user.reference.id);
     HttpsCallable addPrivilegesToContainer =
-        FirebaseFunctions.instanceFor(region: "europe-west2")
-            .httpsCallable('accept');
-    await addPrivilegesToContainer({"invitationId": invitation.reference.id});
+        FirebaseFunctions.instanceFor(region: "europe-west2").httpsCallable('acceptInvitation');
+    AcceptInvitationRequest request = AcceptInvitationRequest()..invitationId = invitation.reference.id;
+
+    Map<String, dynamic> encoded = j.juicer.encode(request);
+    encoded.forEach((key, value) {
+      print("key: $key (${key.runtimeType}), value: $value (${value.runtimeType})");
+    });
+    final result = await addPrivilegesToContainer(j.juicer.encode(request));
+    AcceptInvitationResponse response = j.juicer.decode(result.data, (_) => AcceptInvitationResponse());
+    print(
+        "accept invitation response, id: ${response.invitationId}, error: ${response.error.mnemonic}, ${response.error.message}");
   }
 
   Future<void> reject(Invitation invitation) async {

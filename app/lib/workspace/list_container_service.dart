@@ -6,6 +6,7 @@ import 'package:welist_common/common.dart';
 import 'package:welist_common/common.juicer.dart' as j;
 
 import '../auth/auth_service.dart';
+import '../shared/common.dart';
 import '../shared/service_base.dart';
 
 part 'list_container_service.g.dart';
@@ -42,7 +43,7 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
   Future<void> _updateContainers(QuerySnapshot update) async {
     List<ListContainer> _containers = [];
     for (var doc in update.docs) {
-      ListContainer container = await ListContainer.fromSnapshot(doc, j.juicer);
+      ListContainer container = j.juicer.decode(doc.data(), (_) => ListContainer()..reference = doc.reference);
       _containers.add(container);
     }
     containers = _containers;
