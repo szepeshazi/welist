@@ -14,3 +14,7 @@ HasDocumentReference setFirestoreDocRef(HasDocumentReference entity, DocumentRef
   entity.reference = reference;
   return entity;
 }
+
+extension DocRef on  HasDocumentReference {
+  DocumentReference get reference => FirebaseFirestore.instance.doc(getFirestoreDocRef(this).path);
+}

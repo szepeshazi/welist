@@ -5,7 +5,7 @@ import 'src/delete_containers.dart';
 
 void main() {
   functions['acceptInvitation'] = functions.region(region).https.onCall(acceptInvitation);
-  //functions['deleteContainers'] = functions.region(region).https.onRequest(deleteContainers);
+  functions['deleteContainers'] = functions.region(region).https.onRequest(deleteContainers);
 }
 
 const String region = 'europe-west2';
