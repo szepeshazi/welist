@@ -3,13 +3,13 @@ import 'package:welist_common/common.dart';
 
 
 DocumentReference getFirestoreDocRef(HasDocumentReference entity) {
-  if (entity.reference is DocumentReference) {
-    return entity.reference;
+  if (entity.dynamicReference is DocumentReference) {
+    return entity.dynamicReference;
   }
   return null;
 }
 
 HasDocumentReference setFirestoreDocRef(HasDocumentReference entity, DocumentReference reference) {
-  entity.reference = reference;
+  entity.dynamicReference = reference;
   return entity;
 }

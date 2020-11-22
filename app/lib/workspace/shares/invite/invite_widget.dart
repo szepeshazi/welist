@@ -92,7 +92,7 @@ class InviteInnerWidget extends StatelessWidget {
                                                 container: container,
                                                 recipientEmail: invite.recipientEmail,
                                                 accessLevel: invite.accessLevel,
-                                                subjectUid: getFirestoreDocRef(container).id)
+                                                subjectUid: container.reference.id)
                                             .then((_) => sharesNavigator.toggleAddAccessorForm(false));
                                       },
                                 child: Container(

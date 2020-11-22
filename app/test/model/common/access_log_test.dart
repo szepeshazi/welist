@@ -8,7 +8,7 @@ class AccessLogTest with AccessLogUtils implements HasAccessLog {
   AccessLog accessLog;
 
   @override
-  dynamic reference;
+  dynamic dynamicReference;
 
   @override
   String get collection => "accessLogTest";

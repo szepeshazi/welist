@@ -7,7 +7,7 @@ import '../access/access_log.dart';
 class ListItem with AccessLogUtils {
   @override
   @Property(ignore: true)
-  dynamic reference;
+  dynamic dynamicReference;
 
   String name;
 

@@ -26,7 +26,7 @@ abstract class _SharesStore with Store {
   List<ListItemBase> sharesAndInvites = [];
 
   _SharesStore(this._container, AuthService authService, this._sharesService, this._inviteService)
-      : userId = getFirestoreDocRef(authService.user).id;
+      : userId = authService.user.reference.id;
 
   void initialize() {
     mainContext.onReactionError((a, b) {
@@ -34,7 +34,7 @@ abstract class _SharesStore with Store {
     });
     autorun((_) {
       List<Invitation> currentContainerInvites = _inviteService.sent
-          .where((invite) => invite.subjectId == getFirestoreDocRef(_container).id && invite.senderUid == userId)
+          .where((invite) => invite.subjectId == _container.reference.id && invite.senderUid == userId)
           .toList(growable: false);
       sharesAndInvites = [
         ..._sharesService.accessors.map(fromAccessorProfile),

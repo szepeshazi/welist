@@ -39,7 +39,7 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     fs
         .collection(Invitation.collectionName)
         .notDeleted
-        .where("senderUid", isEqualTo: getFirestoreDocRef(_authService.user).id)
+        .where("senderUid", isEqualTo: _authService.user.reference.id)
         .where("recipientResponded", isEqualTo: false)
         .snapshots()
         .listen(_handleSentUpdates);
@@ -60,18 +60,17 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
         switch (change.type) {
           case DocumentChangeType.added:
             Invitation invitation =
-                setFirestoreDocRef(j.juicer.decode(change.doc.data(), (_) => Invitation()), change.doc.reference);
+                j.juicer.decode(change.doc.data(), (_) => Invitation()..reference = change.doc.reference);
             updatedInvites.add(invitation);
             break;
           case DocumentChangeType.modified:
-            int index = currentInvites
-                .indexWhere((Invitation invite) => getFirestoreDocRef(invite).path == change.doc.reference.path);
+            int index =
+                currentInvites.indexWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
             updatedInvites[index] =
-                setFirestoreDocRef(j.juicer.decode(change.doc.data(), (_) => Invitation()), change.doc.reference);
+                j.juicer.decode(change.doc.data(), (_) => Invitation()..reference = change.doc.reference);
             break;
           case DocumentChangeType.removed:
-            updatedInvites
-                .removeWhere((Invitation invite) => getFirestoreDocRef(invite).path == change.doc.reference.path);
+            updatedInvites.removeWhere((Invitation invite) => invite.reference.path == change.doc.reference.path);
             break;
         }
       }
@@ -83,24 +82,24 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     Invitation invitation = Invitation()
       ..accessLog = AccessLog()
       ..recipientEmail = recipientEmail
-      ..senderUid = getFirestoreDocRef(_authService.user).id
+      ..senderUid = _authService.user.reference.id
       ..senderEmail = _authService.user.email
       ..senderName = _authService.user.displayName
       ..subjectId = subjectUid
       ..payload = {"containerName": container.name, "containerType": container.typeName, "accessLevel": accessLevel};
-    await upsert(invitation, getFirestoreDocRef(_authService.user).id, action: AccessAction.create);
+    await upsert(invitation, _authService.user.reference.id, action: AccessAction.create);
   }
 
   Future<void> revoke(Invitation invitation) async {
-    await upsert(invitation, getFirestoreDocRef(_authService.user).id, action: AccessAction.delete);
+    await upsert(invitation, _authService.user.reference.id, action: AccessAction.delete);
   }
 
   Future<void> accept(Invitation invitation) async {
     invitation.recipientAcceptedTime = DateTime.now().millisecondsSinceEpoch;
-    await upsert(invitation, getFirestoreDocRef(_authService.user).id);
+    await upsert(invitation, _authService.user.reference.id);
     HttpsCallable addPrivilegesToContainer =
         FirebaseFunctions.instanceFor(region: "europe-west2").httpsCallable('acceptInvitation');
-    AcceptInvitationRequest request = AcceptInvitationRequest()..invitationId = getFirestoreDocRef(invitation).id;
+    AcceptInvitationRequest request = AcceptInvitationRequest()..invitationId = invitation.reference.id;
 
     Map<String, dynamic> encoded = j.juicer.encode(request);
     encoded.forEach((key, value) {
@@ -114,6 +113,6 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
 
   Future<void> reject(Invitation invitation) async {
     invitation.recipientRejectedTime = DateTime.now().millisecondsSinceEpoch;
-    await upsert(invitation, getFirestoreDocRef(_authService.user).id);
+    await upsert(invitation, _authService.user.reference.id);
   }
 }

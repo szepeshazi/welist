@@ -6,7 +6,7 @@ import '../access/access_log.dart';
 class Invitation with AccessLogUtils {
   @override
   @Property(ignore: true)
-  dynamic reference;
+  dynamic dynamicReference;
 
   String senderUid;
 

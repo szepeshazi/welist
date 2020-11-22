@@ -10,7 +10,7 @@ class AccessorProfile extends Equatable {
 
   final String uid;
 
-  AccessorProfile(this.role, this.profile) : uid = getFirestoreDocRef(profile).id;
+  AccessorProfile(this.role, this.profile) : uid = profile.reference.id;
 
   @override
   List<Object> get props => [role, uid];

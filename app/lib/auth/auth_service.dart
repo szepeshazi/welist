@@ -95,16 +95,15 @@ abstract class _AuthService with Store {
     if (!userSnapshot.exists) {
       DocumentReference userRef = _fs.collection(we.User.collectionName).doc(_fbAuth.currentUser.uid);
       String displayName = _fbAuth.currentUser.displayName ?? _fbAuth.currentUser.email.split("@").first;
-      final newUser = setFirestoreDocRef(
-          we.User()
-            ..email = _fbAuth.currentUser.email
-            ..displayName = displayName,
-          userRef);
+      final newUser = we.User()
+        ..email = _fbAuth.currentUser.email
+        ..displayName = displayName
+        ..reference = userRef;
       final encodedUser = j.juicer.encode(newUser);
       await userRef.set(encodedUser);
       currentUser = newUser;
     } else {
-      currentUser = setFirestoreDocRef(j.juicer.decode(userSnapshot.data(), (_) => we.User()), userSnapshot.reference);
+      currentUser = j.juicer.decode(userSnapshot.data(), (_) => we.User()..reference = userSnapshot.reference);
     }
 
     DocumentSnapshot publicProfileSnapshot =
@@ -113,19 +112,18 @@ abstract class _AuthService with Store {
       print("creating public profile for ${_fbAuth.currentUser.email}");
       DocumentReference publicProfileRef = _fs.collection(we.PublicProfile.collectionName).doc(_fbAuth.currentUser.uid);
       String displayName = _fbAuth.currentUser.displayName ?? _fbAuth.currentUser.email.split("@").first;
-      final newPublicProfile = setFirestoreDocRef(
-          we.PublicProfile()
-            ..email = _fbAuth.currentUser.email
-            ..displayName = displayName,
-          publicProfileRef);
+      final newPublicProfile = we.PublicProfile()
+        ..email = _fbAuth.currentUser.email
+        ..displayName = displayName
+        ..reference = publicProfileRef;
       final encodedPublicProfile = j.juicer.encode(newPublicProfile);
       await publicProfileRef.set(encodedPublicProfile);
       currentPublicProfile = newPublicProfile;
     } else {
       print("Found public profile for ${_fbAuth.currentUser.email}");
 
-      currentPublicProfile = setFirestoreDocRef(
-          j.juicer.decode(publicProfileSnapshot.data(), (_) => we.PublicProfile()), publicProfileSnapshot.reference);
+      currentPublicProfile = j.juicer
+          .decode(publicProfileSnapshot.data(), (_) => we.PublicProfile()..reference = publicProfileSnapshot.reference);
     }
     // Update observable user and publicProfile in a sync atomic operation
     user = currentUser;

@@ -10,7 +10,7 @@ enum ContainerType { shopping, todo }
 class ListContainer with AccessLogUtils, AccessorUtils {
   @override
   @Property(ignore: true)
-  dynamic reference;
+  dynamic dynamicReference;
 
   String name;
 

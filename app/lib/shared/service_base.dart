@@ -26,7 +26,7 @@ abstract class ServiceBase<T extends HasAccessLog> {
           parent == null ? fs.collection(entity.collection) : parent.collection(entity.collection);
       await collectionReference.add(encoded);
     } else {
-      await getFirestoreDocRef(entity).set(encoded);
+      await entity.reference.set(encoded);
     }
   }
 
@@ -34,7 +34,7 @@ abstract class ServiceBase<T extends HasAccessLog> {
     dynamic encoded = j.juicer.encode(entity);
     entity.log(userId, encoded, AccessAction.update);
     updates[accessLogProperty] = j.juicer.encode(entity.accessLog);
-    await getFirestoreDocRef(entity).update(updates);
+    await entity.reference.update(updates);
   }
 
   static const String accessLogProperty = "accessLog";

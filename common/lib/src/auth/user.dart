@@ -6,7 +6,7 @@ import '../../common.dart';
 class User extends HasDocumentReference {
   @override
   @Property(ignore: true)
-  dynamic reference;
+  dynamic dynamicReference;
 
   String displayName;
 

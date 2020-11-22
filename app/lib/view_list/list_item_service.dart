@@ -37,7 +37,7 @@ abstract class _ListItemService extends ServiceBase<ListItem> with Store {
 
   void initialize() {
     // Listen to authentication changes
-    listChangeListener = getFirestoreDocRef(container)
+    listChangeListener = container.reference
         .collection(ListItem.collectionName)
         .notDeleted
         .snapshots()
@@ -51,17 +51,15 @@ abstract class _ListItemService extends ServiceBase<ListItem> with Store {
       for (var change in updates.docChanges) {
         switch (change.type) {
           case DocumentChangeType.added:
-            ListItem item =
-                setFirestoreDocRef(j.juicer.decode(change.doc.data(), (_) => ListItem()), change.doc.reference);
+            ListItem item = j.juicer.decode(change.doc.data(), (_) => ListItem()..reference = change.doc.reference);
             _items.add(item);
             break;
           case DocumentChangeType.modified:
-            int index = items.indexWhere((ListItem item) => getFirestoreDocRef(item).path == change.doc.reference.path);
-            _items[index] =
-                setFirestoreDocRef(j.juicer.decode(change.doc.data(), (_) => ListItem()), change.doc.reference);
+            int index = items.indexWhere((ListItem item) => item.reference.path == change.doc.reference.path);
+            _items[index] = j.juicer.decode(change.doc.data(), (_) => ListItem()..reference = change.doc.reference);
             break;
           case DocumentChangeType.removed:
-            _items.removeWhere((item) => getFirestoreDocRef(item).path == change.doc.reference.path);
+            _items.removeWhere((item) => item.reference.path == change.doc.reference.path);
             break;
         }
       }
@@ -80,16 +78,16 @@ abstract class _ListItemService extends ServiceBase<ListItem> with Store {
     // real increment operation will happen on FB, and changes will be pushed to the obj
     container.itemCount++;
     await fs.runTransaction((transaction) async {
-      await upsert(item, getFirestoreDocRef(_authService.user).id, parent: container.reference);
+      await upsert(item, _authService.user.reference.id, parent: container.dynamicReference);
       await containerService
-          .updateFields(container, getFirestoreDocRef(_authService.user).id, {"itemCount": FieldValue.increment(1)});
+          .updateFields(container, _authService.user.reference.id, {"itemCount": FieldValue.increment(1)});
     });
   }
 
   @action
   Future<void> update(ListItem item) async {
     // TODO: input sanity check, transaction
-    await upsert(item, getFirestoreDocRef(_authService.user).id);
+    await upsert(item, _authService.user.reference.id);
   }
 
   @action
@@ -97,9 +95,9 @@ abstract class _ListItemService extends ServiceBase<ListItem> with Store {
     // TODO: input sanity check, transaction
     container.itemCount--;
     await fs.runTransaction((transaction) async {
-      await upsert(item, getFirestoreDocRef(_authService.user).id, action: AccessAction.delete);
+      await upsert(item, _authService.user.reference.id, action: AccessAction.delete);
       await containerService
-          .updateFields(container, getFirestoreDocRef(_authService.user).id, {"itemCount": FieldValue.increment(-1)});
+          .updateFields(container, _authService.user.reference.id, {"itemCount": FieldValue.increment(-1)});
     });
   }
 

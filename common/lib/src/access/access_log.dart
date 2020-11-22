@@ -68,9 +68,9 @@ class AccessLog {
 }
 
 abstract class HasDocumentReference {
-  dynamic get reference;
+  dynamic get dynamicReference;
 
-  set reference (dynamic newValue);
+  set dynamicReference (dynamic newValue);
 }
 
 abstract class HasAccessLog extends HasDocumentReference {

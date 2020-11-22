@@ -31,7 +31,7 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
 
   void initialize() {
     // Listen to authentication changes
-    containerChangeListener = getFirestoreDocRef(container).snapshots().listen((update) => _containerUpdated(update));
+    containerChangeListener = container.reference.snapshots().listen((update) => _containerUpdated(update));
   }
 
   Future<void> _containerUpdated(DocumentSnapshot snapshot) async {
@@ -48,8 +48,12 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
     List<String> newAccessorKeys = accessorKeys.where((key) => !accessorMap.containsKey(key)).toList();
     if (newAccessorKeys.isNotEmpty) {
       List<PublicProfile> newAccessorProfiles = await _getAccessorProfiles(newAccessorKeys);
-      Map<String, PublicProfile> profileMap =
-          Map.fromIterable(newAccessorProfiles, key: (profile) => getFirestoreDocRef(profile).id);
+      for (PublicProfile profile in newAccessorProfiles) {
+        print("public profile: ${profile.reference?.id} : ${profile.displayName}");
+      }
+      Map<String, PublicProfile> profileMap = {
+        for (final profile in newAccessorProfiles) profile.reference.id: profile
+      };
 
       Iterable<String> levels = container.accessors.keys.where((key) => key != AccessorUtils.anyLevelKey);
       for (final level in levels) {
@@ -68,7 +72,7 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
     for (final level in container.accessors.keys) {
       container.accessors[level].remove(uid);
     }
-    await upsert(container, getFirestoreDocRef(_authService.user).id);
+    await upsert(container, _authService.user.reference.id);
   }
 
   Future<List<PublicProfile>> _getAccessorProfiles(List<String> uids) async {
@@ -91,5 +95,5 @@ abstract class _SharesService extends ServiceBase<ListContainer> with Store {
   }
 
   PublicProfile fromSnapshot(DocumentSnapshot snapshot) =>
-      setFirestoreDocRef(j.juicer.decode(snapshot.data(), (_) => PublicProfile()), snapshot.reference);
+      j.juicer.decode(snapshot.data(), (_) => PublicProfile()..reference = snapshot.reference);
 }

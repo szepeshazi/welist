@@ -35,7 +35,7 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
     return fs
         .collection(ListContainer.collectionName)
         .notDeleted
-        .hasAccess(getFirestoreDocRef(_authService.user).id)
+        .hasAccess(_authService.user.reference.id)
         .snapshots()
         .listen((update) => _updateContainers(update));
   }
@@ -43,7 +43,7 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
   Future<void> _updateContainers(QuerySnapshot update) async {
     List<ListContainer> _containers = [];
     for (var doc in update.docs) {
-      ListContainer container = setFirestoreDocRef(j.juicer.decode(doc.data(), (_) => ListContainer()), doc.reference);
+      ListContainer container = j.juicer.decode(doc.data(), (_) => ListContainer()..reference = doc.reference);
       _containers.add(container);
     }
     containers = _containers;
@@ -54,13 +54,13 @@ abstract class _ListContainerService extends ServiceBase<ListContainer> with Sto
     container
       ..itemCount = 0
       ..accessLog = AccessLog()
-      ..addAccessor(getFirestoreDocRef(_authService.user).id, ContainerAccess.owners);
-    await upsert(container, getFirestoreDocRef(_authService.user).id);
+      ..addAccessor(_authService.user.reference.id, ContainerAccess.owners);
+    await upsert(container, _authService.user.reference.id);
   }
 
   @action
   Future<void> delete(ListContainer container) async {
-    await upsert(container, getFirestoreDocRef(_authService.user).id, action: AccessAction.delete);
+    await upsert(container, _authService.user.reference.id, action: AccessAction.delete);
   }
 
   void cleanUp() {
