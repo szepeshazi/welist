@@ -25,7 +25,7 @@ class Invitation with AccessLogUtils {
   @override
   AccessLog accessLog;
 
-  bool recipientResponded = false;
+  int recipientRespondedTime = 0;
 
   int recipientAcceptedTime = 0;
 

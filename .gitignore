@@ -13,7 +13,7 @@
 *.iml
 *.ipr
 *.iws
-app/.idea/
+**/.idea/
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
@@ -43,6 +43,8 @@ app/.packages
 **/android/gradlew.bat
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
+**/android/app/google-services.json
+**/android/app/src/
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
@@ -80,3 +82,4 @@ app/.packages
 
 #Generated files
 /lib/**/*.g.dart
+

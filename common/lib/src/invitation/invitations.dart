@@ -8,7 +8,17 @@ class AcceptInvitationRequest {
 }
 
 @juiced
-class AcceptInvitationResponse {
+mixin PossibleErrorResponse {
+  ErrorResponse get error;
+
+  set error(ErrorResponse actualError);
+
+  bool get hasError => error != null;
+}
+
+@juiced
+class AcceptInvitationResponse with PossibleErrorResponse {
+  @override
   ErrorResponse error;
 
   String invitationId;

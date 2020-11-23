@@ -8,6 +8,11 @@ class ErrorResponse {
 
   ErrorResponse();
 
+  factory ErrorResponse.generic({String mnemonic, String message, Map<String, dynamic> payload}) => ErrorResponse()
+    ..mnemonic = mnemonic
+    ..message = message
+    ..payload = payload;
+
   factory ErrorResponse.accessDenied({Map<String, dynamic> payload}) => ErrorResponse()
     ..mnemonic = accessDeniedMnemonic
     ..message = accessDeniedMessage

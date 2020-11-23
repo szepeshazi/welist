@@ -228,7 +228,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i5.Invitation> {
             : Map.fromIterable(val.payload.keys,
                 value: (k) => juicer.encode(val.payload[k])),
         "accessLog": juicer.encode(val.accessLog),
-        "recipientResponded": val.recipientResponded,
+        "recipientResponded": val.recipientRespondedTime,
         "recipientAcceptedTime": val.recipientAcceptedTime,
         "recipientRejectedTime": val.recipientRejectedTime,
 // collectionName is ignored
@@ -253,7 +253,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i5.Invitation> {
       empty.accessLog =
           juicer.decode(map["accessLog"], (_) => jcr_i2.AccessLog());
     if (map.containsKey("recipientResponded"))
-      empty.recipientResponded = map["recipientResponded"];
+      empty.recipientRespondedTime = map["recipientResponded"];
     if (map.containsKey("recipientAcceptedTime"))
       empty.recipientAcceptedTime = map["recipientAcceptedTime"]?.toInt();
     if (map.containsKey("recipientRejectedTime"))

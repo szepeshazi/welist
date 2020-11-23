@@ -1,15 +1,11 @@
 import 'package:firebase_admin_interop/firebase_admin_interop.dart';
 import 'package:welist_common/common.dart';
 
-
-DocumentReference getFirestoreDocRef(HasDocumentReference entity) {
-  if (entity.dynamicReference is DocumentReference) {
-    return entity.dynamicReference;
+extension FirestoreDocumentReference on  HasDocumentReference {
+  DocumentReference get reference {
+    assert (dynamicReference is DocumentReference);
+    return dynamicReference;
   }
-  return null;
-}
 
-HasDocumentReference setFirestoreDocRef(HasDocumentReference entity, DocumentReference reference) {
-  entity.dynamicReference = reference;
-  return entity;
+  set reference(DocumentReference newReference) => dynamicReference = newReference;
 }
