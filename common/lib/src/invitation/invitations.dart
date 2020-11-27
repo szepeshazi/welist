@@ -5,21 +5,18 @@ import '../error_response/error_response.dart';
 @juiced
 class AcceptInvitationRequest {
   String invitationId;
+
+  /// If the invitation should be accepted or rejected
+  /// `true`: accept
+  /// `false`: reject
+  bool accept;
 }
 
 @juiced
-mixin PossibleErrorResponse {
-  ErrorResponse get error;
-
-  set error(ErrorResponse actualError);
-
-  bool get hasError => error != null;
-}
-
-@juiced
-class AcceptInvitationResponse with PossibleErrorResponse {
-  @override
+class AcceptInvitationResponse {
   ErrorResponse error;
 
   String invitationId;
+
+  bool accepted;
 }

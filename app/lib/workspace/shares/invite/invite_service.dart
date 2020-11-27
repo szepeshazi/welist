@@ -32,7 +32,7 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
         .collection(Invitation.collectionName)
         .notDeleted
         .where("recipientEmail", isEqualTo: _authService.user.email)
-        .where("recipientResponded", isEqualTo: false)
+        .where("recipientRespondedTime", isEqualTo: 0)
         .snapshots()
         .listen(_handleReceivedUpdates);
 
@@ -40,7 +40,7 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
         .collection(Invitation.collectionName)
         .notDeleted
         .where("senderUid", isEqualTo: _authService.user.reference.id)
-        .where("recipientResponded", isEqualTo: false)
+        .where("recipientRespondedTime", isEqualTo: 0)
         .snapshots()
         .listen(_handleSentUpdates);
   }
@@ -94,23 +94,25 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
     await upsert(invitation, _authService.user.reference.id, action: AccessAction.delete);
   }
 
-  Future<void> accept(Invitation invitation) async {
-    HttpsCallable addPrivilegesToContainer =
+  Future<void> accept(Invitation invitation) => _react(invitation, true);
+
+  Future<void> reject(Invitation invitation) => _react(invitation, false);
+
+  Future<void> _react(Invitation invitation, bool accept) async {
+    HttpsCallable acceptInvitation =
         FirebaseFunctions.instanceFor(region: "europe-west2").httpsCallable('acceptInvitation');
-    AcceptInvitationRequest request = AcceptInvitationRequest()..invitationId = invitation.reference.id;
+    AcceptInvitationRequest request = AcceptInvitationRequest()
+      ..invitationId = invitation.reference.id
+      ..accept = accept;
 
     Map<String, dynamic> encoded = j.juicer.encode(request);
     encoded.forEach((key, value) {
-      print("key: $key (${key.runtimeType}), value: $value (${value.runtimeType})");
+      print("AcceptInvitationRequest key: $key (${key.runtimeType}), value: $value (${value.runtimeType})");
     });
-    final result = await addPrivilegesToContainer(j.juicer.encode(request));
+    final result = await acceptInvitation(j.juicer.encode(request));
     AcceptInvitationResponse response = j.juicer.decode(result.data, (_) => AcceptInvitationResponse());
     print(
-        "accept invitation response, id: ${response.invitationId}, error: ${response.error.mnemonic}, ${response.error.message}");
-  }
-
-  Future<void> reject(Invitation invitation) async {
-    invitation.recipientRejectedTime = DateTime.now().millisecondsSinceEpoch;
-    await upsert(invitation, _authService.user.reference.id);
+        "accept invitation response, id: ${response.invitationId}, error: ${response.error?.mnemonic}, ${response
+            .error?.message} ${response.accepted ? 'accepted' : 'rejected'}");
   }
 }

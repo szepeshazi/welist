@@ -21,12 +21,13 @@ abstract class ServiceBase<T extends HasAccessLog> {
     dynamic encoded = j.juicer.encode(entity);
     entity.log(userId, encoded, logAction);
     encoded[accessLogProperty] = j.juicer.encode(entity.accessLog);
+    DocumentData data = DocumentData.fromMap(encoded);
     if (logAction == AccessAction.create) {
       CollectionReference collectionReference =
           parent == null ? fs.collection(entity.collection) : parent.collection(entity.collection);
-      await collectionReference.add(encoded);
+      await collectionReference.add(data);
     } else {
-      await entity.reference.setData(encoded);
+      await entity.reference.setData(data);
     }
   }
 
@@ -34,7 +35,7 @@ abstract class ServiceBase<T extends HasAccessLog> {
     dynamic encoded = j.juicer.encode(entity);
     entity.log(userId, encoded, AccessAction.update);
     updates[accessLogProperty] = j.juicer.encode(entity.accessLog);
-    await entity.reference.updateData(updates);
+    await entity.reference.updateData(UpdateData.fromMap(updates));
   }
 
   static const String accessLogProperty = "accessLog";

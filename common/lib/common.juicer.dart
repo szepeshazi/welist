@@ -171,7 +171,7 @@ class _$PublicProfileJuicer extends ClassMapper<jcr_i3.PublicProfile> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i3.PublicProfile val) =>
       juicer.removeNullValues({
-// reference is ignored
+// dynamicReference is ignored
         "displayName": val.displayName,
         "email": val.email,
 // collectionName is ignored
@@ -179,7 +179,7 @@ class _$PublicProfileJuicer extends ClassMapper<jcr_i3.PublicProfile> {
   @override
   jcr_i3.PublicProfile fromMap(
       Juicer juicer, Map map, jcr_i3.PublicProfile empty) {
-// reference is ignored
+// dynamicReference is ignored
     if (map.containsKey("displayName")) empty.displayName = map["displayName"];
     if (map.containsKey("email")) empty.email = map["email"];
 // collectionName is ignored
@@ -194,14 +194,14 @@ class _$UserJuicer extends ClassMapper<jcr_i4.User> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i4.User val) =>
       juicer.removeNullValues({
-// reference is ignored
+// dynamicReference is ignored
         "displayName": val.displayName,
         "email": val.email,
 // collectionName is ignored
       });
   @override
   jcr_i4.User fromMap(Juicer juicer, Map map, jcr_i4.User empty) {
-// reference is ignored
+// dynamicReference is ignored
     if (map.containsKey("displayName")) empty.displayName = map["displayName"];
     if (map.containsKey("email")) empty.email = map["email"];
 // collectionName is ignored
@@ -216,7 +216,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i5.Invitation> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i5.Invitation val) =>
       juicer.removeNullValues({
-// reference is ignored
+// dynamicReference is ignored
         "senderUid": val.senderUid,
         "senderEmail": val.senderEmail,
         "senderName": val.senderName,
@@ -228,7 +228,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i5.Invitation> {
             : Map.fromIterable(val.payload.keys,
                 value: (k) => juicer.encode(val.payload[k])),
         "accessLog": juicer.encode(val.accessLog),
-        "recipientResponded": val.recipientRespondedTime,
+        "recipientRespondedTime": val.recipientRespondedTime,
         "recipientAcceptedTime": val.recipientAcceptedTime,
         "recipientRejectedTime": val.recipientRejectedTime,
 // collectionName is ignored
@@ -236,7 +236,7 @@ class _$InvitationJuicer extends ClassMapper<jcr_i5.Invitation> {
       });
   @override
   jcr_i5.Invitation fromMap(Juicer juicer, Map map, jcr_i5.Invitation empty) {
-// reference is ignored
+// dynamicReference is ignored
     if (map.containsKey("senderUid")) empty.senderUid = map["senderUid"];
     if (map.containsKey("senderEmail")) empty.senderEmail = map["senderEmail"];
     if (map.containsKey("senderName")) empty.senderName = map["senderName"];
@@ -252,8 +252,8 @@ class _$InvitationJuicer extends ClassMapper<jcr_i5.Invitation> {
     if (map.containsKey("accessLog"))
       empty.accessLog =
           juicer.decode(map["accessLog"], (_) => jcr_i2.AccessLog());
-    if (map.containsKey("recipientResponded"))
-      empty.recipientRespondedTime = map["recipientResponded"];
+    if (map.containsKey("recipientRespondedTime"))
+      empty.recipientRespondedTime = map["recipientRespondedTime"]?.toInt();
     if (map.containsKey("recipientAcceptedTime"))
       empty.recipientAcceptedTime = map["recipientAcceptedTime"]?.toInt();
     if (map.containsKey("recipientRejectedTime"))
@@ -275,12 +275,14 @@ class _$AcceptInvitationRequestJuicer
           Juicer juicer, jcr_i6.AcceptInvitationRequest val) =>
       juicer.removeNullValues({
         "invitationId": val.invitationId,
+        "accept": val.accept,
       });
   @override
   jcr_i6.AcceptInvitationRequest fromMap(
       Juicer juicer, Map map, jcr_i6.AcceptInvitationRequest empty) {
     if (map.containsKey("invitationId"))
       empty.invitationId = map["invitationId"];
+    if (map.containsKey("accept")) empty.accept = map["accept"];
     return empty;
   }
 }
@@ -297,6 +299,7 @@ class _$AcceptInvitationResponseJuicer
       juicer.removeNullValues({
         "error": juicer.encode(val.error),
         "invitationId": val.invitationId,
+        "accepted": val.accepted,
       });
   @override
   jcr_i6.AcceptInvitationResponse fromMap(
@@ -305,6 +308,7 @@ class _$AcceptInvitationResponseJuicer
       empty.error = juicer.decode(map["error"], (_) => jcr_i1.ErrorResponse());
     if (map.containsKey("invitationId"))
       empty.invitationId = map["invitationId"];
+    if (map.containsKey("accepted")) empty.accepted = map["accepted"];
     return empty;
   }
 }
@@ -316,7 +320,7 @@ class _$ListItemJuicer extends ClassMapper<jcr_i7.ListItem> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i7.ListItem val) =>
       juicer.removeNullValues({
-// reference is ignored
+// dynamicReference is ignored
         "name": val.name,
         "timeCompleted": val.timeCompleted,
         "accessLog": juicer.encode(val.accessLog),
@@ -327,7 +331,7 @@ class _$ListItemJuicer extends ClassMapper<jcr_i7.ListItem> {
       });
   @override
   jcr_i7.ListItem fromMap(Juicer juicer, Map map, jcr_i7.ListItem empty) {
-// reference is ignored
+// dynamicReference is ignored
     if (map.containsKey("name")) empty.name = map["name"];
     if (map.containsKey("timeCompleted"))
       empty.timeCompleted = map["timeCompleted"]?.toInt();
@@ -349,7 +353,7 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i8.ListContainer> {
   @override
   Map<String, dynamic> toMap(Juicer juicer, jcr_i8.ListContainer val) =>
       juicer.removeNullValues({
-// reference is ignored
+// dynamicReference is ignored
         "name": val.name,
         "itemCount": val.itemCount,
         "typeName": val.typeName,
@@ -372,7 +376,7 @@ class _$ListContainerJuicer extends ClassMapper<jcr_i8.ListContainer> {
   @override
   jcr_i8.ListContainer fromMap(
       Juicer juicer, Map map, jcr_i8.ListContainer empty) {
-// reference is ignored
+// dynamicReference is ignored
     if (map.containsKey("name")) empty.name = map["name"];
     if (map.containsKey("itemCount"))
       empty.itemCount = map["itemCount"]?.toInt();
