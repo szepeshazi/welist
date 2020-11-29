@@ -14,7 +14,7 @@ class SplashWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AnimationDirector director = AnimationDirector();
+    final director = AnimationDirector(3);
     StreamSubscription directorListener;
     directorListener = director.completed.listen((bool completed) {
       if (completed) {
@@ -29,25 +29,23 @@ class SplashWidget extends StatelessWidget {
               manualTrigger: true,
               animate: false,
               controller: director
-                  .register(AnimationPart(id: titlePart, dependsOn: imagePart, trigger: AnimationStatus.completed)),
+                  .register(AnimationConfig(id: titlePart, dependsOn: imagePart, trigger: AnimationEvent.complete)),
               child: Text("We List",
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headline4.copyWith(color: Colors.black))),
           ZoomIn(
               manualTrigger: true,
               animate: true,
-              controller: director.register(AnimationPart(id: imagePart, delay: Duration(milliseconds: 250))),
+              controller: director.register(AnimationConfig(id: imagePart, delay: Duration(milliseconds: 250))),
               child: Image(image: AssetImage('assets/images/checklist.jpg'))),
           JelloIn(
               manualTrigger: true,
               animate: false,
-              controller: director.register(
-                  AnimationPart(
-                      id: subtitlePart,
-                      dependsOn: titlePart,
-                      trigger: AnimationStatus.forward,
-                      delay: Duration(milliseconds: 250)),
-                  setupComplete: true),
+              controller: director.register(AnimationConfig(
+                  id: subtitlePart,
+                  dependsOn: titlePart,
+                  trigger: AnimationEvent.start,
+                  delay: Duration(milliseconds: 250))),
               child: Container(
                   margin: EdgeInsets.only(top: 20),
                   child: Text("Universal, shared lists for everyone",

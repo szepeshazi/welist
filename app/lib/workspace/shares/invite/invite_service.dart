@@ -28,6 +28,8 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
 
   void initialize() {
     // Listen to invitation changes that were either sent or received by current user
+
+    print("Checking invitations for _authService.user.email: ${_authService.user.email}");
     fs
         .collection(Invitation.collectionName)
         .notDeleted
@@ -81,7 +83,7 @@ abstract class _InviteService extends ServiceBase<Invitation> with Store {
   Future<void> send({ListContainer container, String recipientEmail, String subjectUid, String accessLevel}) async {
     Invitation invitation = Invitation()
       ..accessLog = AccessLog()
-      ..recipientEmail = recipientEmail
+      ..recipientEmail = recipientEmail.trim()
       ..senderUid = _authService.user.reference.id
       ..senderEmail = _authService.user.email
       ..senderName = _authService.user.displayName
